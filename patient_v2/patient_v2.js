@@ -103,6 +103,59 @@ function populateDeliverySection(patient) {
     };
 }
 
+// NEW FUNCTION to populate the detailed delivery history
+function populateDeliveryHistory(patient) {
+    const container = document.getElementById('delivery-history-section');
+    let fractions = [];
+    let totalFractions = 'N/A';
+
+    // Safely navigate the JSON structure to find fractions
+    if (patient.radiationOncologyData && 
+        patient.radiationOncologyData.treatmentDelivery && 
+        Array.isArray(patient.radiationOncologyData.treatmentDelivery.fractions)) {
+        fractions = patient.radiationOncologyData.treatmentDelivery.fractions;
+    }
+
+    // Get total fractions from the prescription or from the first fraction record
+    if (patient.treatmentPlan && patient.treatmentPlan.prescription && patient.treatmentPlan.prescription.numberOfFractions) {
+        totalFractions = patient.treatmentPlan.prescription.numberOfFractions;
+    } else if (fractions.length > 0 && fractions[0].totalFractions) {
+        totalFractions = fractions[0].totalFractions;
+    }
+
+    const deliveredCount = fractions.length;
+
+    let tableRows = fractions.length > 0 ? fractions.map(fx => `
+        <tr>
+            <td>${fx.fractionNumber}</td>
+            <td>${fx.date}</td>
+            <td>${fx.machine || 'N/A'}</td>
+            <td>${fx.igrtMatchQuality || 'N/A'}</td>
+            <td>${fx.therapistInitials || 'N/A'}</td>
+        </tr>
+    `).join('') : '<tr><td colspan="5">No fractions delivered yet.</td></tr>';
+
+    container.innerHTML = `
+        <h2>Treatment Delivery History</h2>
+        <div class="card-content">
+            <p><strong>Progress:</strong> ${deliveredCount} of ${totalFractions} fractions delivered.</p>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Fx #</th>
+                        <th>Date</th>
+                        <th>Machine</th>
+                        <th>IGRT Result</th>
+                        <th>Therapists</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
 function populateBillingSection(patient) {
     const container = document.getElementById('billing-section');
     const charges = patient.cptCharges || [];
