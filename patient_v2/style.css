@@ -1,0 +1,178 @@
+/* === Base Styles & Header (Keep existing) === */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f6; /* Slightly lighter grey */
+    color: #333;
+}
+
+.header-container {
+    background-color: #5a1e2f;
+    color: white;
+    padding: 15px 0; /* Reduced padding */
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ... (Keep .header-container::before and header h1 styles) ... */
+
+.back-link {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 1em;
+}
+.back-link:hover { color: white; }
+
+/* === DASHBOARD GRID LAYOUT === */
+.chart-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1.5fr; /* Ratios for Left, Middle, Right columns */
+    gap: 25px;
+    max-width: 1600px;
+    margin: 25px auto;
+    padding: 0 25px;
+    align-items: start; /* Align items to the top */
+}
+
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* === CARD STYLES === */
+.detail-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.detail-card h2 {
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.card-content, .delivery-container, .billing-container {
+    padding: 20px;
+}
+
+.detail-card p {
+    margin-bottom: 12px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+.detail-card p strong {
+    color: #555;
+    margin-right: 5px;
+}
+
+/* Style for lists like alerts */
+.card-content ul { margin: 0; padding-left: 25px; }
+.card-content li { margin-bottom: 5px; color: #d9534f; font-weight: 600; }
+
+/* === MIDDLE COLUMN: Action Cards (Delivery & Billing) === */
+.action-card .delivery-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.action-card .delivery-header h2 {
+    padding: 0; background: none; border: none; font-size: 1.2rem;
+}
+
+.form-group label { font-size: 0.9rem; }
+.form-group input, .form-group textarea { font-size: 0.95rem; }
+.action-button { width: 100%; padding: 12px; font-size: 1rem; }
+
+/* CPT Table */
+#cpt-table-container table { font-size: 0.9rem; }
+#cpt-table-container th, #cpt-table-container td { padding: 10px; }
+
+/* === RIGHT COLUMN: Imaging Card === */
+.imaging-card .imaging-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 550px; /* Fixed height for the imaging section */
+}
+
+.imaging-card .imaging-views {
+    flex: 3;
+    background-color: #000;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid #ddd;
+}
+
+.imaging-card .image-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+.imaging-card .base-image, .imaging-card .overlay-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.imaging-card .imaging-controls {
+    flex: 2;
+    padding: 15px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+.imaging-controls .control-group label { margin-bottom: 5px; }
+.couch-controls { margin-bottom: 5px; }
+.control-btn { font-size: 1.2rem; padding: 2px 8px; }
+.axis-input { padding: 4px; font-size: 0.9rem; }
+.action-buttons .control-btn-action { padding: 10px; font-size: 0.95rem;}
+
+/* === RIGHT COLUMN: History Table === */
+.tables-card .records-header, .tables-card .records-row {
+    grid-template-columns: 40px 90px 1fr; /* Adjust column widths */
+    font-size: 0.9rem;
+    padding: 8px 12px;
+}
+
+/* === Responsive for smaller screens === */
+@media (max-width: 1200px) {
+    .chart-dashboard {
+        grid-template-columns: 1fr 1fr; /* 2 columns */
+    }
+    .right-panel {
+        grid-column: 1 / -1; /* Imaging takes full width at bottom */
+    }
+    .imaging-card .imaging-content-wrapper {
+        flex-direction: row; /* Side-by-side on wider screens */
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-dashboard {
+        grid-template-columns: 1fr; /* 1 column stack */
+    }
+    .imaging-card .imaging-content-wrapper {
+        flex-direction: column;
+        height: auto;
+    }
+    .imaging-card .imaging-views { height: 350px; }
+}
