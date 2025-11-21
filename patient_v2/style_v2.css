@@ -1,0 +1,203 @@
+/* === Base Styles & Header === */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f6; /* Slightly lighter grey background */
+    color: #333;
+}
+
+.header-container {
+    background-color: #5a1e2f; /* Dark red header */
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.header-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.05) 75%, transparent 75%, transparent);
+    background-size: 40px 40px;
+    opacity: 0.3;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    position: relative;
+    z-index: 1;
+}
+
+/* === Schedule Table Styles (index_v2.html) === */
+.schedule-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.schedule-table {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 1200px;
+}
+
+.table-header, .table-row {
+    display: grid;
+    grid-template-columns: 100px 1.5fr 1fr 1fr 2fr 1fr;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.table-header {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.table-row:hover { background-color: #f1f1f1; }
+.patient-name a { color: #dc3545; text-decoration: none; font-weight: bold; }
+.patient-name a:hover { text-decoration: underline; }
+
+/* === Patient Dashboard Styles (patient_v2.html) === */
+
+.back-link {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 1em;
+}
+.back-link:hover { color: white; }
+
+/* DASHBOARD GRID LAYOUT */
+.chart-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1.5fr; /* Ratios for Left, Middle, Right columns */
+    gap: 25px;
+    max-width: 1600px;
+    margin: 25px auto;
+    padding: 0 25px;
+    align-items: start;
+}
+
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* CARD STYLES */
+.detail-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.detail-card h2, .delivery-header h2 {
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.card-content, .delivery-container, .billing-container { padding: 20px; }
+
+.detail-card p {
+    margin-bottom: 12px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+.detail-card p strong { color: #555; margin-right: 5px; }
+.card-content ul { margin: 0; padding-left: 25px; }
+.card-content li { margin-bottom: 5px; color: #d9534f; font-weight: 600; }
+
+/* Action Cards (Middle Column) */
+.delivery-header {
+    background: none;
+    padding: 0 0 15px 0;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.delivery-header h2 { background: none; border: none; padding: 0; font-size: 1.2rem;}
+#fraction-counter { font-weight: bold; color: #555; }
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+.form-group input, .form-group textarea {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; box-sizing: border-box;
+}
+
+.action-button {
+    width: 100%; padding: 12px; font-size: 1rem; font-weight: bold;
+    color: white; background-color: #28a745; border: none; border-radius: 5px; cursor: pointer;
+}
+.action-button:hover { background-color: #218838; }
+.confirmation-message { color: #28a745; font-weight: bold; margin-top: 10px; display: none; }
+
+/* CPT Table */
+#cpt-table-container table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9rem; }
+#cpt-table-container th, #cpt-table-container td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+#cpt-table-container th { background-color: #e9ecef; }
+
+/* Imaging Card (Right Column) */
+.imaging-card .imaging-content-wrapper { display: flex; flex-direction: column; height: 550px; }
+.imaging-card .imaging-views {
+    flex: 3; background-color: #000; position: relative; overflow: hidden; border-bottom: 1px solid #ddd;
+}
+.imaging-card .image-viewer { width: 100%; height: 100%; }
+.imaging-card .base-image, .imaging-card .overlay-image {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;
+}
+.imaging-card .overlay-image { opacity: 0.5; cursor: grab; }
+.imaging-card .overlay-image:active { cursor: grabbing; }
+
+.imaging-card .imaging-controls {
+    flex: 2; padding: 15px; background-color: #f9f9f9; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;
+}
+.imaging-controls .control-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+.control-slider { width: 100%; }
+.couch-controls { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+.couch-controls span { font-weight: bold; width: 40px; }
+.control-btn { font-size: 1.2rem; padding: 2px 8px; cursor: pointer; }
+.axis-input { width: 50px; text-align: center; padding: 4px; font-size: 0.9rem; }
+.action-buttons { display: flex; gap: 10px; margin-top: auto; }
+.action-buttons .control-btn-action { flex-grow: 1; padding: 10px; font-size: 0.95rem; cursor: pointer; border-radius: 4px; border: 1px solid #555;}
+#reset-shifts { background-color: #ffc107; border-color: #e0a800; }
+#apply-shifts { background-color: #28a745; color: white; border-color: #218838; }
+
+/* History Table */
+.records-table { display: grid; grid-template-columns: 1fr; font-size: 0.9rem; }
+.records-header, .records-row {
+    display: grid; grid-template-columns: 40px 90px 1fr; gap: 10px; padding: 8px 12px; border-bottom: 1px solid #eee;
+}
+.records-header { font-weight: bold; background-color: #f9f9f9; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .chart-dashboard { grid-template-columns: 1fr 1fr; }
+    .right-panel { grid-column: 1 / -1; }
+    .imaging-card .imaging-content-wrapper { flex-direction: row; height: 400px; }
+}
+@media (max-width: 768px) {
+    .chart-dashboard { grid-template-columns: 1fr; }
+    .imaging-card .imaging-content-wrapper { flex-direction: column; height: auto; }
+    .imaging-card .imaging-views { height: 350px; }
+}
