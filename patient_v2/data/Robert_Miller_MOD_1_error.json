@@ -1,0 +1,44 @@
+{
+  "patientId": "99112",
+  "demographics": {
+    "name": "Robert Miller",
+    "dob": "1955-03-15"
+  },
+  "treatmentPlan": {
+    "radOnc": "Dr. Emily Valerius",
+    "treatmentSite": "Thorax - Right Upper Lobe",
+    "prescription": {
+      "dosePerFraction_cGy": 1800,
+      "numberOfFractions": 3,
+      "totalDose_cGy": 5400
+    },
+    "therapistAlerts": [
+      "SBRT protocol: 4D-CT required.",
+      "Abdominal compression device must be used."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "SBRT Arc 1",
+        "technique": "SBRT",
+        "energy_MV": 10,
+        "monitorUnits": 1250,
+        "gantryAngle": "200-160",
+        "collimatorAngle": 20,
+        "jawPositions_cm": { "X1": -3.0, "X2": 3.0, "Y1": -4.0, "Y2": 4.0 }
+      },
+      {
+        "fieldName": "SBRT Arc 2",
+        "technique": "SBRT",
+        "energy_MV": 10,
+        "monitorUnits": 1310,
+        "gantryAngle": 160,
+        "collimatorAngle": 340,
+        "jawPositions_cm": { "X1": -3.0, "X2": 3.0, "Y1": -4.0, "Y2": 4.0 }
+      }
+    ]
+  },
+  "treatmentDelivery": {
+    "totalFractionsDelivered": 2,
+    "lastTreatmentDate": "2025-02-18"
+  }
+}

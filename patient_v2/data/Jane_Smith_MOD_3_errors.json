@@ -1,0 +1,44 @@
+{
+  "patientId": "SVCS-002",
+  "demographics": {
+    "name": "Jane Smith",
+    "dob": "1975-03-20"
+  },
+  "treatmentPlan": {
+    "radOnc": "Dr. Laura Brown",
+    "treatmentSite": "Mediastinum",
+    "prescription": {
+      "dosePerFraction_cGy": 3000,
+      "numberOfFractions": 10,
+      "totalDose_cGy": 3000
+    },
+    "therapistAlerts": [
+      "STAT treatment for SVCS.",
+      "Patient is wheelchair-bound."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "ANT",
+        "technique": "3D-CRT",
+        "energy_MV": 6,
+        "monitorUnits": 210,
+        "gantryAngle": 0,
+        "collimatorAngle": 0,
+        "jawPositions_cm": { "X1": -9.0, "X2": 9.0, "Y1": 11.0, "Y2": -11.0 }
+      },
+      {
+        "fieldName": "POST",
+        "technique": "3D-CRT",
+        "energy_MV": 6,
+        "monitorUnits": 225,
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "jawPositions_cm": { "X1": -9.0, "X2": 9.0, "Y1": -11.0, "Y2": 11.0 }
+      }
+    ]
+  },
+  "treatmentDelivery": {
+    "totalFractionsDelivered": 1,
+    "lastTreatmentDate": "2025-04-13"
+  }
+}

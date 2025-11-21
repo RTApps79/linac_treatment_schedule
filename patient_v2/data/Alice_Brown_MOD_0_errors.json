@@ -1,0 +1,48 @@
+{
+  "patientId": "22334",
+  "demographics": {
+    "name": "Alice Brown",
+    "dob": "1960-04-12"
+  },
+  "treatmentPlan": {
+    "radOnc": "Dr. Charles Davis",
+    "treatmentSite": "Right Proximal Femur",
+    "prescription": {
+      "dosePerFraction_cGy": 400,
+      "numberOfFractions": 5,
+      "totalDose_cGy": 2000
+    },
+    "therapistAlerts": [
+      "Patient has protected weight-bearing status on right leg.",
+      "High pain level; assist patient with setup."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "AP",
+        "technique": "3D-CRT",
+        "energy_MV": 6,
+        "monitorUnits": 185,
+        "gantryAngle": 0,
+        "collimatorAngle": 0,
+        "jawPositions_cm": { "X1": -7.0, "X2": 7.0, "Y1": -12.0, "Y2": 12.0 }
+      },
+      {
+        "fieldName": "PA",
+        "technique": "3D-CRT",
+        "energy_MV": 6,
+        "monitorUnits": 192,
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "jawPositions_cm": { "X1": -7.0, "X2": 7.0, "Y1": -12.0, "Y2": 12.0 }
+      }
+    ]
+  },
+  "treatmentDelivery": {
+    "totalFractionsDelivered": 2,
+    "lastTreatmentDate": "2025-04-03"
+  },
+ "imagingData": {
+    "drrImage": "drr_femur.png",
+    "kvImage": "kv_femur.png"
+  }
+}

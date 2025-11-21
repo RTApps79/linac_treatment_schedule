@@ -1,0 +1,44 @@
+{
+  "patientId": "88991",
+  "demographics": {
+    "name": "George Harris",
+    "dob": "1958-10-05"
+  },
+  "treatmentPlan": {
+    "radOnc": "Dr. Charles Davis",
+    "treatmentSite": "Skeletal - L3 Spine",
+    "prescription": {
+      "dosePerFraction_cGy": 300,
+      "numberOfFractions": 10,
+      "totalDose_cGy": 3000
+    },
+    "therapistAlerts": [
+      "Pain medication administered prior to treatment.",
+      "Verify patient is supine, NOT prone."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "AP Spine",
+        "technique": "3D-CRT",
+        "energy_MV": 10,
+        "monitorUnits": 150,
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "jawPositions_cm": { "X1": -4.0, "X2": 4.0, "Y1": -8.0, "Y2": 8.0 }
+      },
+      {
+        "fieldName": "PA Spine",
+        "technique": "3D-CRT",
+        "energy_MV": 10,
+        "monitorUnits": 165,
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "jawPositions_cm": { "X1": -4.0, "X2": 4.0, "Y1": -8.0, "Y2": 8.0 }
+      }
+    ]
+  },
+  "treatmentDelivery": {
+    "totalFractionsDelivered": 9,
+    "lastTreatmentDate": "2025-04-12"
+  }
+}

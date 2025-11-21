@@ -1,0 +1,44 @@
+{
+  "patientId": "33445",
+  "demographics": {
+    "name": "Linda Jones",
+    "dob": "1962-08-25"
+  },
+  "treatmentPlan": {
+    "radOnc": "Dr. Paul Allen",
+    "treatmentSite": "Thorax/Hilum",
+    "prescription": {
+      "dosePerFraction_cGy": 200,
+      "numberOfFractions": 33,
+      "totalDose_cGy": 6600
+    },
+    "therapistAlerts": [
+      "Patient receiving concurrent chemotherapy.",
+      "Weekly port films required."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "Arc 1 (CW)",
+        "technique": "VMAT",
+        "energy_MV": 6,
+        "monitorUnits": 450,
+        "gantryAngle": "180-179",
+        "collimatorAngle": 45,
+        "jawPositions_cm": { "X1": -10.0, "X2": 10.0, "Y1": -15.0, "Y2": 15.0 }
+      },
+      {
+        "fieldName": "Arc 2 (CCW)",
+        "technique": "VMAT",
+        "energy_MV": 6,
+        "monitorUnits": 440,
+        "gantryAngle": "179-180",
+        "collimatorAngle": 315,
+        "jawPositions_cm": { "X1": -10.0, "X2": 10.0, "Y1": -15.0, "Y2": 15.0 }
+      }
+    ]
+  },
+  "treatmentDelivery": {
+    "totalFractionsDelivered": 14,
+    "lastTreatmentDate": "2025-03-25"
+  }
+}
