@@ -152,6 +152,25 @@ header h1 {
 .action-button:hover { background-color: #218838; }
 .confirmation-message { color: #28a745; font-weight: bold; margin-top: 10px; display: none; }
 
+/* NEW STYLES FOR DELIVERY HISTORY TABLE */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.history-table th, .history-table td {
+    border: 1px solid #e0e0e0;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.history-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #444;
+}
+
 /* CPT Table */
 #cpt-table-container table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9rem; }
 #cpt-table-container th, #cpt-table-container td { border: 1px solid #ddd; padding: 10px; text-align: left; }
