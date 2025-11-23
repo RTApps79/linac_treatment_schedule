@@ -1,5 +1,5 @@
 {
-  "patientId": "22334",
+  "patientId": "ABM22334",
   "demographics": {
     "name": "Alice Brown",
     "dob": "1960-04-12",
@@ -14,330 +14,123 @@
     "mobility": "Ambulatory with significant worsening right hip/thigh pain. Requires walker for ambulation due to pain and fracture risk. ECOG Performance Status 2. KPS 70. Difficulty bearing full weight on right leg. Protected weight-bearing status advised by Ortho Onc."
   },
   "diagnosis": {
-    "primary": "Metastatic Breast Cancer (ER/PR+, HER2-)",
-    "location": "Right Proximal Femur (lytic lesion involving femoral neck/subtrochanteric region)",
-    "datePathologicDiagnosis": "01/10/2025 (on PET/CT, biopsy of femur not performed due to high fracture risk, diagnosis confirmed via prior breast primary)",
-    "tumorSize": "5.5 cm (largest dimension of lesion in femur on CT/X-ray)",
-    "grade": "Prior Breast Primary: Invasive Ductal Carcinoma, Nottingham Grade 2 (initial diagnosis 2018)",
-    "pathologicStage": "Stage IV (metastatic at initial presentation of bone mets in 2025)",
-    "symptomsAtPresentation": "Worsening right hip/thigh pain (7/10 at rest, 9/10 with weight bearing), difficulty bearing weight, antalgic gait (limping). Pain is dull, constant, with sharp episodic worsening. No associated swelling or numbness.",
+    "primary": "Metastatic Breast Cancer (Invasive Ductal Carcinoma, ER+/PR+/HER2-)",
+    "location": "Right Proximal Femur (Lytic lesion involving femoral neck and intertrochanteric region)",
+    "datePathologicDiagnosis": "Primary Breast Cancer: 2018. Bone Metastasis Confirmation: 03/20/2025 (MRI and PET/CT findings consistent with metastasis, biopsy deferred given history).",
+    "tnmStage": "TX N1 M1 (Osseous metastasis to right femur) - Stage IV",
+    "overallStage": "Stage IV",
+    "grade": "Grade 2 (Primary breast cancer grade).",
+    "tumorSize": "Lytic lesion in right femur approx. 4.5 cm in largest dimension, with associated cortical thinning.",
+    "vascularInvolvement": "Not applicable for bone metastasis. No neurovascular compromise of the extremity noted on exam.",
+    "pathologicStage": "Biopsy of bone lesion deferred. Staging based on clinical and radiographic evidence.",
+    "symptomsAtPresentation": "Progressive right hip and thigh pain for 6 weeks, worsening with weight-bearing. Pain level 7/10 at baseline, 9/10 with activity. Using walker. Pain disturbs sleep.",
     "pathologyFindings": [
-      "Prior Breast Primary Biopsy (2018): Invasive Ductal Carcinoma, Grade 2. ER+, PR+, HER2-.",
-      "No new biopsy of femoral lesion due to high fracture risk. Diagnosis assumed to be metastatic breast cancer based on imaging correlation and prior history."
+      "Primary Breast Cancer (2018): Invasive Ductal Carcinoma, Grade 2. ER positive (90%), PR positive (70%), HER2 negative (IHC 1+).",
+      "Bone Metastasis (03/2025): Radiographic appearance on MRI and PET/CT is characteristic of lytic metastatic disease. Consistent with patient's known breast cancer history."
     ],
-    "relevantHistory": "History of Stage IIB Breast Cancer, diagnosed 08/15/2018. Treated with Neoadjuvant Chemotherapy (AC-T), Lumpectomy, Axillary Dissection (1/12 nodes positive), Whole Breast Radiation Therapy, and ongoing Endocrine Therapy (Letrozole since 2019). No prior bone metastases. No history of smoking or heavy alcohol use. Patient is a retired teacher, active until recent pain onset. Comorbidities: Well-controlled Hypertension, Osteopenia.",
-    "baselineStatus": "ECOG 2 (due to pain). KPS 70. Significant right hip/thigh pain with ambulation, requiring walker. Bowel/bladder function normal. No new neurologic deficits from current lesion."
+    "relevantHistory": "Diagnosed with Stage IIB (T2 N1 M0) ER+/PR+/HER2- breast cancer in 2018. Treated with lumpectomy, adjuvant chemotherapy (AC-T), and adjuvant whole breast radiation. Has been on adjuvant endocrine therapy (Letrozole) since 2019. No other sites of metastasis currently identified.",
+    "baselineStatus": "ECOG 2 due to pain and mobility restrictions. KPS 70. Alert and oriented.",
+    "pftSummary": "Not indicated for this treatment site.",
+    "comorbidities": "Hypertension (controlled), Hyperlipidemia (controlled), Osteopenia."
   },
   "treatmentPlan": {
     "radOnc": "Dr. Michael Evans",
-    "orthoOnc": "Dr. Victoria Peterson (Orthopedic Oncology)",
-    "medOnc": "Dr. Karen Wells (Medical Oncology)",
-    "treatmentSite": "Right Proximal Femur (Metastatic Lesion)",
-    "intent": "Palliative (Pain control, prevention/stabilization of impending fracture, improvement of mobility).",
-    "modality": "External Beam Radiation Therapy (EBRT) - 3D-Conformal Radiation Therapy (3D-CRT)",
-    "totalDose": "20 Gy",
-    "fractionation": "5 fx",
-    "rtRxDetails": "20 Gy / 5 fx (4 Gy/fx daily), delivered 5 days per week (Monday-Friday) over 1 week.",
-    "targetVolumeSummary": "Planning Target Volume (PTV) encompassing the entire lytic lesion in the right proximal femur with a 5mm margin. This includes the cortical bone and marrow involvement. Designed to cover the tumor adequately while minimizing dose to surrounding soft tissue. Lumbar spine, bladder, and contralateral femur are outside the treatment field.",
-    "techniqueSummary": "3D-CRT utilizing opposed Anterior-Posterior (AP) and Posterior-Anterior (PA) fields. Fields shaped by MLCs to conform to target. Standard photon energy (6MV) used for appropriate depth dose. Daily kV imaging for setup verification.",
-    "concurrentChemo": "Endocrine Therapy (Letrozole)",
-    "detailedConcurrentChemo": "Continue ongoing Endocrine Therapy (Letrozole 2.5mg PO daily), managed by Medical Oncology. Last follow-up 03/10/2025. Patient to continue Letrozole indefinitely.",
+    "medOnc": "Dr. Karen Wells",
+    "surgOnc": "Dr. Sarah Chen (Orthopedic Oncology - consulted, recommended RT first due to fracture risk not being imminent but high)",
+    "treatmentSite": "Right Proximal Femur",
+    "intent": "Palliative - Goal is pain relief and bone stabilization to prevent pathologic fracture.",
+    "modality": "3D Conformal Radiation Therapy (3D-CRT)",
+    "rtRxDetails": "2000 cGy in 5 fractions (400 cGy/fx), delivered daily (Mon-Fri).",
+    "targetVolumeSummary": "Gross Tumor Volume (GTV) defined as the lytic lesion visible on CT/MRI. Clinical Target Volume (CTV) includes GTV plus the entire involved bony compartment (proximal femur, including femoral head/neck and intertrochanteric region) to account for microscopic disease. Planning Target Volume (PTV) is CTV + 0.7 cm margin for setup uncertainty.",
+    "techniqueSummary": "Opposed Anterior-Posterior (AP) and Posterior-Anterior (PA) fields utilizing 6MV photons. Field borders cover the entire PTV with adequate margins. Multileaf collimators (MLCs) used to shape fields and shield surrounding soft tissue. Plan normalized to deliver prescription dose to mid-depth.",
+    "concurrentChemo": "None (Endocrine therapy held during RT, to resume post-RT).",
+    "detailedConcurrentChemo": "N/A",
     "medications": [
-      "Oxycodone 5mg PO every 4-6 hours PRN severe pain (patient currently on 5mg PO every 8 hours scheduled + PRN for breakthrough pain).",
-      "Scheduled Pain Medication (e.g., Oxycodone ER 10mg PO BID) for baseline pain control.",
-      "Dexamethasone (considered if pain flare occurs, not started prophylactically).",
-      "Bisphosphonate (Zoledronic Acid 4mg IV every 4 weeks) or Denosumab (Xgeva 120mg SC every 4 weeks) for bone health and prevention of skeletal-related events (managed by Medical Oncology).",
-      "Calcium 1000mg + Vitamin D 800 IU daily (for bone health).",
-      "Protected weight-bearing status advised by Orthopedic Oncology (use walker, avoid full weight bearing on right leg)."
+      "Oxycodone 5mg PO q4-6h PRN severe pain (Currently taking 3-4 times daily).",
+      "Acetaminophen 500mg PO q6h scheduled.",
+      "Senna-S 2 tabs PO daily (for opioid-induced constipation).",
+      "Letrozole 2.5mg PO daily (Holding during RT course).",
+      "Lisinopril 10mg PO daily (for HTN).",
+      "Atorvastatin 20mg PO daily (for HLD)."
     ],
     "therapistAlerts": [
-      "Patient presents with significant right hip/thigh pain and high fracture risk. Assist with transfers to/from treatment couch using maximal caution and ensure comfortable positioning on immobilization device. Minimize setup time and patient manipulation.",
-      "Strictly enforce 'protected weight bearing' status (e.g., walker use, touch-down weight bearing only) as advised by Orthopedic Oncology. Reinforce this instruction to patient and family daily.",
-      "Assess pain levels daily using a numeric pain scale (0-10) and document. Communicate any changes to nursing/physician for medication adjustment, especially if pain worsens or new symptoms develop.",
-      "Ensure consistent and reproducible setup using Vac-Lok bag and external skin marks. Daily kV imaging is critical for accurate femoral targeting.",
-      "Monitor for any new or worsening mobility issues, limping, or inability to bear weight. Report immediately as this could indicate worsening fracture risk or neurologic changes."
+      "**PROTECTED WEIGHT BEARING** on Right Leg. Patient uses a walker. Verify understanding at each session.",
+      "Fall Risk - provide assistance for transfers on/off treatment couch.",
+      "Assess pain level and medication use daily. Report worsening pain to MD immediately.",
+      "Daily kV imaging required for setup verification (match to bony anatomy).",
+      "Ensure comfort on couch - may need knee sponge support under left leg."
+    ],
+    "planId": "ABM22334_FemurPal",
+    "treatmentFields": [
+      {
+        "fieldName": "AP Femur",
+        "technique": "3D-CRT",
+        "beamTypeDisplay": "STATIC (Static Photon)",
+        "energy_MV": 6,
+        "energyDisplay": "6X",
+        "monitorUnits": 155,
+        "splitMU": null,
+        "doseRate": 600,
+        "estimatedTime_min": 0.26,
+        "wedgeInfo": "None",
+        "bolusInfo": "None",
+        "gantryAngle": 0,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": {
+          "vertical": 24.5,
+          "longitudinal": 110.0,
+          "lateral": 100.0
+        },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": {
+          "X1": -5.0,
+          "X2": 5.0,
+          "Y1": -7.5,
+          "Y2": 7.5
+        },
+        "ssd_cm": 90.5
+      },
+      {
+        "fieldName": "PA Femur",
+        "technique": "3D-CRT",
+        "beamTypeDisplay": "STATIC (Static Photon)",
+        "energy_MV": 6,
+        "energyDisplay": "6X",
+        "monitorUnits": 160,
+        "splitMU": null,
+        "doseRate": 600,
+        "estimatedTime_min": 0.27,
+        "wedgeInfo": "None",
+        "bolusInfo": "None",
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": {
+          "vertical": 24.5,
+          "longitudinal": 110.0,
+          "lateral": 100.0
+        },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": {
+          "X1": -5.0,
+          "X2": 5.0,
+          "Y1": -7.5,
+          "Y2": 7.5
+        },
+        "ssd_cm": 89.0
+      }
     ]
   },
+  "imagingData": {
+    "drrImage": "drr_femur (1).jpg",
+    "kvImage": "kv_femur (1).png"
+  },
   "radiationOncologyData": {
-    "ctSimulation": {
-      "simulationDate": "03/28/2025",
-      "setupInstructions": "Supine in custom Vac-Lok bag (legs/pelvis) with legs in a custom ankle/foot immobilization device for rotational stability. Arms crossed over chest. Patient instructed to breathe normally. SSD setup (Source to Skin Distance).",
-      "immobilization": "Vac-Lok bag (custom molded for legs/pelvis), ankle/foot immobilization device (e.g., Alpha Cradle), knee sponge.",
-      "referenceMarks": "3-point tattoos for alignment (at right hip, right mid-thigh, and midline). Additional marks outlining field borders. Isocenter placed at center of lytic lesion in right proximal femur. Coordinates recorded and verified by RTs and physicist.",
-      "setupImages": [
-        { "type": "AP", "url": "https://placehold.co/250x200/EEE/31343C?text=AP+Setup+Photo_AB22334" },
-        { "type": "Lateral", "url": "https://placehold.co/250x200/EEE/31343C?text=Lateral+Setup+Photo_AB22334" }
-      ],
-      "scanner": "Philips Big Bore CT (for larger field of view and patient comfort)",
-      "sliceThickness": "3.0 mm (optimal for bone lesion contouring).",
-      "contrastUsed": "Non-contrast (Standard for palliative bone RT. Target delineation relies on fused diagnostic MRI and PET/CT). Oral contrast not used for this site.",
-      "ctNotes": "CT of right femur acquired for 3D-CRT planning. Scan range includes hip joint and mid-femur. Fused with diagnostic MRI Right Femur (03/20/2025) and PET/CT (01/10/2025) for accurate target delineation and cortical integrity assessment. Patient tolerated simulation well, remained still, and pain managed effectively with pre-medication."
-    },
-    "dosimetry": {
-      "planId": "ABM22334_FemurPal",
-      "planStatus": "Final - Approved by Dr. Michael Evans (03/30/2025)",
-      "rx": "20 Gy / 5 fx (4 Gy/fx daily)",
-      "technique": "3D-CRT (Opposed AP/PA fields)",
-      "energy": "6MV (photon energy)",
-      "numberOfFieldsOrArcs": 2,
-      "tps": "RayStation 10.0 (Treatment Planning System)",
-      "algorithm": "Monte Carlo (for accurate dose calculation in heterogeneous bone/soft tissue interfaces)",
-      "hetero": "Yes (Full heterogeneity correction applied)",
-      "norm": "Mid-depth (100% at mid-depth, ensuring adequate dose to entire bone lesion) - Prescription to deliver 20 Gy to 95% of PTV_FemurMet.",
-      "constraints": "Skin Max < 110% (achieved 105% at flash); Femoral Head Contralateral Max: < 5 Gy (achieved 0.5 Gy); Bladder Max: < 10 Gy (achieved 0.1 Gy); Rectum Max: < 10 Gy (achieved 0.1 Gy)",
-      "planNotes": "Palliative extremity RT for impending fracture of right proximal femur metastasis from breast cancer. Goal is pain relief and bone stabilization. Plan optimized for maximal dose homogeneity within target. Daily kV imaging for IGRT. Patient-specific QA performed and passed. Physician reviewed and approved for daily delivery. Patient adherence to protected weight bearing is critical for stability.",
-      "igrtProtocol": {
-        "frequency": "Daily",
-        "type": "kV Imaging (Orthogonal Pair - AP & Lateral)",
-        "alignment": "Primary match to bony anatomy of proximal femur and surrounding landmarks. Shifts approved by therapists within pre-set tolerance, physician approval for larger shifts.",
-        "tolerances": "Translational: +/- 3mm; Rotational: +/- 1 degree. Action taken for out-of-tolerance shifts (e.g., re-imaging, physician review)."
-      },
-      "qaChecks": [
-        { "date": "2025-03-30", "type": "Initial Chart Check", "by": "Physics Staff (JL)", "result": "Pass - Rx, volumes, constraints verified. Patient safety reviewed." },
-        { "date": "2025-03-30", "type": "Patient Specific QA (Output Check)", "by": "Medical Physicist (AK)", "result": "Pass (Output within 1.0%)." },
-        { "date": "2025-03-31", "type": "Dry Run Verification", "by": "Lead Therapist (SD)", "result": "Pass - Machine parameters, field sequencing, and couch movements verified on LINAC. Patient setup in immobilization confirmed." }
-      ],
-      "fieldDetails": [
-  {
-    "fieldName": "AP Femur",
-    "technique": "3D-CRT",
-    // --- NEW DISPLAY FIELDS ---
-    "beamTypeDisplay": "STATIC (Static Photon)",
-    "energy_MV": 6,
-    "energyDisplay": "6X",
-    "monitorUnits": 155,
-    // Example of a non-split field
-    "splitMU": null,
-    "doseRate": 600,
-    "estimatedTime_min": 0.26,
-    "wedgeInfo": "None",
-    "bolusInfo": "None",
-    // ---------------------------
-    "gantryAngle": 0,
-    "collimatorAngle": 0,
-    "couchAngle": 0,
-    // --- NEW GEOMETRY FIELDS ---
-    "couchCoordinates_cm": {
-        "vertical": 24.5,
-        "longitudinal": 110.0,
-        "lateral": 100.0
-    },
-    "pitchAngle": 0.0,
-    "rollAngle": 0.0,
-    // ---------------------------
-    "jawPositions_cm": { "X1": 5.0, "X2": 5.0, "Y1": 7.5, "Y2": 7.5 },
-    "ssd_cm": 90.5
-  },
-  {
-    "fieldName": "PA Femur",
-    "technique": "3D-CRT",
-    // --- NEW DISPLAY FIELDS ---
-    "beamTypeDisplay": "STATIC (Static Photon)",
-    "energy_MV": 6,
-    "energyDisplay": "6X",
-    "monitorUnits": 160,
-    "splitMU": null,
-    "doseRate": 600,
-    "estimatedTime_min": 0.27,
-    "wedgeInfo": "None",
-    "bolusInfo": "None",
-    // ---------------------------
-    "gantryAngle": 180,
-    "collimatorAngle": 0,
-    "couchAngle": 0,
-     // --- NEW GEOMETRY FIELDS ---
-    "couchCoordinates_cm": {
-        "vertical": 24.5,
-        "longitudinal": 110.0,
-        "lateral": 100.0
-    },
-    "pitchAngle": 0.0,
-    "rollAngle": 0.0,
-    // ---------------------------
-    "jawPositions_cm": { "X1": 5.0, "X2": 5.0, "Y1": 7.5, "Y2": 7.5 },
-    "ssd_cm": 89.0
-  }
-]
-    },
     "treatmentDelivery": {
-      "fractions": [
-        {
-          "fractionNumber": 1,
-          "totalFractions": 5,
-          "date": "2025-03-31",
-          "machine": "LINAC 2",
-          "therapistInitials": "SD, TW",
-          "overallMUs": 315,
-          "setupVerification": "Tolerances Met",
-          "immobilizationDevicesChecked": "Vac-Lok bag, ankle/foot immobilization",
-          "setupAdjustments": "None (initial setup highly accurate with tattoos/OSMS).",
-          "organTargetChecks": "Daily kV imaging for setup verification. Matched to bony anatomy of femur. Confirmed alignment of lesion.",
-          "imagingType": "kV Pair",
-          "igrtMatchQuality": "Excellent - No Shifts Required",
-          "shiftsApplied": "None",
-          "igrtApprovedBy": "ME (Physician)",
-          "igrtVerificationNotes": "First fraction delivered smoothly. Patient comfortable. Physician approved setup. Reviewed pain management. Patient states pain improved slightly with scheduled meds.",
-          "patientTolerance": "Good",
-          "generalSideEffects": "Mild fatigue from systemic therapy. No nausea.",
-          "siteSpecificSideEffects": "Right hip/thigh pain 5/10 (improved from 7/10 at consult). No skin changes.",
-          "painAssessment": "5/10.",
-          "patientConcerns": "None. Patient cooperative.",
-          "instructionsGiven": "Reinforced daily RT attendance, continued protected weight bearing, and importance of reporting any new symptoms or sudden pain increase. Encouraged light ambulation with walker.",
-          "billingCodes": "77402, 77387",
-          "dailyNotes": "Patient tolerated first treatment well. No acute issues. Setup time quick. Confirmed adherence to protected weight bearing. Pain management to be adjusted by Med Onc as needed.",
-          "recordedFields": [
-            { "fieldName": "AP Femur", "deliveredMu": 155, "notes": "SSD = 90.5 cm" },
-            { "fieldName": "PA Femur", "deliveredMu": 160, "notes": "SSD = 89.2 cm" }
-          ],
-          "energiesUsed": "6MV"
-        },
-        {
-          "fractionNumber": 3,
-          "totalFractions": 5,
-          "date": "2025-04-02",
-          "machine": "LINAC 2",
-          "therapistInitials": "JG, RS",
-          "overallMUs": 315,
-          "setupVerification": "Adjustments Made",
-          "immobilizationDevicesChecked": "Vac-Lok bag, ankle/foot immobilization",
-          "setupAdjustments": "V: 0.1cm, L: 0cm, S: -0.1cm shifts applied based on kV. Small roll adjustment corrected.",
-          "organTargetChecks": "Daily kV imaging reviewed, good alignment. Femoral lesion in field. No changes in bone alignment. Patient coping with pain.",
-          "imagingType": "kV Pair",
-          "igrtMatchQuality": "Good - Shifts Applied",
-          "shiftsApplied": "V: 0.1 cm, L: 0 cm, S: -0.1 cm",
-          "igrtApprovedBy": "ME (Physician)",
-          "igrtVerificationNotes": "Minor shifts applied to align to bony anatomy. Patient comfortable. Physician OTV today. Pain status reviewed. Patient reports diligence with pain meds.",
-          "patientTolerance": "Good",
-          "generalSideEffects": "Continued mild fatigue. No new systemic symptoms.",
-          "siteSpecificSideEffects": "Right hip/thigh pain 3-4/10 (improving). No skin reaction.",
-          "painAssessment": "3/10.",
-          "patientConcerns": "Asked about timeline for pain resolution. Inquired about resuming normal activities.",
-          "instructionsGiven": "Reassured pain continues to improve after RT completion. Advised gradual increase in activity, but strict adherence to protected weight bearing. Continue endocrine therapy.",
-          "billingCodes": "77402, 77387, 77427",
-          "dailyNotes": "OTV today. Patient reports good pain control. Pain improving. Continues to use walker. No issues with setup. Labs reviewed and stable.",
-          "recordedFields": [
-            { "fieldName": "AP Femur", "deliveredMu": 155, "notes": "SSD = 90.5 cm" },
-            { "fieldName": "PA Femur", "deliveredMu": 160, "notes": "SSD = 89.2 cm" }
-          ],
-          "energiesUsed": "6MV"
-        },
-        {
-          "fractionNumber": 5,
-          "totalFractions": 5,
-          "date": "2025-04-04",
-          "machine": "LINAC 2",
-          "therapistInitials": "SD, TW",
-          "overallMUs": 315,
-          "setupVerification": "Tolerances Met",
-          "immobilizationDevicesChecked": "Vac-Lok bag, ankle/foot immobilization",
-          "setupAdjustments": "None",
-          "organTargetChecks": "Final kV imaging. Excellent setup. Femoral lesion fully treated. Bone appears stable. No complications.",
-          "imagingType": "kV Pair",
-          "igrtMatchQuality": "Excellent - No Shifts Required",
-          "shiftsApplied": "None",
-          "igrtApprovedBy": "ME (Physician)",
-          "igrtVerificationNotes": "Final fraction delivered. Patient reports excellent pain relief. Physician approved. Plan completed.",
-          "patientTolerance": "Good",
-          "generalSideEffects": "Fatigue mild.",
-          "siteSpecificSideEffects": "Pain significantly improved (1/10). Minimal skin pinkness. No new neurological deficits.",
-          "painAssessment": "1/10.",
-          "patientConcerns": "Very pleased with pain relief. Asked about future mobility and long-term prognosis. Inquired about follow-up for systemic therapy.",
-          "instructionsGiven": "Reinforced continued protected weight bearing. Advised on gradual increase in activity. Provided contact info for urgent concerns. Scheduled post-RT follow-up with Dr. Evans, Med Onc, and Ortho Onc. Discussed goal of RT was pain relief and local control.",
-          "billingCodes": "77402, 77387, 77427",
-          "dailyNotes": "Completed 5/5 fx palliative RT to R femur. Patient very relieved. Provided completion certificate. Instructions on continued pain management and protected weight bearing emphasized. Patient to follow up with Med Onc for continued systemic therapy. Excellent pain response.",
-          "recordedFields": [
-            { "fieldName": "AP Femur", "deliveredMu": 155, "notes": "SSD = 90.5 cm" },
-            { "fieldName": "PA Femur", "deliveredMu": 160, "notes": "SSD = 89.2 cm" }
-          ],
-          "energiesUsed": "6MV"
-        }
-      ]
+      "fractions": []
     }
-  },
-  "imagingAndReports": [
-    {
-      "date": "01/10/2025",
-      "type": "PET/CT (Whole Body) Staging",
-      "summary": "New hypermetabolic lytic lesion R proximal femur (SUVmax 9.0). Stable small lung nodules. No other FDG-avid disease.",
-      "reportDetails": {
-        "accessionNumber": "PETCT-25-001",
-        "protocol": "FDG PET/CT, Whole Body (Skull Base to Mid-Thigh)",
-        "findings": "New intensely hypermetabolic lytic lesion in the right proximal femur (SUVmax 9.0), consistent with metastatic disease. Stable small (3mm) non-FDG avid lung nodules (likely benign). No other hypermetabolic lymph nodes or distant foci. No new liver lesions or ascites.",
-        "impression": "New right proximal femoral metastasis. Consistent with known breast cancer. No other sites of active metastatic disease. High risk for pathologic fracture. Bone biopsy not recommended due to risk.",
-        "signedBy": "Dr. N. NuclearMed, 01/11/2025"
-      }
-    },
-    {
-      "date": "03/20/2025",
-      "type": "MRI Right Femur w/ & w/o Contrast",
-      "summary": "Large enhancing lytic lesion replacing majority of R proximal femur (5.5cm). Cortical thinning noted. No definite soft tissue mass extending beyond bone. High fracture risk confirmed.",
-      "reportDetails": {
-        "accessionNumber": "MR25-99887",
-        "protocol": "MRI Right Femur with and without Gadolinium Contrast",
-        "findings": "Large enhancing lytic lesion involving the right proximal femoral neck and subtrochanteric region, measuring 5.5 cm in longest dimension. Significant cortical thinning noted, with some endosteal scalloping. Appears confined to bone, no definite soft tissue component extending beyond cortex. Surrounding marrow edema present. Mild bone marrow edema also noted in right acetabulum (likely reactive). No definitive pathologic fracture, but high risk for impending fracture. Correlates with area of maximal pain.",
-        "impression": "Right proximal femoral metastatic lesion, high risk for impending pathologic fracture. Consistent with known breast cancer. For palliative radiation planning and orthopedic oncology evaluation.",
-        "signedBy": "Dr. M. Radiologist, 03/21/2025"
-      }
-    },
-    {
-      "date": "03/26/2025",
-      "type": "Orthopedic Oncology Consult Note",
-      "summary": "Reviewed case/X-rays/MRI. Lytic R prox femur met, Mirels Score 9. High risk for pathologic fracture. Recommend palliative RT for pain/stabilization. Prophylactic fixation not recommended at this time unless pain persists/lesion progresses after RT. Advised strict protected weight bearing with walker (touch-down weight bearing only). Patient to follow up after RT for re-evaluation.",
-      "reportDetails": {
-        "consultDate": "03/26/2025",
-        "reasonForConsult": "Evaluation of right proximal femoral metastatic lesion with impending fracture risk.",
-        "historyOfPresentIllness": "65 yo female with known metastatic breast cancer. Worsening right hip/thigh pain, limiting ambulation. Mirels Score 9. Pain controlled with opioids.",
-        "examFindings": "Antalgic gait. Pain with axial loading and rotation of hip. No significant swelling. Neurovascular exam intact.",
-        "assessment": "Right proximal femoral metastasis from breast cancer with high risk of pathologic fracture. Mirels Score 9 indicates high risk. Non-operative management with RT for pain and stabilization is appropriate as initial step.",
-        "recommendations": "1. Proceed with palliative RT to right proximal femur. 2. Strict protected weight bearing on right lower extremity, touch-down weight bearing only, using walker. 3. Continue pain management. 4. Re-evaluate post-RT for pain response and potential prophylactic fixation if needed.",
-        "signedBy": "Dr. Victoria Peterson, 03/26/2025"
-      }
-    }
-  ],
-  "dicomImages": [
-    { "description": "Diagnostic PET/CT (01/10/2025)", "seriesType": "PT", "imageUrls": [], "ohifViewerUrl": "https://viewer.ohif.org/viewer/latest?studyUIDs=1.3.6.1.4.1.14519.5.2.1.7009.2403.334240655099307998634586483120" },
-    { "description": "CT Simulation Right Femur (03/28/2025)", "seriesType": "CT", "imageUrls": [ "https://raw.githubusercontent.com/cornerstonejs/cornerstone-wado-image-loader/master/examples/images/CT000000.dcm" ], "ohifViewerUrl": "https://viewer.ohif.org/viewer/latest?studyUIDs=1.3.6.1.4.1.5962.99.1.2968617883.1314880426.1493322302363.3.0" }
-  ],
-  "labResults": [
-    { "date": "03/10/2025", "test": "CBC - WBC", "value": "7.0", "units": "K/uL", "notes": "Pre-RT Baseline. All WNL.", "range": "4.0-11.0 K/uL" },
-    { "date": "03/10/2025", "test": "CBC - Hemoglobin", "value": "12.5", "units": "g/dL", "notes": "Pre-RT Baseline. Mild anemia from chronic disease.", "range": "12.0-15.0 g/dL" },
-    { "date": "03/10/2025", "test": "CBC - Platelet count", "value": "250", "units": "K/uL", "notes": "Pre-RT Baseline. All WNL.", "range": "150-450 K/uL" },
-    { "date": "03/10/2025", "test": "Vitamin D, 25-OH", "value": "25", "units": "ng/mL", "notes": "Insufficient. Supplementation recommended by Med Onc for bone health.", "range": "30-100 ng/mL" },
-    { "date": "04/04/2025", "test": "Calcium (Total)", "value": "10.2", "units": "mg/dL", "notes": "End of RT. Stable. Symptomatically no hypercalcemia.", "range": "8.6-10.3 mg/dL" }
-  ],
-  "progressNotes": [
-    { "date": "03/22/2025", "author": "Dr. Karen Wells (Medical Oncology)", "type": "Progress Note", "summary": "Patient with metastatic breast cancer on Letrozole presents with new worsening R hip/thigh pain. Recent PET showed new femoral met. Mirels score 9 on X-ray, high fracture risk. Started scheduled Oxycodone. Referred to Rad Onc for palliative RT consult and Ortho Onc for fracture risk assessment. Continue Letrozole. Plan for continued bone-modifying agent (Denosumab) next week. Advised strict protected weight bearing. Patient is coping, but pain is significant.", "patientTolerance": "Fair", "generalSideEffects": "Moderate fatigue, nausea controlled.", "siteSpecificSideEffects": "Severe right hip/thigh pain (7/10 at rest, 9/10 with weight bearing).", "painAssessment": "7/10.", "patientConcerns": "Concerned about fracture and mobility. Asked about prognosis.", "instructionsGiven": "Reviewed pain management. Emphasized protected weight bearing. Reassured about RT effectiveness for pain. Provided contact for urgent concerns." },
-    { "date": "03/26/2025", "author": "Dr. Victoria Peterson (Orthopedic Oncology)", "type": "Consult Note", "summary": "Reviewed case, X-rays, and MRI. Lytic lesion in R proximal femur, Mirels Score 9. High risk for pathologic fracture. No immediate surgical indication for prophylactic fixation unless pain persists or lesion progresses after RT. Advised strict protected weight bearing using walker (touch-down weight bearing only). Patient understands risks and benefits of radiation vs surgery. Agreeable to RT first. Follow up after RT for re-evaluation.", "patientTolerance": "Good", "generalSideEffects": "None.", "siteSpecificSideEffects": "Painful right hip/thigh.", "painAssessment": "4/10 (with current pain meds).", "patientConcerns": "Asked about long-term stability of bone and need for future surgery.", "instructionsGiven": "Advised RT for pain and some stabilization. Emphasized long-term follow-up." },
-    { "date": "03/27/2025", "author": "Dr. Michael Evans (Radiation Oncology)", "type": "Initial Consult", "summary": "Patient with painful R femoral metastasis, high fracture risk. Reviewed imaging, Ortho consult note. Discussed palliative RT options. Plan for 20 Gy / 5 fx (4 Gy/fx) via 3D-CRT AP/PA fields. Explained goals (pain relief, prevent fracture), procedure, and low risk of side effects (mild skin reaction, fatigue). Emphasized strict protected weight bearing and daily symptom reporting. Patient agrees. CT sim scheduled urgently. Pain controlled with Dexamethasone and Oxycodone.", "patientTolerance": "Good", "generalSideEffects": "Mild fatigue from systemic therapy. No nausea.", "siteSpecificSideEffects": "Right hip/thigh pain 4/10.", "painAssessment": "4/10.", "patientConcerns": "Concerned about speed of treatment and effectiveness. Asked about resuming normal activities.", "instructionsGiven": "Reassured on rapid pain relief from SBRT. Advised gradual increase in activity. Emphasized continued protected weight bearing." },
-    { "date": "04/04/2025", "author": "Dr. Michael Evans (Radiation Oncology)", "type": "OTV - End of Treatment (Fx 5/5)", "summary": "Completed 5/5 fx palliative RT to R femur. Patient tolerated well. Minimal skin pinkness. Pain significantly improved (1/10). No acute side effects. Provided completion certificate. Instructions on continued protected weight bearing. Patient to follow up with Med Onc / Ortho Onc. Excellent pain response achieved. Patient very pleased.", "patientTolerance": "Good", "generalSideEffects": "Mild fatigue.", "siteSpecificSideEffects": "Right hip/thigh pain 1/10. Mild skin pinkness.", "painAssessment": "1/10.", "patientConcerns": "Very pleased with pain relief. Asked about future mobility and long-term prognosis. Inquired about follow-up for systemic therapy.", "instructionsGiven": "Advised gradual return to activities, but strict adherence to protected weight bearing. Scheduled Med Onc and Ortho Onc follow-up. Encouraged continued follow-up for overall cancer management." }
-  ],
-  "patientEducation": {
-    "goalsDiscussed": "Palliative treatment to relieve pain in the right thigh/hip, prevent a bone fracture, and improve mobility. The goal is to strengthen the bone and reduce tumor growth in the treated area.",
-    "sideEffectsReviewed": "Low risk of acute side effects: mild fatigue and a mild skin reaction (like a sunburn) in the treated area. A temporary 'pain flare' (worsening of pain) is possible in the first few days of radiation, managed with medication. Very low risk of deep tissue damage to surrounding muscles or nerves with this technique. Long-term risks include potential for chronic pain or ongoing fracture risk.",
-    "safetyConsiderations": "Crucial importance of **strict adherence to 'protected weight bearing'** as instructed by the orthopedic doctor (using a walker or crutches, avoiding full weight on the treated leg) to prevent a pathologic fracture. Report any sudden increase in pain, new weakness, or inability to bear weight immediately. Maintaining good hydration and nutrition. Continue all systemic therapies as prescribed.",
-    "patientResponsibilities": "Attend all daily RT for one week. Report any sudden increase in pain or new symptoms immediately. Strictly adhere to protected weight-bearing restrictions. Continue pain medication and endocrine therapy as prescribed. Perform recommended physical therapy exercises if provided.",
-    "medicationCompliance": "Continue pain medication as needed and discuss tapering with primary oncology team as pain improves. Adhere to protected weight-bearing status. Continue ongoing endocrine therapy (Letrozole) as prescribed by Medical Oncology."
-  },
-  "scheduling": [
-    { "date": "03/25/2025", "time": "10:00 AM", "type": "X-Ray Right Femur", "location": "Radiology Department", "status": "Completed", "notes": "To assess Mirels score for fracture risk." },
-    { "date": "03/26/2025", "time": "1:00 PM", "type": "Orthopedic Oncology Consult (Peterson)", "location": "Orthopedic Clinic", "status": "Completed", "notes": "High risk for pathologic fracture (Mirels 9). Recommendation for RT first." },
-    { "date": "03/27/2025", "time": "10:00 AM", "type": "Rad Onc Consult (Evans)", "location": "Radiation Oncology Clinic - Exam Room 1", "status": "Completed", "notes": "Palliative RT plan discussed and approved." },
-    { "date": "03/28/2025", "time": "9:00 AM", "type": "CT Simulation Right Femur", "location": "Radiation Oncology Sim Suite", "status": "Completed", "notes": "For RT planning. Patient comfortable in immobilization." },
-    { "date": "03/31/2025", "time": "11:00 AM", "type": "First Radiation Treatment (Fx 1/5)", "location": "LINAC 2", "status": "Completed", "notes": "Treatment start date. Patient reports pain improved slightly with meds." },
-    { "date": "04/02/2025", "time": "11:30 AM (Post-RT)", "type": "On-Treatment Visit (OTV) - Week 1 (Fx 3)", "location": "Radiation Oncology Clinic - Nurse Station", "status": "Completed", "notes": "Mid-treatment review. Pain improving." },
-    { "date": "04/04/2025", "time": "11:00 AM", "type": "End of Treatment (Fx 5/5)", "location": "LINAC 2", "status": "Completed", "notes": "All palliative RT completed. Excellent pain relief." },
-    { "date": "04/15/2025", "time": "1:00 PM", "type": "Medical Oncology Follow-up (Wells)", "location": "Oncology Clinic", "status": "Scheduled", "notes": "Systemic therapy re-evaluation. Pain management review. Bone-modifying agent initiated." },
-    { "date": "05/01/2025", "time": "10:00 AM", "type": "Orthopedic Oncology Follow-up (Peterson)", "location": "Orthopedic Clinic", "status": "Scheduled", "notes": "Assess bone healing and stability post-RT. Review weight-bearing status." },
-    { "date": "07/01/2025", "time": "9:00 AM", "type": "Follow-up PET/CT Scan", "location": "Imaging Department", "status": "Scheduled", "notes": "Assess treatment response and screen for new mets." }
-  ],
-  "cptCharges": [
-    { "code": "77290", "description": "Simulation, Complex (Extremity for RT)", "frequency": "Once (03/28/2025)" },
-    { "code": "77334", "description": "Treatment device, Complex (Vac-Lok bag, immobilization)", "frequency": "Once (Initial Setup)" },
-    { "code": "77295", "description": "3D radiotherapy plan (for palliative extremity RT)", "frequency": "Once (Per plan)" },
-    { "code": "77402", "description": "Radiation treatment delivery, 2 fields (AP/PA)", "frequency": "Daily (5 fractions)" },
-    { "code": "77387", "description": "Image Guided RT (IGRT) - Daily kV imaging", "frequency": "Daily (5 fractions)" },
-    { "code": "77427", "description": "Radiation treatment management, 5 treatments", "frequency": "Once (for 5 fractions course)" },
-    { "code": "99214", "description": "Office or other outpatient visit, established patient", "frequency": "Weekly (2 visits during RT, as appropriate)" }
-  ],
-  "diagnosisSearch": "Metastatic Breast Cancer, Bone Metastasis, Femur"
+  }
 }
