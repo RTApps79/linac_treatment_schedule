@@ -25,28 +25,22 @@ const TOLERANCES = {
     mu: 2.0        // monitor units
 };
 
-// Mock MLC Data (fallback)
+// Mock MLC Data (fallback and specific shapes)
+// Coordinates are X positions in cm. Bank A is Left (negative), Bank B is Right (positive).
 const MOCK_MLC_DATA = {
-    'default': { BankA: Array(20).fill(15), BankB: Array(20).fill(15) },
-    // Static patterns for George Harris's fields
-    'AP Spine': { 
-        BankA: Array(20).fill(4), // 4cm from center left
-        BankB: Array(20).fill(4)  // 4cm from center right
+    // Default open field (leaves retracted)
+    'default': { 
+        BankA: Array(40).fill(-20), 
+        BankB: Array(40).fill(20) 
     },
-    'PA Spine': { 
-        BankA: Array(20).fill(4), 
-        BankB: Array(20).fill(4) 
-    },
-    // More complex shaped fields for other demos
-    'SBRT Arc 1': { 
-        BankA: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2], 
-        BankB: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2] 
-    },
-    'SBRT Arc 2': {
-        BankA: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6],
-        BankB: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6]
+    // Generic shape for static fields like Hip/Femur/Pelvis (based on provided image)
+    // Central leaves open wide, outer leaves closed in.
+    'Static_Shaped_Generic': {
+        BankA: [-2,-2,-2,-3,-4,-5,-6,-7,-8,-9,-10,-10,-10,-10,-10,-10,-10,-10,-9,-8,-7,-6,-5,-4,-3,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2],
+        BankB: [ 2, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
     }
 };
+
 
 // CPT Code Definitions mapping for display
 const CPT_MAP = {
@@ -609,64 +603,70 @@ function drawBEV(field, isAnimating = false, progress = 0) {
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     
-    // Y2 Label (Top)
-    if (y2_px > 10) {
-        ctx.textBaseline = 'bottom';
-        ctx.fillText("Y2", centerX, y2_px - 5);
-    }
-    // Y1 Label (Bottom)
-    if (y1_px < height - 10) {
-        ctx.textBaseline = 'top';
-        ctx.fillText("Y1", centerX, y1_px + 5);
-    }
-    // X1 Label (Left)
-    if (x1_px > 10) {
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        ctx.fillText("X1", x1_px - 5, centerY);
-    }
-    // X2 Label (Right)
-    if (x2_px < width - 10) {
-        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText("X2", x2_px + 5, centerY);
-    }
+    if (y2_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, y2_px - 5); }
+    if (y1_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, y1_px + 5); }
+    if (x1_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", x1_px - 5, centerY); }
+    if (x2_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", x2_px + 5, centerY); }
 
 
     // --- Draw MLC Leaves ---
-    // Use mock data based on field name, or default
-    const mlcData = MOCK_MLC_DATA[field.fieldName] || MOCK_MLC_DATA['default'];
-    const numLeaves = mlcData.BankA.length;
+    const isDynamicMLC = field.beamTypeDisplay && field.beamTypeDisplay.includes('DYNAMIC');
+    // Identify fields that require specific static shapes based on keywords
+    const isComplexStatic = ['Hip', 'Femur', 'Pelvis'].some(keyword => field.fieldName.includes(keyword));
+
+    let mlcData;
+    let numLeaves = 40; // Default number of leaves
     const leafHeightPx = 1.0 * scale;
     const totalMlcHeightPx = numLeaves * leafHeightPx;
-    // Calculate starting Y position to center the MLC bank vertically
     let currentY = centerY - (totalMlcHeightPx / 2);
 
+    // Determine MLC Data Source based on field type
+    if (isDynamicMLC) {
+        // Dynamic: Use default open leaves as base, will add noise later
+        mlcData = MOCK_MLC_DATA['default'];
+    } else if (isComplexStatic) {
+        // Complex Static: Use specific shaped data (e.g., for Hip/Femur)
+        mlcData = MOCK_MLC_DATA['Static_Shaped_Generic'];
+    } else {
+        // Simple Static: Will align with jaws, no mock data array needed
+        mlcData = null; 
+    }
+
     // Update MLC Mode display
-    const isDynamicMLC = field.beamTypeDisplay && field.beamTypeDisplay.includes('DYNAMIC');
     document.getElementById('mlc-mode-display').textContent = `MLC: ${isDynamicMLC ? 'Dynamic (IMRT/VMAT)' : 'Static'}`;
 
-
     ctx.fillStyle = 'rgba(90, 90, 90, 0.95)'; // Leaf color
-    for (let i = 0; i < numLeaves; i++) {
-        let posA_cm = mlcData.BankA[i];
-        let posB_cm = mlcData.BankB[i];
 
-        // --- IMRT Simulation: Add random noise to leaf positions during animation ---
-        if (isAnimating && !hasWedge && isDynamicMLC) {
-             // Add small random movement (+/- 0.4cm)
-             const noise = (Math.random() - 0.5) * 0.8; 
-             posA_cm = Math.max(0, posA_cm + noise);
-             posB_cm = Math.max(0, posB_cm + noise);
+    for (let i = 0; i < numLeaves; i++) {
+        let posA_cm, posB_cm; // X-coordinates in cm (neg=left, pos=right)
+
+        if (isDynamicMLC) {
+             // Base position + random noise during animation
+             posA_cm = mlcData.BankA[i];
+             posB_cm = mlcData.BankB[i];
+             if (isAnimating && !hasWedge) {
+                 const noise = (Math.random() - 0.5) * 0.8; 
+                 posA_cm += noise; posB_cm += noise;
+             }
+        } else if (isComplexStatic && mlcData) {
+             // Static Shape: Use predefined positions, NO animation noise
+             posA_cm = mlcData.BankA[i];
+             posB_cm = mlcData.BankB[i];
+        } else {
+             // Simple Static: Align exactly with X Jaws
+             posA_cm = jaws.X1;
+             posB_cm = jaws.X2;
         }
 
-        const posA_px = posA_cm * scale;
-        const posB_px = posB_cm * scale;
+        const posA_px = centerX + (posA_cm * scale); // Convert X-coord to pixels
+        const posB_px = centerX + (posB_cm * scale);
 
-        // Only draw if within open jaw area (simplified visibility check)
+        // Only draw if within open Y jaw area (simplified visibility check)
         if (currentY > y2_px && currentY < y1_px) {
-             // Draw Bank A Leaf (Left side) - draws from left edge up to position
-             ctx.fillRect(x1_px, currentY, centerX - posA_px - x1_px, leafHeightPx - 0.5);
-             // Draw Bank B Leaf (Right side) - draws from position to right edge
-             ctx.fillRect(centerX + posB_px, currentY, x2_px - (centerX + posB_px), leafHeightPx - 0.5);
+             // Draw Bank A Leaf (Left side) - from left edge to posA_px
+             ctx.fillRect(0, currentY, posA_px, leafHeightPx - 0.5);
+             // Draw Bank B Leaf (Right side) - from posB_px to right edge
+             ctx.fillRect(posB_px, currentY, width - posB_px, leafHeightPx - 0.5);
         }
         currentY += leafHeightPx;
     }
