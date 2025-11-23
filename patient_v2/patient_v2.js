@@ -1,144 +1,205 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Determine which patient file to load
-    // For this demo, we hardcode one file. In a real app, this would come from the URL or a selection screen.
-    const patientFile = 'Alice_Brown_SkeletalExtremity.json';
+    // 1. Get Patient File from URL
+    const params = new URLSearchParams(window.location.search);
+    const fileName = params.get('file');
 
-    // 2. Fetch and load the data
-    fetch(`data/${patientFile}`)
+    if (!fileName) {
+        console.error('No patient file specified in URL.');
+        document.getElementById('pt-name').textContent = 'Error: No File Found';
+        return;
+    }
+
+    // 2. Fetch Patient JSON Data
+    fetch(`data/${fileName}`)
         .then(response => {
-            if (!response.ok) throw new Error('Failed to load patient data');
+            if (!response.ok) throw new Error('Failed to fetch patient data.');
             return response.json();
         })
         .then(patientData => {
-            // 3. Initialize the interface with the loaded data
-            initializeInterface(patientData);
+            // 3. Initialize Console with Data
+            initializeTreatmentConsole(patientData);
         })
         .catch(error => {
             console.error(error);
-            document.getElementById('sidebar-patient-info').innerHTML = `<div style="color: red;">Error loading data.</div>`;
+            document.getElementById('pt-name').textContent = 'Error Loading Data';
         });
+
+    // 4. Wire up Bottom Ribbon Buttons
+    initializeBottomRibbon();
 });
 
-function initializeInterface(patient) {
-    // A. Populate Sidebar Patient Info
-    populatePatientInfo(patient);
 
-    // B. Populate Fields List & Set Active Field
-    const fields = patient.treatmentPlan.treatmentFields || [];
-    populateFieldsList(fields);
+function initializeTreatmentConsole(patient) {
+    // A. Populate Header & Patient Info Sidebar
+    document.getElementById('current-date').textContent = new Date().toLocaleString();
+    
+    const demo = patient.demographics || {};
+    document.getElementById('pt-name').textContent = demo.name || 'N/A';
+    document.getElementById('pt-id').textContent = patient.patientId || 'N/A';
+    document.getElementById('pt-dob').textContent = demo.dob || 'N/A';
+    
+    const plan = patient.treatmentPlan || {};
+    document.getElementById('pt-physician').textContent = plan.radOnc || 'N/A';
+    document.getElementById('plan-id-header').textContent = plan.planId || 'Plan ID';
 
-    // C. Initialize Tabs Functionality
-    initializeTabs();
+    // B. Populate Field List & Select First Field
+    const fields = plan.treatmentFields || [];
+    populateFieldList(fields);
 
-    // Update Date
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+    // C. Update Fraction Counter (Simulated logic based on delivery records)
+    let deliveredFx = 0;
+    if (patient.radiationOncologyData && patient.radiationOncologyData.treatmentDelivery) {
+         deliveredFx = (patient.radiationOncologyData.treatmentDelivery.fractions || []).length;
+    }
+    const totalFx = plan.prescription ? plan.prescription.numberOfFractions : '-';
+    // Showing next fraction to deliver
+    document.getElementById('fx-counter').textContent = deliveredFx + 1;
+    document.getElementById('fx-total').textContent = totalFx;
 }
 
-function populatePatientInfo(patient) {
-    const container = document.getElementById('sidebar-patient-info');
-    const demo = patient.demographics;
-    container.innerHTML = `
-        <p><span class="patient-label">ID</span> ${patient.patientId}</p>
-        <p><span class="patient-label">Name</span> <strong>${demo.name}</strong></p>
-        <p><span class="patient-label">DOB</span> ${demo.dob}</p>
-        <p><span class="patient-label">Rad Onc</span> ${patient.treatmentPlan.radOnc.split(' ').pop()}</p>
-    `;
-}
 
-function populateFieldsList(fields) {
-    const listContainer = document.getElementById('fields-list');
-    listContainer.innerHTML = ''; // Clear existing
+function populateFieldList(fields) {
+    const listContainer = document.getElementById('field-list-items');
+    listContainer.innerHTML = ''; // Clear current list
+
+    if (fields.length === 0) {
+        listContainer.innerHTML = '<li>No fields defined in plan.</li>';
+        return;
+    }
 
     fields.forEach((field, index) => {
-        const item = document.createElement('div');
-        // Make the first field active by default
-        item.className = `field-item ${index === 0 ? 'active-field' : ''}`;
-        item.innerHTML = `
-            <i class="fa-solid fa-tag"></i>
+        const li = document.createElement('li');
+        // First field is active by default
+        if (index === 0) li.classList.add('active');
+        
+        li.innerHTML = `
             <span>${field.fieldName}</span>
-            ${index === 0 ? `<span class="mu-display">0.0 / ${field.monitorUnits}</span>` : ''}
-            <i class="fa-solid fa-check check-icon"></i>
+            <span>0.0 / ${field.monitorUnits}</span>
         `;
 
-        // Add click handler to switch active field
-        item.addEventListener('click', () => {
-            document.querySelectorAll('.field-item').forEach(fi => {
-                fi.classList.remove('active-field');
-                const muDisplay = fi.querySelector('.mu-display');
-                if (muDisplay) muDisplay.remove();
-            });
-            item.classList.add('active-field');
-             // Add MU display to new active field
-             const muSpan = document.createElement('span');
-             muSpan.className = 'mu-display';
-             muSpan.textContent = `0.0 / ${field.monitorUnits}`;
-             item.insertBefore(muSpan, item.querySelector('.check-icon'));
-             
-            // Update parameter tabs with the newly selected field's data
-            updateParameters(field);
+        // Click handler to switch fields
+        li.addEventListener('click', () => {
+            // Remove active class from all items
+            listContainer.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+            // Add to clicked item
+            li.classList.add('active');
+            // Update parameter displays
+            updateFieldParameters(field);
         });
 
-        listContainer.appendChild(item);
+        listContainer.appendChild(li);
     });
 
-    // Initial parameter update for the first field
-    if (fields.length > 0) {
-        updateParameters(fields[0]);
-    }
+    // Trigger update for the first field initially
+    updateFieldParameters(fields[0]);
 }
 
-function updateParameters(field) {
-    // --- Update Beam Tab ---
-    document.getElementById('energy-plan').textContent = field.energy_MV + 'x';
-    // Simulate "Actual" matching "Plan"
-    document.getElementById('energy-actual').textContent = field.energy_MV + 'x';
+
+function updateFieldParameters(field) {
+    // Helper for formatting numbers and handling missing data
+    const formatVal = (val, fixed = 1) => (val !== undefined && val !== null) ? Number(val).toFixed(fixed) : '-';
+    const formatText = (val) => (val !== undefined && val !== null) ? val : '-';
+
+    // --- 1. Update BEAM Parameters (Red Container) ---
     
-    document.getElementById('mu-plan').textContent = field.monitorUnits;
-    // Reset actual MU and progress bar for the new field
-    document.getElementById('mu-actual').textContent = '0.0';
-    document.querySelector('.mu-progress-fill').style.width = '0%';
+    // Beam Type & Energy
+    const beamType = formatText(field.beamTypeDisplay);
+    document.getElementById('beam-type-plan').textContent = beamType;
+    document.getElementById('beam-type-actual').textContent = beamType; // Simulated match
 
-    // --- Update Geometry Tab ---
-    // Helper to handle ranges (e.g., "180-0") vs single angles
-    const formatAngle = (angle) => angle.toString().includes('-') ? angle : parseFloat(angle).toFixed(1);
+    const energy = formatText(field.energyDisplay);
+    document.getElementById('energy-plan').textContent = energy;
+    document.getElementById('energy-actual').textContent = energy;
 
-    const gantry = formatAngle(field.gantryAngle);
+    // Monitor Units (Total and Split)
+    const totalMU = formatVal(field.monitorUnits, 1);
+    document.getElementById('mu-total-plan').textContent = totalMU;
+    
+    const muSplitContainer = document.getElementById('mu-split-actual');
+    if (field.splitMU) {
+        // If split MU data exists, show it
+        muSplitContainer.innerHTML = `
+            <div class="mu-val">MU 1<br>${formatVal(field.splitMU.mu1, 1)}</div>
+            <div class="mu-val">MU 2<br>${formatVal(field.splitMU.mu2, 1)}</div>
+        `;
+    } else {
+        // Otherwise, just show the total MU in the "Actual" slot
+        muSplitContainer.innerHTML = `<div class="mu-val">${totalMU}</div>`;
+    }
+
+    // Dose Rate & Time
+    const doseRate = formatVal(field.doseRate, 0);
+    document.getElementById('dose-rate-plan').textContent = doseRate;
+    document.getElementById('dose-rate-actual').textContent = doseRate;
+
+    const time = formatVal(field.estimatedTime_min, 2);
+    document.getElementById('time-plan').textContent = time;
+    // Simulate time counting up (just showing final time for now)
+    document.getElementById('time-actual').textContent = formatVal(0.00, 2); 
+
+    // Wedge & Bolus
+    const wedge = formatText(field.wedgeInfo);
+    document.getElementById('wedge-plan').textContent = wedge;
+    document.getElementById('wedge-actual').textContent = wedge;
+
+    const bolus = formatText(field.bolusInfo);
+    document.getElementById('bolus-plan').textContent = bolus;
+    document.getElementById('bolus-actual').textContent = bolus;
+
+
+    // --- 2. Update GEOMETRY Parameters (Yellow Container) ---
+
+    // Angles
+    const gantry = formatText(field.gantryAngle);
     document.getElementById('gantry-plan').textContent = gantry;
     document.getElementById('gantry-actual').textContent = gantry;
 
-    const coll = formatAngle(field.collimatorAngle);
+    const coll = formatVal(field.collimatorAngle, 1);
     document.getElementById('coll-plan').textContent = coll;
     document.getElementById('coll-actual').textContent = coll;
 
-    const couch = formatAngle(field.couchAngle);
-    document.getElementById('couch-rtn-plan').textContent = couch;
-    document.getElementById('couch-rtn-actual').textContent = couch;
+    const couchRtn = formatVal(field.couchAngle, 1);
+    document.getElementById('couch-rtn-plan').textContent = couchRtn;
+    document.getElementById('couch-rtn-actual').textContent = couchRtn;
 
     // Jaws
-    const jaws = field.jawPositions_cm;
-    document.getElementById('y1-plan').textContent = jaws.Y1.toFixed(1);
-    document.getElementById('y1-actual').textContent = jaws.Y1.toFixed(1);
-    document.getElementById('y2-plan').textContent = jaws.Y2.toFixed(1);
-    document.getElementById('y2-actual').textContent = jaws.Y2.toFixed(1);
-    document.getElementById('x1-plan').textContent = jaws.X1.toFixed(1);
-    document.getElementById('x1-actual').textContent = jaws.X1.toFixed(1);
-    document.getElementById('x2-plan').textContent = jaws.X2.toFixed(1);
-    document.getElementById('x2-actual').textContent = jaws.X2.toFixed(1);
+    const jaws = field.jawPositions_cm || {};
+    document.getElementById('y1-plan').textContent = formatVal(jaws.Y1);
+    document.getElementById('y1-actual').textContent = formatVal(jaws.Y1);
+    document.getElementById('y2-plan').textContent = formatVal(jaws.Y2);
+    document.getElementById('y2-actual').textContent = formatVal(jaws.Y2);
+    document.getElementById('x1-plan').textContent = formatVal(jaws.X1);
+    document.getElementById('x1-actual').textContent = formatVal(jaws.X1);
+    document.getElementById('x2-plan').textContent = formatVal(jaws.X2);
+    document.getElementById('x2-actual').textContent = formatVal(jaws.X2);
+
+    // Couch Coordinates
+    const couch = field.couchCoordinates_cm || {};
+    document.getElementById('couch-vrt-plan').textContent = formatVal(couch.vertical, 2);
+    document.getElementById('couch-vrt-actual').textContent = formatVal(couch.vertical, 2);
+    document.getElementById('couch-lng-plan').textContent = formatVal(couch.longitudinal, 2);
+    document.getElementById('couch-lng-actual').textContent = formatVal(couch.longitudinal, 2);
+    document.getElementById('couch-lat-plan').textContent = formatVal(couch.lateral, 2);
+    document.getElementById('couch-lat-actual').textContent = formatVal(couch.lateral, 2);
 }
 
-function initializeTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
 
-    tabBtns.forEach(btn => {
+function initializeBottomRibbon() {
+    // 1. Wire up "Close Patient" button
+    const closeBtn = document.getElementById('btn-close-patient');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            // Navigate back to the schedule index page
+            window.location.href = 'index_v2.html';
+        });
+    }
+
+    // 2. Wire up other buttons with placeholder actions
+    const wiredBtns = document.querySelectorAll('.wired-btn');
+    wiredBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Deactivate all
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabPanes.forEach(p => p.classList.remove('active'));
-
-            // Activate clicked
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.tab).classList.add('active');
+            const action = btn.dataset.action;
+            alert(`Action '${action}' triggered. Functionality not yet implemented.`);
         });
     });
 }
