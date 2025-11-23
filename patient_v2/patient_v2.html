@@ -3,86 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Record Dashboard</title>
+    <title>Treatment Console - Record and Verify mode</title>
     <link rel="stylesheet" href="style_v2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="header-container">
-        <header>
-            <a href="index_v2.html" class="back-link">&larr; Back to Schedule</a>
-            <h1 id="patient-name-header">Loading Chart...</h1>
-        </header>
-    </div>
-    
-    <main class="chart-dashboard">
-        <div class="dashboard-column left-panel">
-            <section id="demographics-section" class="detail-card"></section>
-            <section id="plan-summary-section" class="detail-card"></section>
-        </div>
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Treatment</h1>
+                <h2>Record and Verify mode</h2>
+            </div>
+            <div class="patient-info-box" id="sidebar-patient-info">
+                <div>Loading...</div>
+            </div>
+            
+            <div class="dose-details-header">Dose Details</div>
+            
+            <div class="fields-list-container" id="fields-list">
+                </div>
 
-        <div class="dashboard-column middle-panel">
-            <section id="delivery-section" class="detail-card action-card"></section>
-            <section id="delivery-history-section" class="detail-card"></section>
-            <section id="billing-section" class="detail-card action-card"></section>
-        </div>
+            <div class="setup-list-container">
+                 <div class="field-item setup-item">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>KV-KV Setup Pair</span>
+                    <i class="fa-solid fa-check check-icon"></i>
+                </div>
+            </div>
 
-        <div class="dashboard-column right-panel">
-            <section id="imaging-section" class="detail-card imaging-card">
-                <h2>Daily Imaging & Alignment</h2>
-                <div class="imaging-content-wrapper">
-                    <div class="imaging-views">
-                        <div class="image-viewer">
-                            <img alt="DRR Image" class="base-image" id="drr-image">
-                            <img alt="Overlay Image" class="overlay-image" id="kv-image-overlay">
+            <div class="sidebar-footer">
+                <button><i class="fa-solid fa-wrench"></i> Tools</button>
+                <button>Setup Notes</button>
+                <button>Close Patient</button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="top-banner">
+                <div class="user-info">
+                    <div>Primary User: <span>hup</span></div>
+                    <div id="current-date"></div>
+                </div>
+                <div class="patient-orientation">
+                    <div>PATIENT ORIENTATION</div>
+                    <div id="orientation-text">Head First, Supine</div>
+                </div>
+                <div class="privacy-shade">
+                    Privacy Shade <i class="fa-solid fa-caret-up"></i>
+                </div>
+                <div class="logo-area">
+                    <span style="font-variant: small-caps; font-size: 1.2em; letter-spacing: 2px;">VARİAN</span>
+                     <span style="font-size: 0.8em;">medical systems</span>
+                </div>
+            </div>
+
+            <div class="camera-view-container">
+                <div class="camera-placeholder">
+                    <i class="fa-solid fa-video"></i>
+                    <p>Live Gantry View Input</p>
+                </div>
+                <div class="overlay-text">To pause treatment, press Beam Off.</div>
+            </div>
+
+            <div class="status-flow-bar">
+                <div class="flow-step">Preview</div>
+                <div class="flow-arrow"></div>
+                <div class="flow-step">Prepare</div>
+                <div class="flow-arrow"></div>
+                <div class="flow-step active-step">Ready</div>
+                <div class="flow-arrow active-arrow"></div>
+                <div class="flow-step next-step">Beam On</div>
+                <div class="flow-arrow next-arrow"></div>
+                <div class="flow-step"><i class="fa-solid fa-radiation"></i> Record</div>
+            </div>
+
+            <div class="parameter-tabs-section">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="beam-tab">Beam</button>
+                    <button class="tab-btn" data-tab="geometry-tab">Geometry</button>
+                    <button class="tab-btn" data-tab="bev-tab">Beam's Eye View</button>
+                </div>
+
+                <div class="tab-content-container">
+                    <div id="beam-tab" class="tab-pane active">
+                        <div class="comparison-grid">
+                            <div class="grid-header"></div>
+                            <div class="grid-header">Plan</div>
+                            <div class="grid-header">Actual</div>
+
+                            <div class="grid-label">Beam Type</div>
+                            <div class="grid-value" id="beam-type-plan">STATIC</div>
+                            <div class="grid-value matched">STATIC</div>
+
+                            <div class="grid-label">Energy</div>
+                            <div class="grid-value" id="energy-plan">-</div>
+                            <div class="grid-value matched" id="energy-actual">-</div>
+
+                            <div class="grid-label mu-label">MU</div>
+                            <div class="mu-container">
+                                <div class="mu-value" id="mu-plan">-</div>
+                            </div>
+                             <div class="mu-container actual-mu-container">
+                                <div class="mu-progress-bar">
+                                    <div class="mu-progress-fill" style="width: 0%;"></div>
+                                </div>
+                                <div class="mu-value matched" id="mu-actual">0.0</div>
+                            </div>
+
+                            <div class="grid-label">Dose Rate</div>
+                            <div class="grid-value">600</div>
+                            <div class="grid-value matched">600</div>
+
+                             <div class="grid-label">Time</div>
+                            <div class="grid-value" id="time-plan">1.00</div>
+                            <div class="grid-value matched">...</div>
+
+                            <div class="grid-label">Bolus</div>
+                            <div class="grid-value">None</div>
+                            <div class="grid-value matched">None</div>
                         </div>
                     </div>
-                    <div class="imaging-controls">
-                        <div class="control-group">
-                            <label>Opacity/Fusion</label>
-                            <input type="range" min="0" max="100" value="50" class="control-slider" id="opacity-slider">
+
+                    <div id="geometry-tab" class="tab-pane">
+                         <div class="comparison-grid geometry-grid">
+                            <div class="grid-header"></div>
+                            <div class="grid-header">Plan</div>
+                            <div class="grid-header">Actual</div>
+
+                            <div class="grid-label">Gantry Rtn</div>
+                            <div class="grid-value" id="gantry-plan">-</div>
+                            <div class="grid-value matched" id="gantry-actual">-</div>
+
+                            <div class="grid-label">Coll Rtn</div>
+                            <div class="grid-value" id="coll-plan">-</div>
+                            <div class="grid-value matched" id="coll-actual">-</div>
+
+                            <div class="grid-label">Y1</div>
+                            <div class="grid-value" id="y1-plan">-</div>
+                            <div class="grid-value matched" id="y1-actual">-</div>
+                            
+                            <div class="grid-label">Y2</div>
+                            <div class="grid-value" id="y2-plan">-</div>
+                            <div class="grid-value matched" id="y2-actual">-</div>
+
+                            <div class="grid-label">X1</div>
+                            <div class="grid-value" id="x1-plan">-</div>
+                            <div class="grid-value matched" id="x1-actual">-</div>
+
+                            <div class="grid-label">X2</div>
+                            <div class="grid-value" id="x2-plan">-</div>
+                            <div class="grid-value matched" id="x2-actual">-</div>
+
+                            <div class="spacer-row"></div> <div class="spacer-row"></div> <div class="spacer-row"></div>
+
+                            <div class="grid-label">Couch Vrt</div>
+                            <div class="grid-value">100.0</div>
+                            <div class="grid-value matched">100.0</div>
+
+                            <div class="grid-label">Couch Lng</div>
+                            <div class="grid-value">100.0</div>
+                            <div class="grid-value matched">100.0</div>
+
+                             <div class="grid-label">Couch Lat</div>
+                            <div class="grid-value">0.0</div>
+                            <div class="grid-value matched">0.0</div>
+
+                            <div class="grid-label">Couch Rtn</div>
+                            <div class="grid-value" id="couch-rtn-plan">0.0</div>
+                            <div class="grid-value matched" id="couch-rtn-actual">0.0</div>
                         </div>
-                        <div class="control-group">
-                            <label>Couch Shifts (cm)</label>
-                            <div class="couch-controls">
-                                <span>VRT</span>
-                                <button class="control-btn" data-axis="y" data-dir="-1">&uarr;</button>
-                                <input type="text" class="axis-input" id="y-axis" value="0.0" readonly>
-                                <button class="control-btn" data-axis="y" data-dir="1">&darr;</button>
-                            </div>
-                            <div class="couch-controls">
-                                <span>LAT</span>
-                                <button class="control-btn" data-axis="x" data-dir="-1">&larr;</button>
-                                <input type="text" class="axis-input" id="x-axis" value="0.0" readonly>
-                                <button class="control-btn" data-axis="x" data-dir="1">&rarr;</button>
-                            </div>
-                            <div class="couch-controls">
-                                <span>LNG</span>
-                                <button class="control-btn" data-axis="z" data-dir="-1">&uarr;</button>
-                                <input type="text" class="axis-input" id="z-axis" value="0.0" readonly>
-                                <button class="control-btn" data-axis="z" data-dir="1">&darr;</button>
+                    </div>
+
+                    <div id="bev-tab" class="tab-pane">
+                        <div class="bev-container">
+                            <div class="bev-placeholder-graphic">
+                                <div class="bev-jaws-y"></div>
+                                <div class="bev-jaws-x"></div>
+                                <div class="bev-mlc-area"></div>
+                                <div class="bev-labels">
+                                    <span class="label-y2">Y2</span>
+                                    <span class="label-y1">Y1</span>
+                                    <span class="label-x2">X2</span>
+                                    <span class="label-x1">X1</span>
+                                </div>
                             </div>
                         </div>
-                         <div class="control-group">
-                            <label>Rotation (°)</label>
-                             <div class="couch-controls">
-                                <span>PITCH</span>
-                                <button class="control-btn" data-axis="pitch" data-dir="-1">&#8635;</button>
-                                <input type="text" class="axis-input" id="pitch-axis" value="0.0" readonly>
-                                <button class="control-btn" data-axis="pitch" data-dir="1">&#8634;</button>
-                            </div>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="control-btn-action" id="reset-shifts">Reset</button>
-                            <button class="control-btn-action" id="apply-shifts">Apply Shifts</button>
-                        </div>
-                        <div id="shift-confirmation" class="confirmation-message"></div>
                     </div>
                 </div>
-            </section>
-            <section id="history-section" class="detail-card tables-card"></section>
-        </div>
-    </main>
+            </div>
+        </main>
+    </div>
 
-    <script src="patient_v2.js"></script>
+    <script src="script_v2.js"></script>
 </body>
 </html>
