@@ -98,9 +98,66 @@
         { "date": "2025-03-31", "type": "Dry Run Verification", "by": "Lead Therapist (SD)", "result": "Pass - Machine parameters, field sequencing, and couch movements verified on LINAC. Patient setup in immobilization confirmed." }
       ],
       "fieldDetails": [
-        { "fieldName": "AP Femur", "fieldSize": "10 cm x 15 cm", "gantryAngle": "0", "collimatorAngle": "0", "couchAngle": "0", "energy": "6MV", "monitorUnits": 155, "ssd": "90.5 cm" },
-        { "fieldName": "PA Femur", "fieldSize": "10 cm x 15 cm", "gantryAngle": "180", "collimatorAngle": "0", "couchAngle": "0", "energy": "6MV", "monitorUnits": 160, "ssd": "89.0 cm" }
-      ]
+  {
+    "fieldName": "AP Femur",
+    "technique": "3D-CRT",
+    // --- NEW DISPLAY FIELDS ---
+    "beamTypeDisplay": "STATIC (Static Photon)",
+    "energy_MV": 6,
+    "energyDisplay": "6X",
+    "monitorUnits": 155,
+    // Example of a non-split field
+    "splitMU": null,
+    "doseRate": 600,
+    "estimatedTime_min": 0.26,
+    "wedgeInfo": "None",
+    "bolusInfo": "None",
+    // ---------------------------
+    "gantryAngle": 0,
+    "collimatorAngle": 0,
+    "couchAngle": 0,
+    // --- NEW GEOMETRY FIELDS ---
+    "couchCoordinates_cm": {
+        "vertical": 24.5,
+        "longitudinal": 110.0,
+        "lateral": 100.0
+    },
+    "pitchAngle": 0.0,
+    "rollAngle": 0.0,
+    // ---------------------------
+    "jawPositions_cm": { "X1": -5.0, "X2": 5.0, "Y1": -7.5, "Y2": 7.5 },
+    "ssd_cm": 90.5
+  },
+  {
+    "fieldName": "PA Femur",
+    "technique": "3D-CRT",
+    // --- NEW DISPLAY FIELDS ---
+    "beamTypeDisplay": "STATIC (Static Photon)",
+    "energy_MV": 6,
+    "energyDisplay": "6X",
+    "monitorUnits": 160,
+    "splitMU": null,
+    "doseRate": 600,
+    "estimatedTime_min": 0.27,
+    "wedgeInfo": "None",
+    "bolusInfo": "None",
+    // ---------------------------
+    "gantryAngle": 180,
+    "collimatorAngle": 0,
+    "couchAngle": 0,
+     // --- NEW GEOMETRY FIELDS ---
+    "couchCoordinates_cm": {
+        "vertical": 24.5,
+        "longitudinal": 110.0,
+        "lateral": 100.0
+    },
+    "pitchAngle": 0.0,
+    "rollAngle": 0.0,
+    // ---------------------------
+    "jawPositions_cm": { "X1": -5.0, "X2": 5.0, "Y1": -7.5, "Y2": 7.5 },
+    "ssd_cm": 89.0
+  }
+]
     },
     "treatmentDelivery": {
       "fractions": [
