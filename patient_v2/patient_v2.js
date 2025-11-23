@@ -1,22 +1,70 @@
+// =========================================
+// GLOBAL STATE & CONFIGURATION
+// =========================================
+
+let currentPatientData = null;
+// Holds the local state of fields (order, activation status, added imaging fields)
+let currentFieldsList = [];
+let selectedFieldIndex = 0;
+
+// UI Mode States
+let isReorderMode = false;
+let isDeactivateMode = false;
+let overrideRequired = false;
+
+// Define tolerances for parameter checks (Plan vs Actual deviation allowed)
+const TOLERANCES = {
+    angle: 2.0,    // degrees (gantry, coll, couch, pitch, roll)
+    position: 0.5, // cm (jaws, couch vrt/lng/lat)
+    mu: 2.0        // monitor units
+};
+
+// Mock Data for MLC leaves (since JSON doesn't have detailed leaf positions yet)
+const MOCK_MLC_DATA = {
+    'AP Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
+    'PA Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
+    // More complex shaped fields for demo
+    'SBRT Arc 1': { 
+        BankA: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2], 
+        BankB: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2] 
+    },
+    'SBRT Arc 2': {
+        BankA: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6],
+        BankB: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6]
+    }
+};
+
+// =========================================
+// INITIALIZATION
+// =========================================
+
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Get Patient File from URL
     const params = new URLSearchParams(window.location.search);
     const fileName = params.get('file');
 
     if (!fileName) {
         console.error('No patient file specified in URL.');
         document.getElementById('pt-name').textContent = 'Error: No File Found';
+        // In a real app, redirect back to schedule
         return;
     }
 
-    // Add a cache-buster to prevent loading stale JSON
+    // 2. Fetch Data with Cache Busting
     const cacheBuster = new Date().getTime();
-
     fetch(`data/${fileName}?v=${cacheBuster}`)
         .then(response => {
             if (!response.ok) throw new Error('Failed to fetch patient data.');
             return response.json();
         })
         .then(patientData => {
+            currentPatientData = patientData;
+            // Initialize local field list state from fetched JSON data
+            if (patientData.treatmentPlan && patientData.treatmentPlan.treatmentFields) {
+                // Add an 'active' property to track deactivation state locally
+                currentFieldsList = patientData.treatmentPlan.treatmentFields.map(f => ({...f, active: true}));
+            }
+            // 3. Initialize UI
             initializeTreatmentConsole(patientData);
         })
         .catch(error => {
@@ -24,7 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('pt-name').textContent = 'Error Loading Data';
         });
 
+    // 4. Wire up interactive elements
     initializeButtons();
+    initializeModals();
 });
 
 
@@ -41,318 +91,10 @@ function initializeTreatmentConsole(patient) {
     document.getElementById('pt-physician').textContent = plan.radOnc || 'N/A';
     document.getElementById('plan-id-header').textContent = plan.planId || 'Plan ID';
 
-    // B. Populate Field List & Select First Field
-    const fields = plan.treatmentFields || [];
-    populateFieldList(fields);
-
-    // C. Update Fraction Counter
-    let deliveredFx = 0;
-    if (patient.radiationOncologyData && patient.radiationOncologyData.treatmentDelivery) {
-         deliveredFx = (patient.radiationOncologyData.treatmentDelivery.fractions || []).length;
-    }
-    const totalFx = plan.prescription ? plan.prescription.numberOfFractions : '-';
-    document.getElementById('fx-counter').textContent = deliveredFx + 1;
-    document.getElementById('fx-total').textContent = totalFx;
-}
-
-
-function populateFieldList(fields) {
-    const listContainer = document.getElementById('field-list-items');
-    listContainer.innerHTML = ''; // Clear current list
-
-    if (fields.length === 0) {
-        listContainer.innerHTML = '<li style="padding: 10px; font-style: italic;">No fields defined in plan.</li>';
-        // Clear BEV if no fields
-        drawBEV(null);
-        return;
-    }
-
-    fields.forEach((field, index) => {
-        const li = document.createElement('li');
-        if (index === 0) li.classList.add('active');
-        
-        li.innerHTML = `
-            <span>${field.fieldName}</span>
-            <span>0.0 / ${field.monitorUnits}</span>
-        `;
-
-        li.addEventListener('click', () => {
-            listContainer.querySelectorAll('li').forEach(item => item.classList.remove('active'));
-            li.classList.add('active');
-            updateFieldParameters(field);
-        });
-
-        listContainer.appendChild(li);
-    });
-
-    // Trigger update for the first field initially
-    updateFieldParameters(fields[0]);
-}
-
-
-function updateFieldParameters(field) {
-    const formatVal = (val, fixed = 1) => (val !== undefined && val !== null) ? Number(val).toFixed(fixed) : '-';
-    const formatText = (val) => (val !== undefined && val !== null) ? val : '-';
-
-    // --- 1. Update BEAM Parameters (Red Container) ---
-    document.getElementById('beam-type-plan').textContent = formatText(field.beamTypeDisplay);
-    document.getElementById('beam-type-actual').textContent = formatText(field.beamTypeDisplay);
-
-    document.getElementById('energy-plan').textContent = formatText(field.energyDisplay);
-    document.getElementById('energy-actual').textContent = formatText(field.energyDisplay);
-
-    const totalMU = formatVal(field.monitorUnits, 1);
-    document.getElementById('mu-total-plan').textContent = totalMU;
-    
-    const muSplitContainer = document.getElementById('mu-split-actual');
-    if (field.splitMU) {
-        muSplitContainer.innerHTML = `
-            <div class="mu-val">MU 1<br>${formatVal(field.splitMU.mu1, 1)}</div>
-            <div class="mu-val">MU 2<br>${formatVal(field.splitMU.mu2, 1)}</div>
-        `;
-    } else {
-        muSplitContainer.innerHTML = `<div class="mu-val">${totalMU}</div>`;
-    }
-
-    document.getElementById('dose-rate-plan').textContent = formatVal(field.doseRate, 0);
-    document.getElementById('dose-rate-actual').textContent = formatVal(field.doseRate, 0);
-
-    document.getElementById('time-plan').textContent = formatVal(field.estimatedTime_min, 2);
-    document.getElementById('time-actual').textContent = formatVal(0.00, 2); 
-
-    document.getElementById('wedge-plan').textContent = formatText(field.wedgeInfo);
-    document.getElementById('wedge-actual').textContent = formatText(field.wedgeInfo);
-
-    document.getElementById('bolus-plan').textContent = formatText(field.bolusInfo);
-    document.getElementById('bolus-actual').textContent = formatText(field.bolusInfo);
-
-
-    // --- 2. Update GEOMETRY Parameters (Yellow Container) ---
-    document.getElementById('gantry-plan').textContent = formatText(field.gantryAngle);
-    document.getElementById('gantry-actual').textContent = formatText(field.gantryAngle);
-
-    document.getElementById('coll-plan').textContent = formatVal(field.collimatorAngle, 1);
-    document.getElementById('coll-actual').textContent = formatVal(field.collimatorAngle, 1);
-
-    document.getElementById('couch-rtn-plan').textContent = formatVal(field.couchAngle, 1);
-    document.getElementById('couch-rtn-actual').textContent = formatVal(field.couchAngle, 1);
-
-    const jaws = field.jawPositions_cm || {};
-    document.getElementById('y1-plan').textContent = formatVal(jaws.Y1);
-    document.getElementById('y1-actual').textContent = formatVal(jaws.Y1);
-    document.getElementById('y2-plan').textContent = formatVal(jaws.Y2);
-    document.getElementById('y2-actual').textContent = formatVal(jaws.Y2);
-    document.getElementById('x1-plan').textContent = formatVal(jaws.X1);
-    document.getElementById('x1-actual').textContent = formatVal(jaws.X1);
-    document.getElementById('x2-plan').textContent = formatVal(jaws.X2);
-    document.getElementById('x2-actual').textContent = formatVal(jaws.X2);
-
-    const couch = field.couchCoordinates_cm || {};
-    document.getElementById('couch-vrt-plan').textContent = formatVal(couch.vertical, 2);
-    document.getElementById('couch-vrt-actual').textContent = formatVal(couch.vertical, 2);
-    document.getElementById('couch-lng-plan').textContent = formatVal(couch.longitudinal, 2);
-    document.getElementById('couch-lng-actual').textContent = formatVal(couch.longitudinal, 2);
-    document.getElementById('couch-lat-plan').textContent = formatVal(couch.lateral, 2);
-    document.getElementById('couch-lat-actual').textContent = formatVal(couch.lateral, 2);
-
-    document.getElementById('couch-pitch-plan').textContent = formatVal(field.pitchAngle, 1);
-    document.getElementById('couch-pitch-actual').textContent = formatVal(field.pitchAngle, 1);
-    document.getElementById('couch-roll-plan').textContent = formatVal(field.rollAngle, 1);
-    document.getElementById('couch-roll-actual').textContent = formatVal(field.rollAngle, 1);
-
-    // --- 3. Update Beam's Eye View (BEV) ---
-    drawBEV(field);
-}
-
-// --- MOCK DATA FOR MLC ---
-// Since your JSON files don't have detailed MLC positions yet,
-// we'll use this mock data for demonstration purposes.
-const MOCK_MLC_DATA = {
-    // Simple rectangular field
-    'AP Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
-    'PA Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
-    // More complex shaped fields
-    'SBRT Arc 1': { 
-        BankA: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2], 
-        BankB: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2] 
-    },
-    'SBRT Arc 2': {
-        BankA: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6],
-        BankB: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6]
-    }
-};
-
-
-function drawBEV(field) {
-    const canvas = document.getElementById('bev-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    // Ensure canvas resolution matches display size
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    const width = canvas.width;
-    const height = canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
-
-    // Scaling: Pixels per cm. Adjust as needed to fit view.
-    const scale = width / 30; 
-
-    // 1. Clear and Draw Background (Placeholder for DRR)
-    ctx.clearRect(0, 0, width, height);
-    // Draw a circular field limit
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, Math.min(width, height) / 2 * 0.95, 0, 2 * Math.PI);
-    ctx.fillStyle = '#333'; // Placeholder background color
-    ctx.fill();
-    ctx.strokeStyle = '#555';
-    ctx.stroke();
-    
-    if (!field) {
-        ctx.fillStyle = '#eee';
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText("No Field Selected", centerX, centerY);
-        return;
-    }
-
-    // 2. Draw Crosshairs (Isocenter)
-    ctx.beginPath();
-    ctx.moveTo(centerX, 0); ctx.lineTo(centerX, height);
-    ctx.moveTo(0, centerY); ctx.lineTo(width, centerY);
-    ctx.strokeStyle = 'rgba(255, 50, 50, 0.6)'; // Semi-transparent red
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // 3. Draw MLC Leaves based on data
-    // Use mock data if available for the field name, otherwise default
-    const mlcData = MOCK_MLC_DATA[field.fieldName] || { BankA: Array(20).fill(15), BankB: Array(20).fill(15) };
-    const numLeaves = mlcData.BankA.length;
-    const leafThickness = 1.0; // cm (simplified)
-    const leafHeightPx = leafThickness * scale;
-    
-    // Calculate starting Y position to center the MLC bank
-    const totalMlcHeightPx = numLeaves * leafHeightPx;
-    let currentY = centerY - (totalMlcHeightPx / 2);
-
-    ctx.fillStyle = 'rgba(80, 80, 80, 0.9)'; // Dark grey for leaves
-
-    for (let i = 0; i < numLeaves; i++) {
-        // Positions are distance from isocenter (midline)
-        const posA_cm = mlcData.BankA[i];
-        const posB_cm = mlcData.BankB[i];
-        
-        const posA_px = posA_cm * scale;
-        const posB_px = posB_cm * scale;
-
-        // Draw Bank A Leaf (Left side)
-        // Draws from left edge up to the position
-        ctx.fillRect(0, currentY, centerX - posA_px, leafHeightPx - 1); // -1 for slight gap
-
-        // Draw Bank B Leaf (Right side)
-        // Draws from position to the right edge
-        ctx.fillRect(centerX + posB_px, currentY, width - (centerX + posB_px), leafHeightPx - 1);
-
-        currentY += leafHeightPx;
-    }
-}
-
-
-function initializeButtons() {
-    // Wire up Workflow buttons for visual state change
-    const workflowBtns = document.querySelectorAll('#workflow-bar .flow-step');
-    workflowBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            workflowBtns.forEach(b => b.classList.remove('active-beam-on'));
-            btn.classList.add('active-beam-on');
-        });
-    });
-
-    // Wire up "Close Patient" button
-    const closeBtn = document.getElementById('btn-close-patient');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            window.location.href = 'index_v2.html';
-        });
-    }
-
-    // Wire up other toolbar buttons for logging
-    const wiredBtns = document.querySelectorAll('.wired-btn, #btn-mlc-mode');
-    wiredBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            // Use id or text content to identify the button
-            const action = btn.id || btn.textContent;
-            console.log(`Button clicked: ${action}`);
-        });
-    });
-}
-
-// Global State Variables
-let currentPatientData = null;
-let currentFieldsList = [];
-let selectedFieldIndex = 0;
-let isReorderMode = false;
-let isDeactivateMode = false;
-let overrideRequired = false;
-
-// Define tolerances for parameter checks
-const TOLERANCES = {
-    angle: 2.0, // degrees (gantry, coll, couch, pitch, roll)
-    position: 0.5, // cm (jaws, couch vrt/lng/lat)
-    mu: 2.0 // monitor units
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const fileName = params.get('file');
-
-    if (!fileName) {
-        console.error('No patient file specified in URL.');
-        document.getElementById('pt-name').textContent = 'Error: No File Found';
-        return;
-    }
-
-    const cacheBuster = new Date().getTime();
-    fetch(`data/${fileName}?v=${cacheBuster}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch patient data.');
-            return response.json();
-        })
-        .then(patientData => {
-            currentPatientData = patientData;
-            // Initialize local field list from JSON data
-            if (patientData.treatmentPlan && patientData.treatmentPlan.treatmentFields) {
-                // Add a 'active' property to track deactivation state
-                currentFieldsList = patientData.treatmentPlan.treatmentFields.map(f => ({...f, active: true}));
-            }
-            initializeTreatmentConsole(patientData);
-        })
-        .catch(error => {
-            console.error(error);
-            document.getElementById('pt-name').textContent = 'Error Loading Data';
-        });
-
-    initializeButtons();
-    initializeModals();
-});
-
-
-function initializeTreatmentConsole(patient) {
-    document.getElementById('current-date').textContent = new Date().toLocaleString();
-    
-    const demo = patient.demographics || {};
-    document.getElementById('pt-name').textContent = demo.name || 'N/A';
-    document.getElementById('pt-id').textContent = patient.patientId || 'N/A';
-    document.getElementById('pt-dob').textContent = demo.dob || 'N/A';
-    
-    const plan = patient.treatmentPlan || {};
-    document.getElementById('pt-physician').textContent = plan.radOnc || 'N/A';
-    document.getElementById('plan-id-header').textContent = plan.planId || 'Plan ID';
-
-    // Populate field list using the local state variable
+    // B. Populate the sidebar field list based on current state
     populateFieldList();
 
+    // C. Update Fraction Counter (Simulated based on delivery records length)
     let deliveredFx = 0;
     if (patient.radiationOncologyData && patient.radiationOncologyData.treatmentDelivery) {
          deliveredFx = (patient.radiationOncologyData.treatmentDelivery.fractions || []).length;
@@ -362,27 +104,33 @@ function initializeTreatmentConsole(patient) {
     document.getElementById('fx-total').textContent = totalFx;
 }
 
+
+// =========================================
+// SIDEBAR FIELD LIST LOGIC
+// =========================================
 
 function populateFieldList() {
     const listContainer = document.getElementById('field-list-items');
-    listContainer.innerHTML = '';
+    listContainer.innerHTML = ''; // Clear current DOM list
 
     if (currentFieldsList.length === 0) {
         listContainer.innerHTML = '<li style="padding: 10px; font-style: italic;">No fields defined.</li>';
-        drawBEV(null);
+        // Clear main displays
         updateFieldParameters(null);
         return;
     }
 
-    // Ensure selected index is valid
+    // Ensure selected index is valid after potential removals
     if (selectedFieldIndex >= currentFieldsList.length) selectedFieldIndex = 0;
 
     currentFieldsList.forEach((fieldItem, index) => {
         const li = document.createElement('li');
-        // Set active class only if it's the selected index AND it's not deactivated
+        
+        // Set styling classes based on state
         if (index === selectedFieldIndex && fieldItem.active) li.classList.add('active');
         if (!fieldItem.active) li.classList.add('deactivated');
         
+        // Render Content based on field type (Imaging vs Treatment)
         if (fieldItem.isImaging) {
             li.classList.add('imaging-field');
             li.innerHTML = `
@@ -399,13 +147,15 @@ function populateFieldList() {
             `;
         }
 
-        // Makes list sortable
+        // Enable Drag and Drop functionality
         li.draggable = true; 
         li.dataset.index = index;
 
-        // Click handler for selection
+        // --- Event Handlers ---
+
+        // 1. Selection Click Handler
         li.addEventListener('click', (e) => {
-            // Don't trigger selection if clicking checkbox or drag handle
+            // Don't trigger selection if clicking directly on checkbox or drag handle
             if (e.target.classList.contains('field-checkbox') || e.target.classList.contains('drag-handle')) return;
 
             if (fieldItem.active) {
@@ -414,19 +164,19 @@ function populateFieldList() {
             }
         });
 
-        // Checkbox handler for deactivation
+        // 2. Deactivation Checkbox Handler
         const checkbox = li.querySelector('.field-checkbox');
         checkbox.addEventListener('change', (e) => {
              fieldItem.active = e.target.checked;
-             // If deselected field was active, find a new active field
+             // If the deselected field was the active one, find a new active field
              if (!fieldItem.active && index === selectedFieldIndex) {
-                 const nextActive = currentFieldsList.findIndex(f => f.active);
-                 selectedFieldIndex = nextActive !== -1 ? nextActive : 0;
+                 const nextActiveIndex = currentFieldsList.findIndex(f => f.active);
+                 selectedFieldIndex = nextActiveIndex !== -1 ? nextActiveIndex : 0;
              }
-             populateFieldList(); // Re-render to show deactivated state
+             populateFieldList(); // Re-render to show deactivated styling
         });
 
-        // --- Drag and Drop Handlers ---
+        // 3. Drag and Drop Handlers (for Reorder Mode)
         li.addEventListener('dragstart', (e) => {
             if (!isReorderMode) { e.preventDefault(); return; }
             e.dataTransfer.setData('text/plain', index);
@@ -439,19 +189,21 @@ function populateFieldList() {
             if (!isReorderMode) return;
             const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
             const toIndex = index;
-            // Move item in the array
+            
+            // Reorder the state array
             const itemToMove = currentFieldsList.splice(fromIndex, 1)[0];
             currentFieldsList.splice(toIndex, 0, itemToMove);
-            // Update selected index if needed
+            
+            // Update selected index if the selected item moved
             if (selectedFieldIndex === fromIndex) selectedFieldIndex = toIndex;
+            
             populateFieldList(); // Re-render list in new order
         });
-        // -----------------------------
 
         listContainer.appendChild(li);
     });
 
-    // Trigger update for the currently selected, active field
+    // Trigger parameter update for the currently selected, active field
     const selectedField = currentFieldsList[selectedFieldIndex];
     if (selectedField && selectedField.active) {
         updateFieldParameters(selectedField);
@@ -462,8 +214,12 @@ function populateFieldList() {
 }
 
 
+// =========================================
+// MAIN CONTENT UPDATE LOGIC (Red/Yellow Containers)
+// =========================================
+
 function updateFieldParameters(field) {
-    // Reset states
+    // 1. Reset Tolerance/Override States
     overrideRequired = false;
     document.getElementById('tolerance-warning').style.display = 'none';
     document.getElementById('btn-override').disabled = true;
@@ -472,19 +228,25 @@ function updateFieldParameters(field) {
     const formatVal = (val, fixed = 1) => (val !== undefined && val !== null) ? Number(val).toFixed(fixed) : '-';
     const formatText = (val) => (val !== undefined && val !== null) ? val : '-';
 
-    // Helper function to check tolerance and update UI
+    // Helper: Check tolerance between plan and actual, update UI if failed
     const checkTolerance = (planId, actualId, type) => {
         const planEl = document.getElementById(planId);
         const actualEl = document.getElementById(actualId);
         
-        // In a real scenario, 'actual' would come from machine feedback.
-        // Here we simulate it by just using the plan value.
-        // To test the tolerance logic, we can manually add a small offset here:
-        // let actualVal = parseFloat(planEl.textContent) + (type === 'angle' ? 2.1 : 0); 
-        let actualVal = parseFloat(planEl.textContent);
+        // --- SIMULATION FOR DEMONSTRATION ---
+        // In a real system, 'actual' comes from the machine. 
+        // Here, we simulate a slight deviation to test the tolerance logic.
+        // We add a small offset to the plan value to create the "actual" value.
+        let offset = 0;
+        // Uncomment next line to force tolerance failures on angles for testing:
+        // if (type === 'angle' && parseFloat(planEl.textContent) !== 0) offset = 2.1; 
+        
+        let actualVal = parseFloat(planEl.textContent) + offset;
 
+        // Display simulated actual value
         actualEl.textContent = formatVal(actualVal, type === 'position' ? 2 : 1);
 
+        // Perform check
         if (!isNaN(actualVal)) {
              const planVal = parseFloat(planEl.textContent);
              const tolerance = TOLERANCES[type];
@@ -495,8 +257,8 @@ function updateFieldParameters(field) {
         }
     };
 
+    // Handle null or imaging fields (clear displays)
     if (!field || field.isImaging) {
-        // Clear all parameter displays if it's an imaging field or null
         document.querySelectorAll('.treatment-data-container .value-box:not(.highlighted)').forEach(el => el.textContent = '-');
         document.getElementById('mu-total-plan').textContent = '-';
         document.getElementById('mu-actual-display').textContent = '-';
@@ -505,37 +267,40 @@ function updateFieldParameters(field) {
     }
 
 
-    // --- 1. Update BEAM Parameters ---
+    // --- 2. Update BEAM Parameters (Red Container) ---
     document.getElementById('beam-type-plan').textContent = formatText(field.beamTypeDisplay);
     document.getElementById('beam-type-actual').textContent = formatText(field.beamTypeDisplay);
+
     document.getElementById('energy-plan').textContent = formatText(field.energyDisplay);
     document.getElementById('energy-actual').textContent = formatText(field.energyDisplay);
 
     const totalMU = formatVal(field.monitorUnits, 1);
     document.getElementById('mu-total-plan').textContent = totalMU;
-    document.getElementById('mu-actual-display').textContent = totalMU; // Simulated actual
-    // checkTolerance('mu-total-plan', 'mu-actual-display', 'mu'); // Simulating check
+    document.getElementById('mu-actual-display').textContent = totalMU; 
+    // checkTolerance('mu-total-plan', 'mu-actual-display', 'mu'); // Optional: Check MU tolerance
 
     document.getElementById('dose-rate-plan').textContent = formatVal(field.doseRate, 0);
     document.getElementById('dose-rate-actual').textContent = formatVal(field.doseRate, 0);
+
     document.getElementById('time-plan').textContent = formatVal(field.estimatedTime_min, 2);
-    document.getElementById('time-actual').textContent = formatVal(0.00, 2); 
+    document.getElementById('time-actual').textContent = formatVal(0.00, 2); // Timer reset
+
     document.getElementById('wedge-plan').textContent = formatText(field.wedgeInfo);
     document.getElementById('wedge-actual').textContent = formatText(field.wedgeInfo);
+
     document.getElementById('bolus-plan').textContent = formatText(field.bolusInfo);
     document.getElementById('bolus-actual').textContent = formatText(field.bolusInfo);
 
-    // --- 2. Update GEOMETRY Parameters & Check Tolerances ---
-    // Parsing complex angle strings if necessary (e.g., ranges for arcs)
-    const parseAngle = (val) => {
-        if (typeof val === 'string' && val.includes('-')) return parseFloat(val.split('-')[0]);
-        return parseFloat(val);
-    }
 
+    // --- 3. Update GEOMETRY Parameters & Check Tolerances (Yellow Container) ---
+    
     document.getElementById('gantry-plan').textContent = formatText(field.gantryAngle);
-    // For tolerance check, we use a parsed numeric value
-    // document.getElementById('gantry-plan').dataset.numericValue = parseAngle(field.gantryAngle);
-    checkTolerance('gantry-plan', 'gantry-actual', 'angle');
+    // Only check tolerance on numeric angles, skip ranges like "180-0"
+    if (!isNaN(parseFloat(field.gantryAngle))) {
+         checkTolerance('gantry-plan', 'gantry-actual', 'angle');
+    } else {
+         document.getElementById('gantry-actual').textContent = formatText(field.gantryAngle);
+    }
 
     document.getElementById('coll-plan').textContent = formatVal(field.collimatorAngle, 1);
     checkTolerance('coll-plan', 'coll-actual', 'angle');
@@ -557,74 +322,88 @@ function updateFieldParameters(field) {
     document.getElementById('couch-pitch-plan').textContent = formatVal(field.pitchAngle, 1); checkTolerance('couch-pitch-plan', 'couch-pitch-actual', 'angle');
     document.getElementById('couch-roll-plan').textContent = formatVal(field.rollAngle, 1); checkTolerance('couch-roll-plan', 'couch-roll-actual', 'angle');
 
-    // --- 3. Finalize Tolerance State ---
+    // --- 4. Finalize Tolerance State ---
     if (overrideRequired) {
         document.getElementById('tolerance-warning').style.display = 'block';
         document.getElementById('btn-override').disabled = false;
     }
 
-    // --- 4. Update BEAM's Eye View ---
+    // --- 5. Update Beam's Eye View ---
     drawBEV(field);
 }
 
-// --- MOCK MLC DATA (Keep existing mock data) ---
-const MOCK_MLC_DATA = {
-    'AP Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
-    'PA Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
-    'SBRT Arc 1': { BankA: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2], BankB: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2] },
-    'SBRT Arc 2': { BankA: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6], BankB: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6] }
-};
 
-// --- keep existing drawBEV function ---
+// =========================================
+// BEAM'S EYE VIEW (Canvas Drawing)
+// =========================================
+
 function drawBEV(field) {
     const canvas = document.getElementById('bev-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+
+    // Set canvas resolution match display size
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const width = canvas.width;
     const height = canvas.height;
     const centerX = width / 2;
     const centerY = height / 2;
+    // Scaling factor (pixels per cm) - adjust as needed fit view
     const scale = width / 30; 
 
+    // 1. Clear and Draw Background (Placeholder for DRR image)
     ctx.clearRect(0, 0, width, height);
     ctx.beginPath();
+    // Draw circular field limit
     ctx.arc(centerX, centerY, Math.min(width, height) / 2 * 0.95, 0, 2 * Math.PI);
     ctx.fillStyle = '#333'; ctx.fill();
     ctx.strokeStyle = '#555'; ctx.stroke();
     
-    if (!field || field.isImaging) { // Don't draw BEV for imaging fields
+    // Handle cases with no field or imaging field selected
+    if (!field || field.isImaging) { 
         ctx.fillStyle = '#eee'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
-        ctx.fillText(field && field.isImaging ? "Imaging Field" : "No Field Selected", centerX, centerY);
+        ctx.fillText(field && field.isImaging ? "Imaging Field View" : "No Field Selected", centerX, centerY);
         return;
     }
 
+    // 2. Draw Crosshairs (Isocenter)
     ctx.beginPath();
     ctx.moveTo(centerX, 0); ctx.lineTo(centerX, height);
     ctx.moveTo(0, centerY); ctx.lineTo(width, centerY);
     ctx.strokeStyle = 'rgba(255, 50, 50, 0.6)'; ctx.lineWidth = 1; ctx.stroke();
 
+    // 3. Draw MLC Leaves based on mock data
     const mlcData = MOCK_MLC_DATA[field.fieldName] || { BankA: Array(20).fill(15), BankB: Array(20).fill(15) };
     const numLeaves = mlcData.BankA.length;
-    const leafThickness = 1.0; 
-    const leafHeightPx = leafThickness * scale;
+    const leafThickness_cm = 1.0; 
+    const leafHeightPx = leafThickness_cm * scale;
     const totalMlcHeightPx = numLeaves * leafHeightPx;
+    // Calculate starting Y position to center the MLC bank vertically
     let currentY = centerY - (totalMlcHeightPx / 2);
 
-    ctx.fillStyle = 'rgba(80, 80, 80, 0.9)';
+    ctx.fillStyle = 'rgba(80, 80, 80, 0.9)'; // Dark grey leaves
     for (let i = 0; i < numLeaves; i++) {
+        // Positions are distance from isocenter (midline) in cm
         const posA_px = mlcData.BankA[i] * scale;
         const posB_px = mlcData.BankB[i] * scale;
+
+        // Draw Bank A Leaf (Left side) - draws from left edge up to position
         ctx.fillRect(0, currentY, centerX - posA_px, leafHeightPx - 1);
+        // Draw Bank B Leaf (Right side) - draws from position to right edge
         ctx.fillRect(centerX + posB_px, currentY, width - (centerX + posB_px), leafHeightPx - 1);
+
         currentY += leafHeightPx;
     }
 }
 
 
+// =========================================
+// BUTTON & MODAL WIRING
+// =========================================
+
 function initializeButtons() {
-    // Workflow buttons
+    // Workflow Buttons (visual toggle only)
     const workflowBtns = document.querySelectorAll('#workflow-bar .flow-step');
     workflowBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -633,12 +412,12 @@ function initializeButtons() {
         });
     });
 
-    // Close Patient
+    // Close Patient -> Return to Schedule index
     document.getElementById('btn-close-patient').addEventListener('click', () => {
         window.location.href = 'index_v2.html';
     });
 
-    // --- Toolbar Button Functionality ---
+    // --- Toolbar Tools ---
 
     // Reorder Mode Toggle
     document.getElementById('btn-reorder').addEventListener('click', (e) => {
@@ -652,67 +431,66 @@ function initializeButtons() {
         isDeactivateMode = !isDeactivateMode;
         e.target.classList.toggle('active-tool', isDeactivateMode);
         document.getElementById('field-list-items').classList.toggle('deactivate-mode', isDeactivateMode);
+        // Enable 'Remove' button only when in deactivate mode
         document.getElementById('btn-remove').disabled = !isDeactivateMode;
     });
 
-    // Remove Button
+    // Remove Button (Removes inactive fields from local state)
     document.getElementById('btn-remove').addEventListener('click', () => {
-        // Filter out inactive fields
         currentFieldsList = currentFieldsList.filter(f => f.active);
-        // Reset selected index if current selection was removed
+        // Reset selection if needed
         if (selectedFieldIndex >= currentFieldsList.length) selectedFieldIndex = 0;
-        populateFieldList();
+        populateFieldList(); // Re-render
     });
 
-    // Add Button -> Opens Modal
+    // Add Button -> Opens Imaging Modal
     document.getElementById('btn-add').addEventListener('click', () => {
         document.getElementById('modal-add-imaging').style.display = 'block';
     });
 
-    // Setup Notes Button -> Opens Modal
+    // Setup Notes Button -> Opens Notes Modal with data
     document.getElementById('btn-setup-notes').addEventListener('click', () => {
         const notes = (currentPatientData && currentPatientData.radiationOncologyData && currentPatientData.radiationOncologyData.ctSimulation) 
                       ? currentPatientData.radiationOncologyData.ctSimulation.setupInstructions 
-                      : "No setup instructions found.";
+                      : "No setup instructions found for this patient.";
         document.getElementById('setup-notes-content').textContent = notes;
         document.getElementById('modal-setup-notes').style.display = 'block';
     });
 
-    // Tools Button -> Opens Modal
+    // Tools Button -> Opens EMR Tools Modal
     document.getElementById('btn-tools').addEventListener('click', () => {
         document.getElementById('modal-emr-tools').style.display = 'block';
     });
 
-    // Override Button -> Opens Modal
+    // Override Button -> Opens Confirmation Modal (if required)
     document.getElementById('btn-override').addEventListener('click', () => {
         if (overrideRequired) {
             document.getElementById('modal-override').style.display = 'block';
         }
     });
 
-    // Acquire Button -> Captures parameters
+    // Acquire Button -> Simulates capturing parameters
     const btnAcquire = document.getElementById('btn-acquire');
     btnAcquire.addEventListener('click', () => {
         showNotification("Parameters Acquired & Saved.");
-        btnAcquire.disabled = true; // Disable until new changes happen
-        // In a real app, this would save the 'actual' values to the backend state.
+        btnAcquire.disabled = true; // Disable until next field change
     });
 
-    // Apply/Cancel placeholder logging
+    // Placeholder actions for Apply/Cancel
     document.getElementById('btn-apply').addEventListener('click', () => console.log('Apply clicked'));
     document.getElementById('btn-cancel').addEventListener('click', () => console.log('Cancel clicked'));
 }
 
 
 function initializeModals() {
-    // Close buttons for all modals
+    // Generic Close logic for all modals
     document.querySelectorAll('.close-modal, .close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
         });
     });
 
-    // Close modal when clicking outside content
+    // Close modal if clicking outside content area
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
@@ -721,7 +499,7 @@ function initializeModals() {
 
     // --- Specific Modal Actions ---
 
-    // Confirm Add Imaging
+    // Confirm Add Imaging Field
     document.getElementById('btn-confirm-add-imaging').addEventListener('click', () => {
         const modality = document.getElementById('imaging-type').value;
         const newImagingField = {
@@ -729,49 +507,53 @@ function initializeModals() {
             isImaging: true,
             active: true
         };
-        // Insert after currently selected field
+        // Insert new field after currently selected one
         currentFieldsList.splice(selectedFieldIndex + 1, 0, newImagingField);
-        populateFieldList();
+        populateFieldList(); // Re-render list
         document.getElementById('modal-add-imaging').style.display = 'none';
         showNotification(`${modality} added.`);
     });
 
-    // Confirm Override
+    // Confirm Parameter Override
     document.getElementById('btn-confirm-override').addEventListener('click', () => {
         const therapistId = document.getElementById('therapist-id').value;
         if (therapistId.trim() === "") {
             alert("Please enter a Therapist ID to confirm.");
             return;
         }
-        console.log(`Override confirmed by: ${therapistId}`);
-        // Clear warning state
+        console.log(`Override confirmed byID: ${therapistId}`);
+        
+        // Reset tolerance warning states
         overrideRequired = false;
         document.getElementById('tolerance-warning').style.display = 'none';
         document.getElementById('btn-override').disabled = true;
         document.querySelectorAll('.value-box.out-of-tolerance').forEach(el => el.classList.remove('out-of-tolerance'));
+        
+        // Close modal and clear input
         document.getElementById('modal-override').style.display = 'none';
+        document.getElementById('therapist-id').value = ''; 
         showNotification("Override Confirmed. Treatment Enabled.");
-        document.getElementById('therapist-id').value = ''; // Clear input
     });
 
-    // EMR Tool Tabs functionality
+    // EMR Tool Tab Switching Logic
     const modalTabs = document.querySelectorAll('.modal-tab');
     modalTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             modalTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-            document.querySelector('.modal-tab-content p').textContent = `Displaying content for: ${tab.textContent}`;
+            // Update content based on selected tab (placeholder logic)
+            document.querySelector('.modal-tab-content p').textContent = `Displaying placeholder content for: ${tab.textContent}`;
         });
     });
 }
 
-// Helper for showing temporary notifications
+// Helper to show temporary toast notifications
 function showNotification(message) {
     const area = document.getElementById('notification-area');
     const note = document.createElement('div');
     note.className = 'notification';
     note.textContent = message;
     area.appendChild(note);
-    // Remove after animation finishes (3s)
+    // Remove notification after 3 seconds
     setTimeout(() => { area.removeChild(note); }, 3000);
 }
