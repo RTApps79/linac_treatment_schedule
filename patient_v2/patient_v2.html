@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Treatment Record and Verify</title>
     <link rel="stylesheet" href="style_v2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header class="header">
@@ -53,6 +54,7 @@
                 <div class="privacy-shade-label">Privacy Shade</div>
                 <img src="https://www.veritas-medicalsolutions.com/wp-content/uploads/2021/06/C3-Flooring-Systems.png" alt="Machine View Live Stream">
                 <div class="machine-overlay-text">To pause treatment, press Beam Off.</div>
+                <div id="notification-area"></div>
             </section>
 
             <div class="treatment-flow-bar" id="workflow-bar">
@@ -168,6 +170,7 @@
                             </div>
                         </div>
                     </div>
+                    <div id="tolerance-warning" style="display: none;">Override Required: Parameters out of tolerance.</div>
                 </section>
             </div>
         </main>
@@ -178,13 +181,13 @@
             <button class="wired-btn" id="btn-reorder">Reorder</button>
             <button class="wired-btn" id="btn-deactivate">Deactivate</button>
             <button class="wired-btn" id="btn-add">Add</button>
-            <button class="wired-btn" id="btn-remove">Remove</button>
+            <button class="wired-btn" id="btn-remove" disabled>Remove</button>
             <button class="primary-tool wired-btn" id="btn-tools">Tools</button>
             <button class="wired-btn" id="btn-setup-notes">Setup Notes</button>
             <button id="btn-close-patient">Close Patient</button>
         </div>
         <div class="tool-group right">
-            <button class="wired-btn" id="btn-override">Override</button>
+            <button class="wired-btn warning-btn" id="btn-override" disabled>Override</button>
             <button class="wired-btn" id="btn-acquire">Acquire</button>
             <button class="wired-btn" id="btn-edit">Edit</button>
             <button class="wired-btn" id="btn-goto">Go To</button>
@@ -192,6 +195,74 @@
             <button class="action-btn cancel wired-btn" id="btn-cancel">Cancel</button>
         </div>
     </footer>
+
+
+    <div id="modal-add-imaging" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add Imaging Field</h2>
+            <p>Select imaging modality for the current field.</p>
+            <div class="form-group">
+                <label for="imaging-type">Modality:</label>
+                <select id="imaging-type">
+                    <option value="kV-kV Setup Pair">kV-kV Setup Pair</option>
+                    <option value="CBCT">CBCT (Cone Beam CT)</option>
+                    <option value="MV Port">MV Port Film</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-confirm-add-imaging" class="action-btn apply">Add Imaging</button>
+                <button class="action-btn cancel close-modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-setup-notes" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>CT Simulation Setup Instructions</h2>
+            <div id="setup-notes-content" class="notes-content">
+                Loading notes...
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn apply close-modal-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-emr-tools" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>EMR Tools</h2>
+            <div class="modal-tabs">
+                <button class="modal-tab active">Patient Info</button>
+                <button class="modal-tab">Documents</button>
+                <button class="modal-tab">History</button>
+            </div>
+            <div class="modal-tab-content">
+                <p>Placeholder for generic EMR patient information tabs.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn apply close-modal-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+     <div id="modal-override" class="modal">
+        <div class="modal-content warning-content">
+            <h2>Parameter Override Acknowledgment</h2>
+            <p class="warning-text">WARNING: One or more actual parameters are outside the planned tolerance limits.</p>
+            <p>By proceeding, you acknowledge these deviations and authorize treatment delivery.</p>
+            <div class="form-group">
+                <label for="therapist-id">Therapist ID / Signature:</label>
+                <input type="text" id="therapist-id" placeholder="Enter ID">
+            </div>
+            <div class="modal-actions">
+                <button id="btn-confirm-override" class="action-btn apply warning-btn">Confirm Override</button>
+                <button class="action-btn cancel close-modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script src="patient_v2.js"></script>
 </body>
