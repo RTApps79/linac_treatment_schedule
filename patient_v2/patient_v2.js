@@ -645,30 +645,44 @@ function drawBEV(field, isAnimating = false, progress = 0) {
     }
 
 
-     // --- DRAW JAWS (Second, semi-transparent on top of MLCs) ---
+    // --- DRAW JAWS (Second, semi-transparent on top of MLCs) ---
     ctx.fillStyle = 'rgba(40, 40, 40, 0.8)'; // Dark, semi-transparent jaw material
-    const y1_px = centerY + (currentY1 * scale);
-    const y2_px = centerY - (jaws.Y2 * scale);
-    const x1_px = centerX + (jaws.X1 * scale);
-    // FIXED: X2 is positive to the right, so add to centerX
-    const x2_px = centerX + (jaws.X2 * scale); 
+    
+    // Calculate pixel boundaries based on IEC coordinate system where:
+    // +Y is Up (Superior), -Y is Down (Inferior). Canvas Y increases downwards.
+    // Y2 is Superior (positive cm). Subtract from CenterY to move up in pixels.
+    const y2_boundary_px = centerY - (jaws.Y2 * scale);
+    // Y1 is Inferior (negative cm). Subtracting a negative adds to CenterY, moving down.
+    // Use currentY1 because this is the one that might animate (wedge).
+    const y1_boundary_px = centerY - (currentY1 * scale);
+    // X1 is Left (negative cm). Add to CenterX to move left.
+    const x1_boundary_px = centerX + (jaws.X1 * scale);
+    // X2 is Right (positive cm). Add to CenterX to move right.
+    const x2_boundary_px = centerX + (jaws.X2 * scale);
 
-    // Top/Bottom Jaws (Y)
-    ctx.fillRect(0, 0, width, y2_px); // Top block
-    ctx.fillRect(0, y1_px, width, height - y1_px); // Bottom block
-    // Left/Right Jaws (X)
-    ctx.fillRect(0, y2_px, x1_px, y1_px - y2_px); // Left block
-    ctx.fillRect(x2_px, y2_px, width - x2_px, y1_px - y2_px); // Right block
+    // Top Jaw Block (Y2)
+    ctx.fillRect(0, 0, width, y2_boundary_px);
+    // Bottom Jaw Block (Y1)
+    ctx.fillRect(0, y1_boundary_px, width, height - y1_boundary_px);
+
+    // Calculate open height between Y jaws for X jaws
+    const openHeight = Math.max(0, y1_boundary_px - y2_boundary_px);
+
+    // Left Jaw Block (X1) - between Y boundary lines
+    ctx.fillRect(0, y2_boundary_px, x1_boundary_px, openHeight);
+    // Right Jaw Block (X2) - between Y boundary lines
+    ctx.fillRect(x2_boundary_px, y2_boundary_px, width - x2_boundary_px, openHeight);
+
 
     // --- Draw Jaw Labels (X1, X2, Y1, Y2) ---
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Light grey text
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     
-    if (y2_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, y2_px - 5); }
-    if (y1_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, y1_px + 5); }
-    if (x1_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", x1_px - 5, centerY); }
-    if (x2_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", x2_px + 5, centerY); }
+    if (y2_boundary_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, y2_boundary_px - 5); }
+    if (y1_boundary_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, y1_boundary_px + 5); }
+    if (x1_boundary_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", x1_boundary_px - 5, centerY); }
+    if (x2_boundary_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", x2_boundary_px + 5, centerY); }
 }
 
 
