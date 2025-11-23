@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // This array MUST match the exact filenames in your 'data' folder.
-    // Updated with the files from your recent uploads.
     const patientFiles = [
          'Alice_Brown_SkeletalExtremity.json',
          'James_Wilson_PelvisProstate.json',
@@ -15,14 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create a promise for each file fetch
     const fetchPromises = patientFiles.map(file =>
-        // Ensure the path 'data/' matches your actual folder structure
-        fetch(`data/${file}`).then(response => {
+        fetch(`data/${file}`)
+        .then(response => {
             if (!response.ok) {
-                // Helpful error message if a file isn't found
-                throw new Error(`Failed to load ${file} (404 Not Found)`);
+                throw new Error(`Network error loading ${file} (404 Not Found)`);
             }
-            return response.json();
-        }).then(data => {
+            // 1. Get raw text first so we can identify the file if parsing fails
+            return response.text(); 
+        })
+        .then(text => {
+            try {
+                // 2. Try parsing the text as JSON
+                return JSON.parse(text);
+            } catch (e) {
+                // 3. IF PARSING FAILS, LOG THE SPECIFIC FILE NAME
+                console.error('=============================');
+                console.error('FATAL JSON SYNTAX ERROR DETECTED');
+                console.error(`THE BROKEN FILE IS: ${file}`);
+                console.error(`Error details: ${e.message}`);
+                console.error('Action: Open this specific file and look for missing double quotes around property names near the line number indicated.');
+                console.error('=============================');
+                // Re-throw to stop execution for this chain
+                throw e; 
+            }
+        })
+        .then(data => {
             // Attach the source filename to the data object for linking later
             data._sourceFilename = file;
             return data;
@@ -79,12 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(error => {
-            console.error('Error fetching patient data:', error);
-            // Display an error message on the page if loading fails
+            // The specific file error is already logged above.
+            console.error('Schedule loading aborted due to JSON errors.');
             scheduleBody.innerHTML = `
-                <div class="table-row" style="display: block; text-align: center; padding: 20px; color: #dc3545;">
-                    <strong>Failed to load patient schedule.</strong><br>
-                    <small>Check console for details (likely missing files in 'data' folder).</small>
+                <div class="table-row" style="display: block; text-align: center; padding: 20px; color: #dc3545; background-color: #fff;">
+                    <strong style="font-size: 1.2em;">CRITICAL ERROR: Failed to load patient data.</strong><br>
+                    <span style="font-size: 1em;">One of your JSON files has a syntax error (missing quotes).</span><br>
+                    <strong>Open the browser console (F12) to see exactly which file is broken.</strong>
                 </div>
             `;
         });
