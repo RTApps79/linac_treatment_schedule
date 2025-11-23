@@ -584,32 +584,7 @@ function drawBEV(field, isAnimating = false, progress = 0) {
         document.getElementById('y1-actual').textContent = currentY1.toFixed(1);
     }
 
-    // --- Draw Jaws (as a clipping region or semi-transparent overlay) ---
-    ctx.fillStyle = 'rgba(40, 40, 40, 0.8)'; // Dark jaw material
-    const y1_px = centerY + (currentY1 * scale);
-    const y2_px = centerY - (jaws.Y2 * scale);
-    const x1_px = centerX + (jaws.X1 * scale);
-    const x2_px = centerX - (jaws.X2 * scale);
-
-    // Top/Bottom Jaws (Y)
-    ctx.fillRect(0, 0, width, y2_px); // Top block
-    ctx.fillRect(0, y1_px, width, height - y1_px); // Bottom block
-    // Left/Right Jaws (X)
-    ctx.fillRect(0, y2_px, x1_px, y1_px - y2_px); // Left block
-    ctx.fillRect(x2_px, y2_px, width - x2_px, y1_px - y2_px); // Right block
-
-    // --- Draw Jaw Labels (X1, X2, Y1, Y2) ---
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Light grey text
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    
-    if (y2_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, y2_px - 5); }
-    if (y1_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, y1_px + 5); }
-    if (x1_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", x1_px - 5, centerY); }
-    if (x2_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", x2_px + 5, centerY); }
-
-
-    // --- Draw MLC Leaves ---
+    // --- DRAW MLC LEAVES (First, so they are behind jaws) ---
     const isDynamicMLC = field.beamTypeDisplay && field.beamTypeDisplay.includes('DYNAMIC');
     // Identify fields that require specific static shapes based on keywords
     const isComplexStatic = ['Hip', 'Femur', 'Pelvis'].some(keyword => field.fieldName.includes(keyword));
@@ -661,15 +636,38 @@ function drawBEV(field, isAnimating = false, progress = 0) {
         const posA_px = centerX + (posA_cm * scale); // Convert X-coord to pixels
         const posB_px = centerX + (posB_cm * scale);
 
-        // Only draw if within open Y jaw area (simplified visibility check)
-        if (currentY > y2_px && currentY < y1_px) {
-             // Draw Bank A Leaf (Left side) - from left edge to posA_px
-             ctx.fillRect(0, currentY, posA_px, leafHeightPx - 0.5);
-             // Draw Bank B Leaf (Right side) - from posB_px to right edge
-             ctx.fillRect(posB_px, currentY, width - posB_px, leafHeightPx - 0.5);
-        }
+        // Draw Bank A Leaf (Left side) - from left edge to posA_px
+        ctx.fillRect(0, currentY, posA_px, leafHeightPx - 0.5);
+        // Draw Bank B Leaf (Right side) - from posB_px to right edge
+        ctx.fillRect(posB_px, currentY, width - posB_px, leafHeightPx - 0.5);
+        
         currentY += leafHeightPx;
     }
+
+
+    // --- DRAW JAWS (Second, semi-transparent on top of MLCs) ---
+    ctx.fillStyle = 'rgba(40, 40, 40, 0.8)'; // Dark, semi-transparent jaw material
+    const y1_px = centerY + (currentY1 * scale);
+    const y2_px = centerY - (jaws.Y2 * scale);
+    const x1_px = centerX + (jaws.X1 * scale);
+    const x2_px = centerX - (jaws.X2 * scale);
+
+    // Top/Bottom Jaws (Y)
+    ctx.fillRect(0, 0, width, y2_px); // Top block
+    ctx.fillRect(0, y1_px, width, height - y1_px); // Bottom block
+    // Left/Right Jaws (X)
+    ctx.fillRect(0, y2_px, x1_px, y1_px - y2_px); // Left block
+    ctx.fillRect(x2_px, y2_px, width - x2_px, y1_px - y2_px); // Right block
+
+    // --- Draw Jaw Labels (X1, X2, Y1, Y2) ---
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Light grey text
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    
+    if (y2_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, y2_px - 5); }
+    if (y1_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, y1_px + 5); }
+    if (x1_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", x1_px - 5, centerY); }
+    if (x2_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", x2_px + 5, centerY); }
 }
 
 
