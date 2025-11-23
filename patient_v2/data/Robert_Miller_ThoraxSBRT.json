@@ -108,18 +108,15 @@
   {
     "fieldName": "SBRT Arc 1",
     "technique": "SBRT",
-    // --- NEW DISPLAY FIELDS ---
-    "beamTypeDisplay": "DYNAMIC (VMAT Arc)",
+      "beamTypeDisplay": "DYNAMIC (VMAT Arc)",
     "energy_MV": 10,
     "energyDisplay": "10X FFF",
     "monitorUnits": 1250,
-    // VMAT typically doesn't use the split MU display shown in the static example
     "splitMU": null,
     "doseRate": 2400, // FFF mode has higher dose rates
     "estimatedTime_min": 0.52,
     "wedgeInfo": "None",
     "bolusInfo": "None",
-    // ---------------------------
     "gantryAngle": "200-160 CW", // Keep string for arcs, JS will handle display
     "collimatorAngle": 20,
     "couchAngle": 0,
@@ -132,7 +129,7 @@
     "pitchAngle": 0.0,
     "rollAngle": 0.0,
     // ---------------------------
-    "jawPositions_cm": { "X1": -3.0, "X2": 3.0, "Y1": -4.0, "Y2": 4.0 }
+    "jawPositions_cm": { "X1": 3.0, "X2": 3.0, "Y1": 4.0, "Y2": 4.0 }
   },
   {
     "fieldName": "SBRT Arc 2",
@@ -160,7 +157,7 @@
     "pitchAngle": 0.0,
     "rollAngle": 0.0,
     // ---------------------------
-    "jawPositions_cm": { "X1": -3.0, "X2": 3.0, "Y1": -4.0, "Y2": 4.0 }
+    "jawPositions_cm": { "X1": 3.0, "X2": 3.0, "Y1": 4.0, "Y2": 4.0 }
   }
 ]
     },
