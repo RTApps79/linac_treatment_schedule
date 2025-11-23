@@ -104,13 +104,65 @@
         { "date": "2025-02-14", "type": "Patient Specific SBRT QA (MapCHECK, Delta4)", "by": "Physics Staff (SD)", "result": "Pass (Gamma 99.1% @ 2%/1mm); Absolute dose match within 1.0%. Delivered MU verification passed." },
         { "date": "2025-02-15", "type": "Dry Run Verification", "by": "Lead Therapist (RW)", "result": "Pass - Machine parameters, arc delivery, and couch movements verified on LINAC. Patient position and vacuum bag reproducibility confirmed." }
       ],
-      "fieldDetails": [
-        { "fieldName": "Arc 1 (CW)", "fieldSize": "Dynamic MLC (variable field shape)", "gantryAngle": "200-160 CW", "collimatorAngle": "30", "couchAngle": "0", "energy": "10MV FFF", "monitorUnits": 2750, "ssd": "Variable (VMAT isocenter fixed, SSD varies dynamically)" },
-        { "fieldName": "Arc 2 (CCW)", "fieldSize": "Dynamic MLC (variable field shape)", "gantryAngle": "160-200 CCW", "collimatorAngle": "330", "couchAngle": "0", "energy": "10MV FFF", "monitorUnits": 2810, "ssd": "Variable (VMAT isocenter fixed, SSD varies dynamically)" }
-      ],
-      "imagingFields": [
-        { "fieldName": "CBCT (Full Thorax)", "gantryAngle": "Full Arc", "fieldSize": "Volume", "energy": "kV", "monitorUnits": "N/A" }
-      ]
+      "fieldDetails": [[
+  {
+    "fieldName": "SBRT Arc 1",
+    "technique": "SBRT",
+    // --- NEW DISPLAY FIELDS ---
+    "beamTypeDisplay": "DYNAMIC (VMAT Arc)",
+    "energy_MV": 10,
+    "energyDisplay": "10X FFF",
+    "monitorUnits": 1250,
+    // VMAT typically doesn't use the split MU display shown in the static example
+    "splitMU": null,
+    "doseRate": 2400, // FFF mode has higher dose rates
+    "estimatedTime_min": 0.52,
+    "wedgeInfo": "None",
+    "bolusInfo": "None",
+    // ---------------------------
+    "gantryAngle": "200-160 CW", // Keep string for arcs, JS will handle display
+    "collimatorAngle": 20,
+    "couchAngle": 0,
+     // --- NEW GEOMETRY FIELDS ---
+    "couchCoordinates_cm": {
+        "vertical": 22.0,
+        "longitudinal": 125.5,
+        "lateral": 998.0
+    },
+    "pitchAngle": 0.0,
+    "rollAngle": 0.0,
+    // ---------------------------
+    "jawPositions_cm": { "X1": -3.0, "X2": 3.0, "Y1": -4.0, "Y2": 4.0 }
+  },
+  {
+    "fieldName": "SBRT Arc 2",
+    "technique": "SBRT",
+    // --- NEW DISPLAY FIELDS ---
+    "beamTypeDisplay": "DYNAMIC (VMAT Arc)",
+    "energy_MV": 10,
+    "energyDisplay": "10X FFF",
+    "monitorUnits": 1310,
+    "splitMU": null,
+    "doseRate": 2400,
+    "estimatedTime_min": 0.55,
+    "wedgeInfo": "None",
+    "bolusInfo": "None",
+    // ---------------------------
+    "gantryAngle": "160-200 CCW",
+    "collimatorAngle": 340,
+    "couchAngle": 0,
+    // --- NEW GEOMETRY FIELDS ---
+    "couchCoordinates_cm": {
+        "vertical": 22.0,
+        "longitudinal": 125.5,
+        "lateral": 998.0
+    },
+    "pitchAngle": 0.0,
+    "rollAngle": 0.0,
+    // ---------------------------
+    "jawPositions_cm": { "X1": -3.0, "X2": 3.0, "Y1": -4.0, "Y2": 4.0 }
+  }
+]
     },
     "treatmentDelivery": {
       "fractions": [
