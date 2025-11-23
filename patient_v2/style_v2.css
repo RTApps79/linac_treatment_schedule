@@ -275,3 +275,88 @@ body {
     color: #eee;
     cursor: pointer;
 }
+
+* --- Notifications --- */
+#notification-area {
+    position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+    width: 80%; z-index: 100; pointer-events: none;
+}
+.notification {
+    background-color: rgba(40, 167, 69, 0.9); color: white; padding: 15px;
+    border-radius: 5px; margin-bottom: 10px; text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); font-weight: bold;
+    animation: fadeOut 3s forwards;
+}
+@keyframes fadeOut {
+    0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; }
+}
+
+/* --- Field List States --- */
+#field-list-items li {
+    display: flex; align-items: center; cursor: pointer; user-select: none;
+}
+.drag-handle {
+    margin-right: 10px; color: #aaa; cursor: grab; display: none;
+}
+.reorder-mode .drag-handle { display: block; }
+.field-checkbox { margin-right: 10px; display: none; }
+.deactivate-mode .field-checkbox { display: block; }
+li.deactivated { color: #888; font-style: italic; }
+li.deactivated span { text-decoration: line-through; }
+
+/* Imaging Field Style */
+li.imaging-field {
+    background-color: #3a4a5e; border-left: 4px solid #4a90e2; color: #cee;
+}
+li.imaging-field .icon { margin-right: 8px; }
+
+/* --- Tolerance Warning --- */
+.value-box.out-of-tolerance {
+    background-color: #c0392b; color: white; border: 1px solid #e74c3c;
+    animation: pulseRed 2s infinite;
+}
+@keyframes pulseRed { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+
+#tolerance-warning {
+    background-color: #c0392b; color: white; text-align: center;
+    padding: 10px; font-weight: bold;
+}
+.warning-btn { background: #c0392b !important; border: 1px solid #a93226 !important; }
+
+/* --- Modals --- */
+.modal {
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+    width: 100%; height: 100%; overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+}
+.modal-content {
+    background-color: #2c3e50; margin: 10% auto; padding: 25px;
+    border: 1px solid #4a6b8a; width: 500px; color: #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); position: relative;
+}
+.close-modal {
+    color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;
+}
+.close-modal:hover { color: white; }
+.modal h2 { margin-top: 0; border-bottom: 1px solid #4a6b8a; padding-bottom: 10px; }
+
+.form-group { margin: 20px 0; }
+.form-group label { display: block; margin-bottom: 8px; }
+.form-group select, .form-group input {
+    width: 100%; padding: 10px; background-color: #1a2a3a; color: white;
+    border: 1px solid #3a5a7a;
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px; }
+.notes-content {
+    background-color: #1a2a3a; padding: 15px; height: 200px; overflow-y: auto;
+    border: 1px solid #3a5a7a; white-space: pre-wrap;
+}
+.warning-content { border-color: #c0392b; }
+.warning-text { color: #e74c3c; font-weight: bold; }
+
+/* Modal Tabs */
+.modal-tabs { display: flex; border-bottom: 1px solid #4a6b8a; margin-bottom: 15px; }
+.modal-tab {
+    padding: 10px 20px; background: none; border: none; color: #aaa; cursor: pointer;
+}
+.modal-tab.active { color: white; border-bottom: 2px solid #4a90e2; }
