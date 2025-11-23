@@ -1,5 +1,5 @@
 {
-  "patientId": "88991",
+  "patientId": "GH88991",
   "demographics": {
     "name": "George Harris",
     "dob": "1958-10-05",
@@ -16,12 +16,13 @@
   "diagnosis": {
     "primary": "Metastatic Castration-Resistant Prostate Cancer (mCRPC)",
     "location": "L3 Vertebral Body (with mild epidural extension)",
+    "overallStage": "Stage IV",
+    "tnmStage": "mCRPC - Widespread osseous mets",
     "grade": "Gleason Score: 4 + 3 = 7 (initial diagnosis, Grade Group 3)",
     "datePathologicDiagnosis": "11/15/2024 (Bone Scan showing mets, confirmed by subsequent biopsy)",
     "tumorSize": "L3 lesion measures 3.2 cm (axial) x 2.8 cm (craniocaudal) on MRI. Overall extensive bony metastatic burden.",
     "vascularInvolvement": "No direct major vascular involvement by spinal lesion. No distant vascular compromise.",
     "pathologicStage": "Stage IV (mCRPC) - widespread osseous metastases.",
-    "psaAtDiagnosis": "Initial prostate cancer diagnosis (2019): PSA 6.8 ng/mL. Current (03/15/2025): PSA 55.2 ng/mL (rising, consistent with mCRPC).",
     "symptomsAtPresentation": "Severe low back pain (8/10), localized to L3 region, worse with movement and night pain. No new leg weakness, numbness, or bowel/bladder dysfunction (no definitive cord compression at presentation, but mild posterior bulging noted on MRI).",
     "pathologyFindings": [
       "Initial Prostate Biopsy (2019): Adenocarcinoma, Gleason 4+3=7 (Grade Group 3).",
@@ -34,11 +35,12 @@
   "treatmentPlan": {
     "radOnc": "Dr. Laura Fisher",
     "medOnc": "Dr. Samuel Adams",
+    "planId": "GH88991_SpinePal",
     "treatmentSite": "L3 Vertebral Body (Painful Metastasis)",
     "intent": "Palliative (Pain control, prevention of progressive pain, potential fracture prevention, and prevention of spinal cord compression).",
     "modality": "External Beam Radiation Therapy (EBRT) - 3D-Conformal Radiation Therapy (3D-CRT)",
-    "totalDose": "30 Gy",
     "fractionation": "10 fx",
+    "billingCodes": "77402, 77387, 77427",
     "rtRxDetails": "30 Gy / 10 fx (3 Gy/fx daily), delivered 5 days per week (Monday-Friday) over 2 weeks.",
     "targetVolumeSummary": "Planning Target Volume (PTV) encompassing the entire L3 vertebral body with 5mm margin, including mild epidural extension identified on MRI. Designed to cover tumor and a small margin of normal bone, respecting spinal cord constraints.",
     "techniqueSummary": "3D-CRT utilizing opposed Anterior-Posterior (AP) and Posterior-Anterior (PA) fields. Fields shaped by MLCs to conform to target. Standard photon energy (6MV) used. Daily kV imaging for setup verification.",
@@ -52,206 +54,59 @@
       "Calcium 1000mg + Vitamin D 800 IU daily (for bone health, lifelong)."
     ],
     "therapistAlerts": [
-        "Patient presents with significant pain. Assist with transfers to/from treatment couch and ensure comfortable positioning on immobilization device. Minimize setup time.",
-        "Monitor patient closely for any new or worsening neurological symptoms (e.g., leg weakness, numbness, bowel/bladder dysfunction) indicating potential cord compression. Report immediately.",
-        "Assess pain levels daily and document. Communicate changes to nursing/physician for medication adjustment.",
-        "Ensure consistent and reproducible setup using Vac-Lok bag and external skin marks. Daily kV imaging is critical for accurate spinal targeting.",
-        "Patient is on Dexamethasone; monitor for steroid side effects (e.g., hyperglycemia, mood changes, fluid retention)."
+      "Patient presents with significant pain. Assist with transfers to/from treatment couch and ensure comfortable positioning on immobilization device. Minimize setup time.",
+      "Monitor patient closely for any new or worsening neurological symptoms (e.g., leg weakness, numbness, bowel/bladder dysfunction) indicating potential cord compression. Report immediately.",
+      "Assess pain levels daily and document. Communicate changes to nursing/physician for medication adjustment.",
+      "Ensure consistent and reproducible setup using Vac-Lok bag and external skin marks. Daily kV imaging is critical for accurate spinal targeting.",
+      "Patient is on Dexamethasone; monitor for steroid side effects (e.g., hyperglycemia, mood changes, fluid retention)."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "AP Spine",
+        "technique": "3D-CRT",
+        "beamTypeDisplay": "STATIC (Static Photon)",
+        "energyDisplay": "6X",
+        "monitorUnits": 165,
+        "doseRate": 600,
+        "estimatedTime_min": 0.28,
+        "wedgeInfo": "None",
+        "bolusInfo": "None",
+        "gantryAngle": 0,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 23.0, "longitudinal": 105.0, "lateral": 100.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -5.0, "X2": 5.0, "Y1": -6.0, "Y2": 6.0 }
+      },
+      {
+        "fieldName": "PA Spine",
+        "technique": "3D-CRT",
+        "beamTypeDisplay": "STATIC (Static Photon)",
+        "energyDisplay": "6X",
+        "monitorUnits": 170,
+        "doseRate": 600,
+        "estimatedTime_min": 0.29,
+        "wedgeInfo": "None",
+        "bolusInfo": "None",
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 23.0, "longitudinal": 105.0, "lateral": 100.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -5.0, "X2": 5.0, "Y1": -6.0, "Y2": 6.0 }
+      }
     ]
   },
   "radiationOncologyData": {
     "ctSimulation": {
-      "simulationDate": "03/28/2025",
-      "setupInstructions": "Supine in custom VacLok bag, with knee sponge and ankle immobilization for comfort and stability. Arms crossed over chest. Patient instructed to breathe normally. SAD setup. External skin marks placed at isocenter projections.",
-      "immobilization": "VacLok bag (custom molded for torso/pelvis), knee sponge, ankle immobilization cushion.",
-      "referenceMarks": "3-point tattoos placed at anterior mid-line, and bilateral lateral mid-axillary lines (at level of L3). Additional small marks placed to outline treatment field borders. Isocenter placed at L3 vertebral body center. Coordinates recorded and verified.",
-      "setupImages": [
-        { "type": "AP", "url": "https://placehold.co/250x200/EEE/31343C?text=AP+Setup+Photo_GH88991" },
-        { "type": "Lateral", "url": "https://placehold.co/250x200/EEE/31343C?text=Lateral+Setup+Photo_GH88991" }
-      ],
-      "scanner": "Philips Big Bore CT (for large bore size and patient comfort)",
-      "sliceThickness": "3.0 mm (optimal for spine contouring and dose calculation).",
-      "contrastUsed": "Non-contrast (Standard for palliative spine RT. Target delineation relies on fused diagnostic MRI and PET/CT).",
-      "ctNotes": "Non-contrast CT acquired supine in VacLok bag. Scan range includes T12-S1. Fused with diagnostic MRI Lumbar Spine (03/20/2025) and PET/CT (01/28/2025) for accurate target delineation and spinal cord visualization. Isocenter placed at center of L3 vertebral body. Patient tolerated simulation well, remained still, and pain managed effectively with pre-medication."
-    },
-    "dosimetry": {
-      "planId": "GH88991_SpinePal",
-      "planStatus": "Final - Approved by Dr. Laura Fisher (03/30/2025)",
-      "rx": "30 Gy / 10 fx (3 Gy/fx daily)",
-      "technique": "3D-CRT (Opposed AP/PA fields)",
-      "energy": "6MV (photon energy)",
-      "numberOfFieldsOrArcs": 2,
-      "gantryAngles": "0 (AP), 180 (PA)",
-      "collAngles": "0 (Collimator set to 0 for rectangular fields)",
-      "couchAngles": "0 (Patient supine)",
-      "isoCoords": "L0.0, A0.0, V-10.0 (Lateral, Anterior-Posterior, Superior-Inferior relative to CT sim reference point, fixed at L3 vertebral body center)",
-      "tps": "Eclipse 16.1 (Treatment Planning System)",
-      "algorithm": "AAA (Anisotropic Analytical Algorithm)",
-      "hetero": "Yes (Full heterogeneity correction applied for bone/tissue interfaces)",
-      "norm": "Isocenter (100% at isocenter) - Prescription to deliver 30 Gy to 95% of PTV_L3.",
-      "constraints": "Spinal Cord Max < 25 Gy (achieved 23.1 Gy); Kidney Max (Rt/Lt) < 18 Gy (achieved Rt: 1.5 Gy, Lt: 1.2 Gy); Small Bowel Max < 30 Gy (achieved 25.0 Gy)",
-      "planNotes": "Palliative spine RT for L3 metastasis from mCRPC. Goal is pain relief and local control. Plan optimized for maximal spinal cord sparing while covering entire L3 vertebral body. Daily kV imaging for IGRT. Patient-specific QA performed and passed. Physician reviewed and approved for daily delivery.",
-      "igrtProtocol": {
-        "frequency": "Daily",
-        "type": "kV Imaging (Orthogonal Pair - AP & Lateral)",
-        "alignment": "Primary match to bony anatomy of L3 vertebral body and adjacent vertebrae. Shifts approved by therapists within pre-set tolerance, physician approval for larger shifts.",
-        "tolerances": "Translational: +/- 3mm; Rotational: +/- 1 degree. Action taken for out-of-tolerance shifts (e.g., re-imaging, physician review)."
-      },
-      "qaChecks": [
-        { "date": "2025-03-30", "type": "Initial Chart Check", "by": "Physics Staff (SD)", "result": "Pass - Rx, volumes, constraints verified. Patient safety reviewed." },
-        { "date": "2025-03-30", "type": "Patient Specific QA (Output Check)", "by": "Medical Physicist (JL)", "result": "Pass (Output within 1.0%)." },
-        { "date": "2025-03-31", "type": "Dry Run Verification", "by": "Lead Therapist (MW)", "result": "Pass - Machine parameters, field sequencing, and couch movements verified. Patient setup confirmed." }
-      ],
-      "fieldDetails": [
-        { "fieldName": "AP Spine", "fieldSize": "10 cm x 12 cm", "gantryAngle": "0", "collimatorAngle": "0", "couchAngle": "0", "energy": "6MV", "monitorUnits": 165, "ssd": "90.0 cm" },
-        { "fieldName": "PA Spine", "fieldSize": "10 cm x 12 cm", "gantryAngle": "180", "collimatorAngle": "0", "couchAngle": "0", "energy": "6MV", "monitorUnits": 170, "ssd": "90.0 cm" }
-      ],
-      "imagingFields": [
-        { "fieldName": "AP Verification (kV)", "gantryAngle": "0", "fieldSize": "10 x 12 cm", "energy": "kV", "monitorUnits": "N/A" },
-        { "fieldName": "Lateral Verification (kV)", "gantryAngle": "90", "fieldSize": "10 x 12 cm", "energy": "kV", "monitorUnits": "N/A" }
-      ]
+      "setupInstructions": "Supine in custom VacLok bag, with knee sponge and ankle immobilization for comfort and stability. Arms crossed over chest. Patient instructed to breathe normally. SAD setup. External skin marks placed at isocenter projections. Align to 3-point tattoos placed at anterior mid-line, and bilateral lateral mid-axillary lines (at level of L3). Daily kV imaging required."
     },
     "treatmentDelivery": {
-      "fractions": [
-        {
-          "fractionNumber": 1, "totalFractions": 10, "date": "2025-03-31", "machine": "LINAC 3", "therapistInitials": "SD, TW", "overallMUs": 335,
-          "recordedFields": [
-              { "fieldName": "AP Spine", "deliveredMu": 165, "notes": "" },
-              { "fieldName": "PA Spine", "deliveredMu": 170, "notes": "" }
-          ],
-          "energiesUsed": "6MV", "setupVerification": "Tolerances Met", "immobilizationDevicesChecked": "VacLok bag, knee sponge", "setupAdjustments": "None", "organTargetChecks": "kV pair imaging for daily setup. Matched to L3 vertebral body. Spinal cord position verified.", "imagingType": "kV Pair", "igrtMatchQuality": "Excellent - No Shifts Required", "shiftsApplied": "None", "igrtApprovedBy": "LF (Physician)",
-          "igrtVerificationNotes": "First fraction delivered smoothly. Patient comfortable. Physician approved setup.", "patientTolerance": "Good", "generalSideEffects": "Mild fatigue.", "siteSpecificSideEffects": "Back pain 6/10.", "painAssessment": "6/10", "patientConcerns": "None.",
-          "instructionsGiven": "Reinforced daily RT attendance and importance of reporting new neurologic symptoms.", "billingCodes": "77402, 77387", "dailyNotes": "Patient tolerated first treatment well. No acute issues. Setup time quick."
-        },
-        {
-          "fractionNumber": 5, "totalFractions": 10, "date": "2025-04-04", "machine": "LINAC 3", "therapistInitials": "JG, RS", "overallMUs": 335,
-          "recordedFields": [
-              { "fieldName": "AP Spine", "deliveredMu": 165, "notes": "" },
-              { "fieldName": "PA Spine", "deliveredMu": 170, "notes": "" }
-          ],
-          "energiesUsed": "6MV", "setupVerification": "Tolerances Met", "immobilizationDevicesChecked": "VacLok bag, knee sponge", "setupAdjustments": "None", "organTargetChecks": "kV pair imaging reviewed, good alignment. L3 vertebral body in field.", "imagingType": "kV Pair", "igrtMatchQuality": "Good - No Shifts Required", "shiftsApplied": "None", "igrtApprovedBy": "LF (Physician)",
-          "igrtVerificationNotes": "Routine kV, no shifts. Patient comfortable. OTV today.", "patientTolerance": "Good", "generalSideEffects": "Slight improvement in back pain (4/10 from 6/10).", "siteSpecificSideEffects": "None.", "painAssessment": "4/10.", "patientConcerns": "Asked about Dexamethasone taper.",
-          "instructionsGiven": "Reviewed steroid taper schedule. Reinforce reporting any new neurological symptoms immediately.", "billingCodes": "77402, 77387, 77427", "dailyNotes": "OTV today. Patient reports good pain control. Starting steroid taper today. Consistent setup."
-        },
-        {
-          "fractionNumber": 10, "totalFractions": 10, "date": "2025-04-11", "machine": "LINAC 3", "therapistInitials": "SD, TW", "overallMUs": 335,
-          "recordedFields": [
-              { "fieldName": "AP Spine", "deliveredMu": 165, "notes": "" },
-              { "fieldName": "PA Spine", "deliveredMu": 170, "notes": "" }
-          ],
-          "energiesUsed": "6MV", "setupVerification": "Tolerances Met", "immobilizationDevicesChecked": "VacLok bag, knee sponge", "setupAdjustments": "None", "organTargetChecks": "Final kV imaging. Excellent setup. L3 fully treated.", "imagingType": "kV Pair", "igrtMatchQuality": "Excellent - No Shifts Required", "shiftsApplied": "None", "igrtApprovedBy": "LF (Physician)",
-          "igrtVerificationNotes": "Final fraction delivered. Patient reports excellent pain relief.", "patientTolerance": "Good", "generalSideEffects": "Fatigue mild to moderate.", "siteSpecificSideEffects": "Pain significantly improved (1/10).", "painAssessment": "1/10.", "patientConcerns": "Very relieved to finish.",
-          "instructionsGiven": "Reinforced continued Dexamethasone taper. Advised on gradual increase in activity. Scheduled post-RT follow-up.", "billingCodes": "77402, 77387, 77427", "dailyNotes": "Completed 10/10 fx palliative RT to L3 spine. Excellent pain response."
-        }
-      ]
+      "fractions": []
     }
   },
-  "imagingAndReports": [
-    {
-      "date": "11/15/2024",
-      "type": "Bone Scan (Technetium-99m)",
-      "summary": "Multiple areas of increased uptake consistent with widespread bone metastases, including lumbar spine, ribs, pelvis. Most intense uptake at L3. Initial diagnosis of metastatic disease.",
-      "reportDetails": {
-        "accessionNumber": "NM24-56789",
-        "protocol": "Whole Body Bone Scintigraphy (Technetium-99m MDP)",
-        "findings": "Multiple foci of abnormally increased tracer uptake throughout the axial and appendicular skeleton, most prominent at L3 vertebral body, multiple ribs, and bilateral pelvic bones. Findings consistent with widespread bony metastatic disease. No evidence of major fracture.",
-        "impression": "Widespread osseous metastatic disease. Highly suspicious for metastatic prostate cancer.",
-        "signedBy": "Dr. N. NuclearMed, 11/16/2024"
-      }
-    },
-    {
-      "date": "03/15/2025",
-      "type": "Diagnostic PSA Blood Test",
-      "summary": "PSA 55.2 ng/mL. Rising from previous baseline, consistent with mCRPC progression.",
-      "reportDetails": {
-        "lab": "Anytown Medical Labs",
-        "test": "Prostate-Specific Antigen (PSA)",
-        "value": "55.2",
-        "units": "ng/mL",
-        "range": "<4.0",
-        "notes": "Elevated, rising from post-ADT nadir, consistent with castration-resistant disease. Correlates with new pain."
-      }
-    },
-    {
-      "date": "03/20/2025",
-      "type": "MRI Lumbar Spine w/ & w/o Contrast",
-      "summary": "Large enhancing lesion replacing majority of L3 vertebral body, mild posterior bulging without frank cord compression. Correlates with area of maximal pain. Confirms metastatic lesion.",
-      "reportDetails": {
-        "accessionNumber": "MR25-99887",
-        "protocol": "MRI Lumbar Spine with and without Gadolinium Contrast",
-        "findings": "Large enhancing lesion replacing approximately 80% of the L3 vertebral body, with mild posterior epidural extension causing mild effacement of the thecal sac without frank spinal cord compression or myelopathy. Lesion shows heterogeneous signal characteristics. No other significant spinal metastases at this level. Cord signal is normal. Adjacent vertebrae are unremarkable. No new fractures noted.",
-        "impression": "L3 vertebral body metastatic lesion, consistent with known prostate cancer. Mild epidural extension. No definitive cord compression. For palliative radiation planning.",
-        "signedBy": "Dr. M. Radiologist, 03/21/2025"
-      }
-    },
-    {
-      "date": "03/20/2025",
-      "type": "L3 Vertebral Biopsy Report",
-      "summary": "Adenocarcinoma, consistent with prostate primary. ERG positive, AR positive. Confirms metastatic disease.",
-      "reportDetails": {
-        "lab": "Anytown Hospital Pathology",
-        "accessionNumber": "BX-25-0050",
-        "specimenSource": "CT-guided biopsy, L3 Vertebral Body",
-        "diagnosis": "ADENOCARCINOMA, CONSISTENT WITH PROSTATE PRIMARY.",
-        "microscopicDescription": "Core biopsy fragments show infiltrating glandular structures with moderate atypia, consistent with adenocarcinoma. Immunohistochemistry: PSA positive, PSAP positive, ERG positive (confirms prostate origin). Androgen Receptor (AR) positive. No definitive perineural or lymphovascular invasion noted in this specimen.",
-        "grossDescription": "Received in formalin, 2 core biopsy fragments, largest 0.8 cm.",
-        "comment": "Confirms metastatic adenocarcinoma to the L3 vertebral body, consistent with known prostate primary. Hormone receptor status (AR) is positive, which guides systemic therapy decisions.",
-        "signedBy": "Dr. P. Pathologist, 03/21/2025"
-      }
-    },
-    {
-      "date": "03/28/2025",
-      "type": "CT Simulation (Spine)",
-      "summary": "Non-contrast CT acquired supine. Scan includes L1-L5. Fused with diagnostic MRI. For RT planning.",
-      "reportDetails": {
-        "accessionNumber": "RTCT25-54321",
-        "scanType": "Treatment Planning CT (Spine)",
-        "setup": "Supine, VacLok immobilization, knee sponge, ankle immobilization. Arms across chest. Patient comfortable. Oral contrast not used.",
-        "findings": "L3 vertebral body mass clearly visible. Spinal canal assessed. No gross changes since diagnostic MRI. Image quality good for RT planning. Fused with MRI for detailed target and OAR (spinal cord) delineation.",
-        "impression": "Adequate CT simulation for palliative spine RT. Setup reproducible. Ready for contouring and plan generation.",
-        "signedBy": "Dr. T. Radiologist (Physics), 03/28/2025"
-      }
-    }
-  ],
-  "dicomImages": [
-    { "description": "MRI Lumbar Spine (03/20/2025)", "seriesType": "MR", "imageUrls": [], "ohifViewerUrl": "https://viewer.ohif.org/viewer/latest?studyUIDs=1.3.6.1.4.1.14519.5.2.1.7009.2403.334240655099307998634586483120" },
-    { "description": "CT Simulation Spine (03/28/2025)", "seriesType": "CT", "imageUrls": [ "https://raw.githubusercontent.com/cornerstonejs/cornerstone-wado-image-loader/master/examples/images/CT000000.dcm" ], "ohifViewerUrl": "https://viewer.ohif.org/viewer/latest?studyUIDs=1.3.6.1.4.1.5962.99.1.2968617883.1314880426.1493322302363.3.0" }
-  ],
-  "labResults": [
-    { "date": "03/15/2025", "test": "PSA", "value": "55.2", "units": "ng/mL", "notes": "Rising, consistent with mCRPC progression.", "range": "<4.0 ng/mL" },
-    { "date": "03/15/2025", "test": "Alkaline Phosphatase (Alk Phos)", "value": "250", "units": "U/L", "notes": "Elevated, consistent with widespread bone metastases.", "range": "40-130 U/L" },
-    { "date": "03/25/2025", "test": "CBC - WBC", "value": "7.5", "units": "K/uL", "notes": "Pre-RT Baseline. All WNL.", "range": "4.0-11.0 K/uL" },
-    { "date": "03/25/2025", "test": "CBC - Hemoglobin", "value": "13.8", "units": "g/dL", "notes": "Pre-RT Baseline. All WNL.", "range": "13.0-17.0 g/dL" },
-    { "date": "03/25/2025", "test": "CBC - Platelet count", "value": "260", "units": "K/uL", "notes": "Pre-RT Baseline. All WNL.", "range": "150-450 K/uL" },
-    { "date": "03/25/2025", "test": "Comprehensive Metabolic Panel (CMP)", "value": "WNL", "units": "N/A", "notes": "Pre-RT Baseline. Liver and renal function stable.", "range": "WNL" },
-    { "date": "04/04/2025", "test": "CBC - WBC", "value": "7.2", "units": "K/uL", "notes": "Mid-treatment, stable.", "range": "4.0-11.0 K/uL" },
-    { "date": "04/04/2025", "test": "Alkaline Phosphatase (Alk Phos)", "value": "240", "units": "U/L", "notes": "Mid-treatment, stable. Indicates bone turnover.", "range": "40-130 U/L" }
-  ],
-  "progressNotes": [
-    { "date": "03/18/2025", "author": "Dr. Samuel Adams (Medical Oncology)", "type": "Progress Note", "summary": "Patient with mCRPC on ADT presents with worsening LBP (8/10). Pain localized to L-spine. Recent PSA rising (55.2 ng/mL), bone scan showed extensive mets. Ordered urgent MRI L-spine to assess L3 met and rule out cord compression. Started scheduled Oxycodone. Referred to Rad Onc for palliative RT consult.", "patientTolerance": "Fair", "generalSideEffects": "Mild nausea from pain meds.", "siteSpecificSideEffects": "Severe low back pain (L3).", "painAssessment": "8/10.", "patientConcerns": "Concerned about escalating pain and mobility. Asked about potential for paralysis.", "instructionsGiven": "Reassured about prompt intervention. Reviewed pain medication schedule. Advised to report any new weakness or numbness immediately." },
-    { "date": "03/22/2025", "author": "Dr. Laura Fisher (Radiation Oncology)", "type": "Initial Consult", "summary": "Patient with mCRPC referred for palliative RT to painful L3 metastasis. MRI reviewed, shows large L3 lesion with mild epidural extension, but no frank cord compression. Discussed palliative RT options: 30 Gy in 10 fx (standard for pain relief), 20 Gy in 5 fx (shorter course), or 8 Gy in 1 fx (single treatment). Plan for 30 Gy / 10 fx via 3D-CRT AP/PA fields due to location and desire for durable pain control. Explained goals (pain relief, local control, fracture prevention), procedure, and low risk of acute side effects (mild fatigue, transient pain flare, low nausea risk). Patient understands and agrees. CT sim scheduled. Dexamethasone initiated by Med Onc.", "patientTolerance": "Fair", "generalSideEffects": "Mild fatigue from ADT and pain meds.", "siteSpecificSideEffects": "Low back pain 7/10 (with meds).", "painAssessment": "7/10.", "patientConcerns": "Asked about timeline for pain relief. Concerned about radiation affecting other organs.", "instructionsGiven": "Reassured pain relief usually starts mid-course. Emphasized precision of RT. Reviewed steroid side effects with patient." },
-    { "date": "03/28/2025", "author": "Radiation Therapist Lead", "type": "Simulation Note", "summary": "CT Sim for spine RT completed. Patient supine in VacLok bag with knee/ankle immobilization. Patient comfortable. External skin marks placed. Images sent to dosimetry for 3D-CRT planning. Fused with diagnostic MRI Lumbar Spine and PET/CT. Isocenter placed at L3 vertebral body. Confirmed adequate immobilization and setup reproducibility.", "patientTolerance": "Good", "generalSideEffects": "None.", "siteSpecificSideEffects": "None.", "painAssessment": "0/10 (pre-medicated).", "patientConcerns": "Asked about need for daily imaging. Reassured on safety and accuracy.", "instructionsGiven": "Reviewed daily treatment setup. Emphasized staying still. Patient assisted off table safely." },
-    { "date": "04/04/2025", "author": "Dr. Laura Fisher (Radiation Oncology)", "type": "OTV - Mid Treatment (Fx 5/10)", "summary": "Patient completed 5/10 fx. Reports definite improvement in back pain (4/10 from 7/10). No acute RT side effects noted. Tolerating RT well. Started Dexamethasone taper today as pain is controlled. Continue current plan. Reviewed weekly labs (WBC 7.2, Alk Phos 240) - stable. Patient is eager for full pain relief. Reassured that pain continues to improve after RT completion.", "patientTolerance": "Good", "generalSideEffects": "Mild fatigue. No nausea or new GI issues.", "siteSpecificSideEffects": "Back pain 4/10. No skin reaction.", "painAssessment": "4/10.", "patientConcerns": "Asked about duration of steroid taper. Inquired about long-term prognosis and next systemic treatment.", "instructionsGiven": "Reviewed steroid taper schedule. Discussed follow-up with Medical Oncology for systemic therapy options. Encouraged continued light activity." },
-    { "date": "04/11/2025", "author": "Dr. Laura Fisher (Radiation Oncology)", "type": "OTV - End of Treatment (Fx 10/10)", "summary": "Completed 10/10 fx palliative RT to L3 spine. Pain significantly improved (1/10 from 8/10 at consult). Patient able to walk without cane for short distances. Fatigue mild. No acute skin reaction. Provided completion certificate. Instructions on continued Dexamethasone taper. Patient to follow up with Med Onc regarding systemic therapy options. Rad Onc F/U PRN. Excellent pain response achieved.", "patientTolerance": "Good", "generalSideEffects": "Mild fatigue.", "siteSpecificSideEffects": "Back pain 1/10. No skin reaction.", "painAssessment": "1/10.", "patientConcerns": "Very pleased with pain relief. Asked about duration of pain relief and next steps for systemic therapy. Expressed interest in returning to golfing.", "instructionsGiven": "Discussed anticipated long-term pain relief. Advised gradual return to activities. Scheduled Med Onc follow-up. Encouraged continued follow-up for overall cancer management." }
-  ],
-  "patientEducation": {
-    "goalsDiscussed": "Palliative treatment to relieve pain in the lower back, improve mobility, and prevent a potential fracture or spinal cord compression from the L3 metastasis. This will improve quality of life.",
-    "sideEffectsReviewed": "Potential for a temporary 'pain flare' (worsening pain) in the first few days of RT before improving. Mild fatigue (from RT and concurrent ADT). Low risk of nausea, skin reaction (erythema, dry skin), or esophagitis (rare for lumbar spine). Patient should report any new or worsening weakness, numbness, or loss of bowel/bladder control immediately as this could indicate cord compression progression.",
-    "safetyConsiderations": "Importance of attending all daily RT appointments for consistent dose delivery. Reporting any new or worsening neurological symptoms immediately. Adherence to prescribed pain medications to maintain comfort. Maintenance of hydration and nutrition. Long-term monitoring for new bony metastases.",
-    "patientResponsibilities": "Attend daily RT appointments. Report pain levels and any new symptoms (especially neurological changes). Continue ADT as prescribed. Take pain medication and Dexamethasone as directed, discussing any tapering with your oncology team. Maintain gentle activity as tolerated.",
-    "medicationCompliance": "Continue pain medication as prescribed and discuss tapering with primary oncology team as pain improves. Adhere to Dexamethasone taper schedule. Continue ADT as prescribed."
-  },
-  "scheduling": [
-    { "date": "03/18/2025", "time": "2:00 PM", "type": "Medical Oncology Consult (Adams)", "location": "Oncology Clinic - Exam Room 1", "status": "Completed", "notes": "For new back pain and mCRPC progression." },
-    { "date": "03/20/2025", "time": "9:00 AM", "type": "MRI Lumbar Spine & L3 Biopsy", "location": "Radiology / IR Suite", "status": "Completed", "notes": "Confirms L3 met. Biopsy positive for prostate adenoCa." },
-    { "date": "03/22/2025", "time": "11:00 AM", "type": "Rad Onc Consult (Fisher)", "location": "Radiation Oncology Clinic - Exam Room 2", "status": "Completed", "notes": "Palliative RT plan discussed and approved." },
-    { "date": "03/28/2025", "time": "2:00 PM", "type": "CT Simulation Spine", "location": "Radiation Oncology Sim Suite", "status": "Completed", "notes": "For RT planning." },
-    { "date": "03/31/2025", "time": "9:00 AM", "type": "First Radiation Treatment (Fx 1/10)", "location": "LINAC 3", "status": "Completed", "notes": "Treatment start date." },
-    { "date": "04/04/2025", "time": "9:30 AM (Post-RT)", "type": "On-Treatment Visit (OTV) - Week 1 (Fx 5)", "location": "Radiation Oncology Clinic - Nurse Station", "status": "Completed", "notes": "Mid-treatment review. Steroid taper initiated." },
-    { "date": "04/11/2025", "time": "9:00 AM", "type": "End of Treatment (Fx 10/10)", "location": "LINAC 3", "status": "Completed", "notes": "All palliative RT completed." },
-    { "date": "05/09/2025", "time": "10:00 AM", "type": "Medical Oncology Follow-up", "location": "Oncology Clinic - Exam Room 1", "status": "Scheduled", "notes": "Systemic therapy re-evaluation. Pain management review." },
-    { "date": "07/11/2025", "time": "1:00 PM", "type": "Follow-up Bone Scan", "location": "Nuclear Medicine", "status": "Scheduled", "notes": "To assess overall bony disease status." }
-  ],
   "cptCharges": [
     { "code": "77290", "description": "Simulation, Complex (Spine RT)", "frequency": "Once (03/28/2025)" },
     { "code": "77334", "description": "Treatment device, Complex (VacLok bag, custom immobilization)", "frequency": "Once (Initial Setup)" },
@@ -260,6 +115,5 @@
     { "code": "77387", "description": "Image Guided RT (IGRT) - Daily kV imaging", "frequency": "Daily (10 fractions)" },
     { "code": "77427", "description": "Radiation treatment management, 5 treatments", "frequency": "Twice (for 10 fractions course)" },
     { "code": "99214", "description": "Office or other outpatient visit, established patient (for weekly MD visits)", "frequency": "Weekly (2 visits during RT, as appropriate for side effects)" }
-  ],
-  "diagnosisSearch": "Metastatic Castration-Resistant Prostate Cancer, Spinal Metastasis"
+  ]
 }
