@@ -51,16 +51,16 @@
         <main class="content-right">
             <section class="machine-view-container">
                 <div class="privacy-shade-label">Privacy Shade</div>
-                <img src="https://via.placeholder.com/800x400/2d5a2d/ffffff?text=Machine+View+Live+Stream" alt="Machine View">
+                <img src="https://www.veritas-medicalsolutions.com/wp-content/uploads/2021/06/C3-Flooring-Systems.png" alt="Machine View Live Stream">
                 <div class="machine-overlay-text">To pause treatment, press Beam Off.</div>
             </section>
 
-            <div class="treatment-flow-bar">
-                <div class="flow-step">Preview</div>
-                <div class="flow-step">Prepare</div>
-                <div class="flow-step active-beam-on">Ready</div>
-                <div class="flow-step">Beam On</div>
-                <div class="flow-step">Record</div>
+            <div class="treatment-flow-bar" id="workflow-bar">
+                <div class="flow-step" id="btn-preview">Preview</div>
+                <div class="flow-step" id="btn-prepare">Prepare</div>
+                <div class="flow-step active-beam-on" id="btn-ready">Ready</div>
+                <div class="flow-step" id="btn-beam-on">Beam On</div>
+                <div class="flow-step" id="btn-record">Record</div>
             </div>
 
             <div class="treatment-data-container">
@@ -161,10 +161,10 @@
                             <div class="value-box" id="couch-roll-actual">-</div>
                         </div>
                         <div class="bev-graphic-container">
-                            <img src="https://via.placeholder.com/300x300/a0a064/ffffff?text=Beam's+Eye+View+Graphic" alt="BEV Graphic">
+                            <canvas id="bev-canvas" width="300" height="300"></canvas>
                             <div class="bev-controls">
                                 <span>MLC</span>
-                                <button>Static</button>
+                                <button id="btn-mlc-mode">Static</button>
                             </div>
                         </div>
                     </div>
@@ -175,21 +175,21 @@
 
     <footer class="status-tool-bar">
         <div class="tool-group left">
-            <button class="wired-btn" data-action="reorder">Reorder</button>
-            <button class="wired-btn" data-action="deactivate">Deactivate</button>
-            <button class="wired-btn" data-action="add">Add</button>
-            <button class="wired-btn" data-action="remove">Remove</button>
-            <button class="primary-tool wired-btn" data-action="tools">Tools</button>
-            <button class="wired-btn" data-action="setup-notes">Setup Notes</button>
+            <button class="wired-btn" id="btn-reorder">Reorder</button>
+            <button class="wired-btn" id="btn-deactivate">Deactivate</button>
+            <button class="wired-btn" id="btn-add">Add</button>
+            <button class="wired-btn" id="btn-remove">Remove</button>
+            <button class="primary-tool wired-btn" id="btn-tools">Tools</button>
+            <button class="wired-btn" id="btn-setup-notes">Setup Notes</button>
             <button id="btn-close-patient">Close Patient</button>
         </div>
         <div class="tool-group right">
-            <button class="wired-btn" data-action="override">Override</button>
-            <button class="wired-btn" data-action="acquire">Acquire</button>
-            <button class="wired-btn" data-action="edit">Edit</button>
-            <button class="wired-btn" data-action="goto">Go To</button>
-            <button class="action-btn apply wired-btn" data-action="apply">Apply</button>
-            <button class="action-btn cancel wired-btn" data-action="cancel">Cancel</button>
+            <button class="wired-btn" id="btn-override">Override</button>
+            <button class="wired-btn" id="btn-acquire">Acquire</button>
+            <button class="wired-btn" id="btn-edit">Edit</button>
+            <button class="wired-btn" id="btn-goto">Go To</button>
+            <button class="action-btn apply wired-btn" id="btn-apply">Apply</button>
+            <button class="action-btn cancel wired-btn" id="btn-cancel">Cancel</button>
         </div>
     </footer>
 
