@@ -27,7 +27,25 @@ const TOLERANCES = {
 
 // Mock MLC Data (fallback)
 const MOCK_MLC_DATA = {
-    'default': { BankA: Array(20).fill(15), BankB: Array(20).fill(15) }
+    'default': { BankA: Array(20).fill(15), BankB: Array(20).fill(15) },
+    // Static patterns for George Harris's fields
+    'AP Spine': { 
+        BankA: Array(20).fill(4), // 4cm from center left
+        BankB: Array(20).fill(4)  // 4cm from center right
+    },
+    'PA Spine': { 
+        BankA: Array(20).fill(4), 
+        BankB: Array(20).fill(4) 
+    },
+    // More complex shaped fields for other demos
+    'SBRT Arc 1': { 
+        BankA: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2], 
+        BankB: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2] 
+    },
+    'SBRT Arc 2': {
+        BankA: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6],
+        BankB: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6]
+    }
 };
 
 // CPT Code Definitions mapping for display
@@ -585,6 +603,32 @@ function drawBEV(field, isAnimating = false, progress = 0) {
     // Left/Right Jaws (X)
     ctx.fillRect(0, y2_px, x1_px, y1_px - y2_px); // Left block
     ctx.fillRect(x2_px, y2_px, width - x2_px, y1_px - y2_px); // Right block
+
+    // --- Draw Jaw Labels (X1, X2, Y1, Y2) ---
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Light grey text
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    
+    // Y2 Label (Top)
+    if (y2_px > 10) {
+        ctx.textBaseline = 'bottom';
+        ctx.fillText("Y2", centerX, y2_px - 5);
+    }
+    // Y1 Label (Bottom)
+    if (y1_px < height - 10) {
+        ctx.textBaseline = 'top';
+        ctx.fillText("Y1", centerX, y1_px + 5);
+    }
+    // X1 Label (Left)
+    if (x1_px > 10) {
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        ctx.fillText("X1", x1_px - 5, centerY);
+    }
+    // X2 Label (Right)
+    if (x2_px < width - 10) {
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText("X2", x2_px + 5, centerY);
+    }
 
 
     // --- Draw MLC Leaves ---
