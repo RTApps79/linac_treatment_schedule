@@ -645,12 +645,13 @@ function drawBEV(field, isAnimating = false, progress = 0) {
     }
 
 
-    // --- DRAW JAWS (Second, semi-transparent on top of MLCs) ---
+     // --- DRAW JAWS (Second, semi-transparent on top of MLCs) ---
     ctx.fillStyle = 'rgba(40, 40, 40, 0.8)'; // Dark, semi-transparent jaw material
     const y1_px = centerY + (currentY1 * scale);
     const y2_px = centerY - (jaws.Y2 * scale);
     const x1_px = centerX + (jaws.X1 * scale);
-    const x2_px = centerX - (jaws.X2 * scale);
+    // FIXED: X2 is positive to the right, so add to centerX
+    const x2_px = centerX + (jaws.X2 * scale); 
 
     // Top/Bottom Jaws (Y)
     ctx.fillRect(0, 0, width, y2_px); // Top block
