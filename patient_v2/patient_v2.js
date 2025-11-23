@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Get Patient File from URL
     const params = new URLSearchParams(window.location.search);
     const fileName = params.get('file');
 
@@ -9,14 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // 2. Fetch Patient JSON Data
-    fetch(`data/${fileName}`)
+    // Add a cache-buster to prevent loading stale JSON
+    const cacheBuster = new Date().getTime();
+
+    fetch(`data/${fileName}?v=${cacheBuster}`)
         .then(response => {
             if (!response.ok) throw new Error('Failed to fetch patient data.');
             return response.json();
         })
         .then(patientData => {
-            // 3. Initialize Console with Data
             initializeTreatmentConsole(patientData);
         })
         .catch(error => {
@@ -24,8 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('pt-name').textContent = 'Error Loading Data';
         });
 
-    // 4. Wire up Bottom Ribbon Buttons
-    initializeBottomRibbon();
+    initializeButtons();
 });
 
 
@@ -62,7 +61,9 @@ function populateFieldList(fields) {
     listContainer.innerHTML = ''; // Clear current list
 
     if (fields.length === 0) {
-        listContainer.innerHTML = '<li>No fields defined in plan.</li>';
+        listContainer.innerHTML = '<li style="padding: 10px; font-style: italic;">No fields defined in plan.</li>';
+        // Clear BEV if no fields
+        drawBEV(null);
         return;
     }
 
@@ -94,14 +95,11 @@ function updateFieldParameters(field) {
     const formatText = (val) => (val !== undefined && val !== null) ? val : '-';
 
     // --- 1. Update BEAM Parameters (Red Container) ---
-    
-    const beamType = formatText(field.beamTypeDisplay);
-    document.getElementById('beam-type-plan').textContent = beamType;
-    document.getElementById('beam-type-actual').textContent = beamType;
+    document.getElementById('beam-type-plan').textContent = formatText(field.beamTypeDisplay);
+    document.getElementById('beam-type-actual').textContent = formatText(field.beamTypeDisplay);
 
-    const energy = formatText(field.energyDisplay);
-    document.getElementById('energy-plan').textContent = energy;
-    document.getElementById('energy-actual').textContent = energy;
+    document.getElementById('energy-plan').textContent = formatText(field.energyDisplay);
+    document.getElementById('energy-actual').textContent = formatText(field.energyDisplay);
 
     const totalMU = formatVal(field.monitorUnits, 1);
     document.getElementById('mu-total-plan').textContent = totalMU;
@@ -116,36 +114,28 @@ function updateFieldParameters(field) {
         muSplitContainer.innerHTML = `<div class="mu-val">${totalMU}</div>`;
     }
 
-    const doseRate = formatVal(field.doseRate, 0);
-    document.getElementById('dose-rate-plan').textContent = doseRate;
-    document.getElementById('dose-rate-actual').textContent = doseRate;
+    document.getElementById('dose-rate-plan').textContent = formatVal(field.doseRate, 0);
+    document.getElementById('dose-rate-actual').textContent = formatVal(field.doseRate, 0);
 
-    const time = formatVal(field.estimatedTime_min, 2);
-    document.getElementById('time-plan').textContent = time;
+    document.getElementById('time-plan').textContent = formatVal(field.estimatedTime_min, 2);
     document.getElementById('time-actual').textContent = formatVal(0.00, 2); 
 
-    const wedge = formatText(field.wedgeInfo);
-    document.getElementById('wedge-plan').textContent = wedge;
-    document.getElementById('wedge-actual').textContent = wedge;
+    document.getElementById('wedge-plan').textContent = formatText(field.wedgeInfo);
+    document.getElementById('wedge-actual').textContent = formatText(field.wedgeInfo);
 
-    const bolus = formatText(field.bolusInfo);
-    document.getElementById('bolus-plan').textContent = bolus;
-    document.getElementById('bolus-actual').textContent = bolus;
+    document.getElementById('bolus-plan').textContent = formatText(field.bolusInfo);
+    document.getElementById('bolus-actual').textContent = formatText(field.bolusInfo);
 
 
     // --- 2. Update GEOMETRY Parameters (Yellow Container) ---
+    document.getElementById('gantry-plan').textContent = formatText(field.gantryAngle);
+    document.getElementById('gantry-actual').textContent = formatText(field.gantryAngle);
 
-    const gantry = formatText(field.gantryAngle);
-    document.getElementById('gantry-plan').textContent = gantry;
-    document.getElementById('gantry-actual').textContent = gantry;
+    document.getElementById('coll-plan').textContent = formatVal(field.collimatorAngle, 1);
+    document.getElementById('coll-actual').textContent = formatVal(field.collimatorAngle, 1);
 
-    const coll = formatVal(field.collimatorAngle, 1);
-    document.getElementById('coll-plan').textContent = coll;
-    document.getElementById('coll-actual').textContent = coll;
-
-    const couchRtn = formatVal(field.couchAngle, 1);
-    document.getElementById('couch-rtn-plan').textContent = couchRtn;
-    document.getElementById('couch-rtn-actual').textContent = couchRtn;
+    document.getElementById('couch-rtn-plan').textContent = formatVal(field.couchAngle, 1);
+    document.getElementById('couch-rtn-actual').textContent = formatVal(field.couchAngle, 1);
 
     const jaws = field.jawPositions_cm || {};
     document.getElementById('y1-plan').textContent = formatVal(jaws.Y1);
@@ -165,15 +155,121 @@ function updateFieldParameters(field) {
     document.getElementById('couch-lat-plan').textContent = formatVal(couch.lateral, 2);
     document.getElementById('couch-lat-actual').textContent = formatVal(couch.lateral, 2);
 
-    // Couch Pitch & Roll (NEW)
     document.getElementById('couch-pitch-plan').textContent = formatVal(field.pitchAngle, 1);
     document.getElementById('couch-pitch-actual').textContent = formatVal(field.pitchAngle, 1);
     document.getElementById('couch-roll-plan').textContent = formatVal(field.rollAngle, 1);
     document.getElementById('couch-roll-actual').textContent = formatVal(field.rollAngle, 1);
+
+    // --- 3. Update Beam's Eye View (BEV) ---
+    drawBEV(field);
+}
+
+// --- MOCK DATA FOR MLC ---
+// Since your JSON files don't have detailed MLC positions yet,
+// we'll use this mock data for demonstration purposes.
+const MOCK_MLC_DATA = {
+    // Simple rectangular field
+    'AP Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
+    'PA Femur': { BankA: Array(20).fill(5), BankB: Array(20).fill(5) },
+    // More complex shaped fields
+    'SBRT Arc 1': { 
+        BankA: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2], 
+        BankB: [2,2,3,3,4,4,5,5,6,6,6,6,5,5,4,4,3,3,2,2] 
+    },
+    'SBRT Arc 2': {
+        BankA: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6],
+        BankB: [6,6,5,5,4,4,3,3,2,2,2,2,3,3,4,4,5,5,6,6]
+    }
+};
+
+
+function drawBEV(field) {
+    const canvas = document.getElementById('bev-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    // Ensure canvas resolution matches display size
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Scaling: Pixels per cm. Adjust as needed to fit view.
+    const scale = width / 30; 
+
+    // 1. Clear and Draw Background (Placeholder for DRR)
+    ctx.clearRect(0, 0, width, height);
+    // Draw a circular field limit
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, Math.min(width, height) / 2 * 0.95, 0, 2 * Math.PI);
+    ctx.fillStyle = '#333'; // Placeholder background color
+    ctx.fill();
+    ctx.strokeStyle = '#555';
+    ctx.stroke();
+    
+    if (!field) {
+        ctx.fillStyle = '#eee';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText("No Field Selected", centerX, centerY);
+        return;
+    }
+
+    // 2. Draw Crosshairs (Isocenter)
+    ctx.beginPath();
+    ctx.moveTo(centerX, 0); ctx.lineTo(centerX, height);
+    ctx.moveTo(0, centerY); ctx.lineTo(width, centerY);
+    ctx.strokeStyle = 'rgba(255, 50, 50, 0.6)'; // Semi-transparent red
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 3. Draw MLC Leaves based on data
+    // Use mock data if available for the field name, otherwise default
+    const mlcData = MOCK_MLC_DATA[field.fieldName] || { BankA: Array(20).fill(15), BankB: Array(20).fill(15) };
+    const numLeaves = mlcData.BankA.length;
+    const leafThickness = 1.0; // cm (simplified)
+    const leafHeightPx = leafThickness * scale;
+    
+    // Calculate starting Y position to center the MLC bank
+    const totalMlcHeightPx = numLeaves * leafHeightPx;
+    let currentY = centerY - (totalMlcHeightPx / 2);
+
+    ctx.fillStyle = 'rgba(80, 80, 80, 0.9)'; // Dark grey for leaves
+
+    for (let i = 0; i < numLeaves; i++) {
+        // Positions are distance from isocenter (midline)
+        const posA_cm = mlcData.BankA[i];
+        const posB_cm = mlcData.BankB[i];
+        
+        const posA_px = posA_cm * scale;
+        const posB_px = posB_cm * scale;
+
+        // Draw Bank A Leaf (Left side)
+        // Draws from left edge up to the position
+        ctx.fillRect(0, currentY, centerX - posA_px, leafHeightPx - 1); // -1 for slight gap
+
+        // Draw Bank B Leaf (Right side)
+        // Draws from position to the right edge
+        ctx.fillRect(centerX + posB_px, currentY, width - (centerX + posB_px), leafHeightPx - 1);
+
+        currentY += leafHeightPx;
+    }
 }
 
 
-function initializeBottomRibbon() {
+function initializeButtons() {
+    // Wire up Workflow buttons for visual state change
+    const workflowBtns = document.querySelectorAll('#workflow-bar .flow-step');
+    workflowBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            workflowBtns.forEach(b => b.classList.remove('active-beam-on'));
+            btn.classList.add('active-beam-on');
+        });
+    });
+
+    // Wire up "Close Patient" button
     const closeBtn = document.getElementById('btn-close-patient');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
@@ -181,11 +277,13 @@ function initializeBottomRibbon() {
         });
     }
 
-    const wiredBtns = document.querySelectorAll('.wired-btn');
+    // Wire up other toolbar buttons for logging
+    const wiredBtns = document.querySelectorAll('.wired-btn, #btn-mlc-mode');
     wiredBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const action = btn.dataset.action;
-            alert(`Action '${action}' triggered. Functionality not yet implemented.`);
+        btn.addEventListener('click', (e) => {
+            // Use id or text content to identify the button
+            const action = btn.id || btn.textContent;
+            console.log(`Button clicked: ${action}`);
         });
     });
 }
