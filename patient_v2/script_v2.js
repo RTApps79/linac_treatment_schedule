@@ -12,12 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduleBody = document.getElementById('schedule-body');
     scheduleBody.innerHTML = ''; // Clear the "Loading..." message
 
+    // Create a cache-busting timestamp just once
+    const cacheBuster = new Date().getTime();
+
     // Create a promise for each file fetch
     const fetchPromises = patientFiles.map(file =>
-        fetch(`data/${file}`)
+        // --- FIX: Append cacheBuster to URL ---
+        // This forces the browser to download the fresh file every time.
+        fetch(`data/${file}?v=${cacheBuster}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Network error loading ${file} (404 Not Found)`);
+                // Helpful error message if a file isn't found
+                throw new Error(`Failed to load ${file} (404 Not Found)`);
             }
             // 1. Get raw text first so we can identify the file if parsing fails
             return response.text(); 
@@ -34,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(`Error details: ${e.message}`);
                 console.error('Action: Open this specific file and look for missing double quotes around property names near the line number indicated.');
                 console.error('=============================');
-                // Re-throw to stop execution for this chain
+                // Re-throw to stop execution
                 throw e; 
             }
         })
@@ -95,12 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         })
         .catch(error => {
-            // The specific file error is already logged above.
-            console.error('Schedule loading aborted due to JSON errors.');
+            console.error('Schedule loading aborted due to errors.');
+            // Display an error message on the page if loading fails
             scheduleBody.innerHTML = `
                 <div class="table-row" style="display: block; text-align: center; padding: 20px; color: #dc3545; background-color: #fff;">
                     <strong style="font-size: 1.2em;">CRITICAL ERROR: Failed to load patient data.</strong><br>
-                    <span style="font-size: 1em;">One of your JSON files has a syntax error (missing quotes).</span><br>
+                    <span style="font-size: 1em;">A JSON file is missing or has a syntax error.</span><br>
                     <strong>Open the browser console (F12) to see exactly which file is broken.</strong>
                 </div>
             `;
