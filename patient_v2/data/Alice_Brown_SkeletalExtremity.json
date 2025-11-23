@@ -131,6 +131,22 @@
   "radiationOncologyData": {
     "treatmentDelivery": {
       "fractions": []
+    },
+    "ctSimulation": {
+      "simulationDate": "03/28/2025",
+      "setupInstructions": "Supine in custom Vac-Lok bag (legs/pelvis) with legs in a custom ankle/foot immobilization device for rotational stability. Arms crossed over chest. Patient instructed to breathe normally. SSD setup (Source to Skin Distance).",
+      "immobilization": "Vac-Lok bag (custom molded for legs/pelvis), ankle/foot immobilization device (e.g., Alpha Cradle), knee sponge.",
+      "referenceMarks": "3-point tattoos for alignment (at right hip, right mid-thigh, and midline). Additional marks outlining field borders. Isocenter placed at center of lytic lesion in right proximal femur. Coordinates recorded and verified by RTs and physicist.",
+      "setupImages": [
+        {
+          "type": "AP",
+          "url": "https://placehold.co/250x200/EEE/31343C?text=AP+Setup+Photo_AB22334"
+        },
+        {
+          "type": "Lateral",
+          "url": "https://placehold.co/250x200/EEE/31343C?text=Lateral+Setup+Photo_AB22334"
+        }
+      ]
     }
   }
 }
