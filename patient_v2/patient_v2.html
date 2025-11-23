@@ -3,197 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Treatment Console - Record and Verify mode</title>
-    <link rel="stylesheet" href="style_v2.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Treatment Record and Verify Layout</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1>Treatment</h1>
-                <h2>Record and Verify mode</h2>
+    <header class="header">
+        <div class="header-left">
+            <h1>Treatment</h1>
+            <h2>Record and Verify mode</h2>
+        </div>
+        <div class="header-middle">
+            <div class="user-info">
+                <span>Primary User: hup</span>
+                <span>02:17 PM 07-Mar-2014</span>
             </div>
-            <div class="patient-info-box" id="sidebar-patient-info">
-                <div>Loading...</div>
+            <div class="patient-orientation">
+                <span>PATIENT ORIENTATION</span>
+                <span>Head First, Supine</span>
             </div>
-            
-            <div class="dose-details-header">Dose Details</div>
-            
-            <div class="fields-list-container" id="fields-list">
-                </div>
+        </div>
+        <div class="header-right">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Varian_Medical_Systems_logo.svg/320px-Varian_Medical_Systems_logo.svg.png" alt="Varian Medical Systems" class="logo">
+        </div>
+    </header>
 
-            <div class="setup-list-container">
-                 <div class="field-item setup-item">
-                    <i class="fa-solid fa-camera"></i>
-                    <span>KV-KV Setup Pair</span>
-                    <i class="fa-solid fa-check check-icon"></i>
-                </div>
+    <div class="main-body">
+        <aside class="patient-info-container">
+            <div class="patient-details">
+                <p><strong>First Name:</strong> Nadja</p>
+                <p><strong>Last Name:</strong> ...</p>
+                <p><strong>ID 1:</strong> ...</p>
+                <p><strong>DOB:</strong> ...</p>
+                <p><strong>Rad. Onc.:</strong> ...</p>
             </div>
-
-            <div class="sidebar-footer">
-                <button><i class="fa-solid fa-wrench"></i> Tools</button>
-                <button>Setup Notes</button>
-                <button>Close Patient</button>
+            <div class="dose-details-header">
+                <span>Dose Details</span>
+            </div>
+            <div class="treatment-list">
+                <div class="list-header">
+                    <span>MamSINDIBHre2</span>
+                    <span>Fraction: 2 of 27</span>
+                </div>
+                <ul>
+                    <li><span>Treatment Port</span></li>
+                    <li class="active">
+                        <span>modMAMsin</span>
+                        <span>0.0 / 134.4</span>
+                    </li>
+                    <li>
+                        <span>latMAMsin</span>
+                        <span>0.0 / 115.2</span>
+                    </li>
+                    <li><span>KV-KV Setup Pair</span></li>
+                </ul>
             </div>
         </aside>
 
-        <main class="content-area">
-            <div class="top-banner">
-                <div class="user-info">
-                    <div>Primary User: <span>hup</span></div>
-                    <div id="current-date"></div>
-                </div>
-                <div class="patient-orientation">
-                    <div>PATIENT ORIENTATION</div>
-                    <div id="orientation-text">Head First, Supine</div>
-                </div>
-                <div class="privacy-shade">
-                    Privacy Shade <i class="fa-solid fa-caret-up"></i>
-                </div>
-                <div class="logo-area">
-                    <span style="font-variant: small-caps; font-size: 1.2em; letter-spacing: 2px;">VARİAN</span>
-                     <span style="font-size: 0.8em;">medical systems</span>
-                </div>
-            </div>
+        <main class="content-right">
+            <section class="machine-view-container">
+                <div class="privacy-shade-label">Privacy Shade</div>
+                <img src="https://via.placeholder.com/800x400/2d5a2d/ffffff?text=Machine+View" alt="Machine View">
+                <div class="machine-overlay-text">To pause treatment, press Beam Off.</div>
+            </section>
 
-            <div class="camera-view-container">
-                <div class="camera-placeholder">
-                    <i class="fa-solid fa-video"></i>
-                    <p>Live Gantry View Input</p>
-                </div>
-                <div class="overlay-text">To pause treatment, press Beam Off.</div>
-            </div>
-
-            <div class="status-flow-bar">
+            <div class="treatment-flow-bar">
                 <div class="flow-step">Preview</div>
-                <div class="flow-arrow"></div>
                 <div class="flow-step">Prepare</div>
-                <div class="flow-arrow"></div>
-                <div class="flow-step active-step">Ready</div>
-                <div class="flow-arrow active-arrow"></div>
-                <div class="flow-step next-step">Beam On</div>
-                <div class="flow-arrow next-arrow"></div>
-                <div class="flow-step"><i class="fa-solid fa-radiation"></i> Record</div>
+                <div class="flow-step">Ready</div>
+                <div class="flow-step active-beam-on">Beam On</div>
+                <div class="flow-step">Record</div>
             </div>
 
-            <div class="parameter-tabs-section">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-tab="beam-tab">Beam</button>
-                    <button class="tab-btn" data-tab="geometry-tab">Geometry</button>
-                    <button class="tab-btn" data-tab="bev-tab">Beam's Eye View</button>
-                </div>
-
-                <div class="tab-content-container">
-                    <div id="beam-tab" class="tab-pane active">
-                        <div class="comparison-grid">
-                            <div class="grid-header"></div>
-                            <div class="grid-header">Plan</div>
-                            <div class="grid-header">Actual</div>
-
-                            <div class="grid-label">Beam Type</div>
-                            <div class="grid-value" id="beam-type-plan">STATIC</div>
-                            <div class="grid-value matched">STATIC</div>
-
-                            <div class="grid-label">Energy</div>
-                            <div class="grid-value" id="energy-plan">-</div>
-                            <div class="grid-value matched" id="energy-actual">-</div>
-
-                            <div class="grid-label mu-label">MU</div>
-                            <div class="mu-container">
-                                <div class="mu-value" id="mu-plan">-</div>
-                            </div>
-                             <div class="mu-container actual-mu-container">
-                                <div class="mu-progress-bar">
-                                    <div class="mu-progress-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="mu-value matched" id="mu-actual">0.0</div>
-                            </div>
-
-                            <div class="grid-label">Dose Rate</div>
-                            <div class="grid-value">600</div>
-                            <div class="grid-value matched">600</div>
-
-                             <div class="grid-label">Time</div>
-                            <div class="grid-value" id="time-plan">1.00</div>
-                            <div class="grid-value matched">...</div>
-
-                            <div class="grid-label">Bolus</div>
-                            <div class="grid-value">None</div>
-                            <div class="grid-value matched">None</div>
-                        </div>
+            <div class="treatment-data-container">
+                <section class="treatment-fields-container">
+                    <div class="container-header">
+                        <span>Beam</span>
+                        <span>Plan</span>
+                        <span>Actual</span>
                     </div>
+                    <div class="data-grid fields-grid">
+                        <label>Beam Type</label>
+                        <div class="value-box">STATIC (Static Photon)</div>
+                        <div class="value-box"></div>
 
-                    <div id="geometry-tab" class="tab-pane">
-                         <div class="comparison-grid geometry-grid">
-                            <div class="grid-header"></div>
-                            <div class="grid-header">Plan</div>
-                            <div class="grid-header">Actual</div>
+                        <label>Energy Type</label>
+                        <div class="value-box">6X</div>
+                        <div class="value-box"></div>
 
-                            <div class="grid-label">Gantry Rtn</div>
-                            <div class="grid-value" id="gantry-plan">-</div>
-                            <div class="grid-value matched" id="gantry-actual">-</div>
+                        <label>MU</label>
+                        <div class="value-box highlighted">134.4</div>
+                        <div class="mu-split">
+                            <div class="mu-val">MU 1<br>61.2</div>
+                            <div class="mu-val">MU 2<br>61.3</div>
+                        </div>
 
-                            <div class="grid-label">Coll Rtn</div>
-                            <div class="grid-value" id="coll-plan">-</div>
-                            <div class="grid-value matched" id="coll-actual">-</div>
+                        <label>Dose Rate</label>
+                        <div class="value-box">600</div>
+                        <div class="value-box">598</div>
 
-                            <div class="grid-label">Y1</div>
-                            <div class="grid-value" id="y1-plan">-</div>
-                            <div class="grid-value matched" id="y1-actual">-</div>
+                        <label>Time</label>
+                        <div class="value-box">1.00</div>
+                        <div class="value-box">0.10</div>
+
+                        </div>
+                </section>
+
+                <section class="treatment-console-container">
+                    <div class="container-header-split">
+                        <div class="geo-header">
+                            <span>Geometry</span>
+                            <span>Plan</span>
+                            <span>Actual</span>
+                        </div>
+                        <div class="bev-header">Beam's Eye View</div>
+                    </div>
+                    <div class="console-content">
+                        <div class="data-grid geometry-grid">
+                            <label>Gantry Rtn</label>
+                            <div class="value-box">312.0</div>
+                            <div class="value-box">312.0</div>
+
+                            <label>Coll Rtn</label>
+                            <div class="value-box">97.0</div>
+                            <div class="value-box">97.0</div>
+
+                            <label>Y1</label>
+                            <div class="value-box">8.4</div>
+                            <div class="value-box">8.4</div>
                             
-                            <div class="grid-label">Y2</div>
-                            <div class="grid-value" id="y2-plan">-</div>
-                            <div class="grid-value matched" id="y2-actual">-</div>
-
-                            <div class="grid-label">X1</div>
-                            <div class="grid-value" id="x1-plan">-</div>
-                            <div class="grid-value matched" id="x1-actual">-</div>
-
-                            <div class="grid-label">X2</div>
-                            <div class="grid-value" id="x2-plan">-</div>
-                            <div class="grid-value matched" id="x2-actual">-</div>
-
-                            <div class="spacer-row"></div> <div class="spacer-row"></div> <div class="spacer-row"></div>
-
-                            <div class="grid-label">Couch Vrt</div>
-                            <div class="grid-value">100.0</div>
-                            <div class="grid-value matched">100.0</div>
-
-                            <div class="grid-label">Couch Lng</div>
-                            <div class="grid-value">100.0</div>
-                            <div class="grid-value matched">100.0</div>
-
-                             <div class="grid-label">Couch Lat</div>
-                            <div class="grid-value">0.0</div>
-                            <div class="grid-value matched">0.0</div>
-
-                            <div class="grid-label">Couch Rtn</div>
-                            <div class="grid-value" id="couch-rtn-plan">0.0</div>
-                            <div class="grid-value matched" id="couch-rtn-actual">0.0</div>
+                            <label>Couch Vrt</label>
+                            <div class="value-box">24.10</div>
+                            <div class="value-box">24.10</div>
                         </div>
-                    </div>
-
-                    <div id="bev-tab" class="tab-pane">
-                        <div class="bev-container">
-                            <div class="bev-placeholder-graphic">
-                                <div class="bev-jaws-y"></div>
-                                <div class="bev-jaws-x"></div>
-                                <div class="bev-mlc-area"></div>
-                                <div class="bev-labels">
-                                    <span class="label-y2">Y2</span>
-                                    <span class="label-y1">Y1</span>
-                                    <span class="label-x2">X2</span>
-                                    <span class="label-x1">X1</span>
-                                </div>
+                        <div class="bev-graphic-container">
+                            <img src="https://via.placeholder.com/300x300/a0a064/ffffff?text=Beam's+Eye+View+Graphic" alt="BEV Graphic">
+                            <div class="bev-controls">
+                                <span>MLC</span>
+                                <button>Static</button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
         </main>
     </div>
 
-    <script src="script_v2.js"></script>
+    <footer class="status-tool-bar">
+        <div class="tool-group left">
+            <button>Reorder</button>
+            <button>Deactivate</button>
+            <button>Add</button>
+            <button>Remove</button>
+            <button class="primary-tool">Tools</button>
+            <button>Setup Notes</button>
+            <button>Close Patient</button>
+        </div>
+        <div class="tool-group right">
+            <button>Override</button>
+            <button>Acquire</button>
+            <button>Edit</button>
+            <button>Go To</button>
+            <button class="action-btn apply">Apply</button>
+            <button class="action-btn cancel">Cancel</button>
+        </div>
+    </footer>
 </body>
 </html>
