@@ -584,105 +584,95 @@ function drawBEV(field, isAnimating = false, progress = 0) {
         document.getElementById('y1-actual').textContent = currentY1.toFixed(1);
     }
 
-    // --- DRAW MLC LEAVES (First, so they are behind jaws) ---
+    // ==================================================================================
+    // CALCULATE FIELD BOUNDARIES (Pixels) - Robust against sign convention variations
+    // ==================================================================================
+    // Use Math.min/max to ensure Left is always left of Right, regardless of input signs.
+    const field_left_px = centerX + (Math.min(jaws.X1, jaws.X2) * scale);
+    const field_right_px = centerX + (Math.max(jaws.X1, jaws.X2) * scale);
+    // Canvas Y increases DOWN. Superior (max Y cm) is higher up (smaller pixel Y).
+    const field_top_px = centerY - (Math.max(jaws.Y2, currentY1) * scale);
+    // Inferior (min Y cm) is lower down (larger pixel Y).
+    const field_bottom_px = centerY - (Math.min(jaws.Y2, currentY1) * scale);
+
+    const field_width_px = field_right_px - field_left_px;
+    const field_height_px = field_bottom_px - field_top_px;
+
+
+    // --- DRAW MLC LEAVES (First, behind jaws) ---
     const isDynamicMLC = field.beamTypeDisplay && field.beamTypeDisplay.includes('DYNAMIC');
-    // Identify fields that require specific static shapes based on keywords
     const isComplexStatic = ['Hip', 'Femur', 'Pelvis'].some(keyword => field.fieldName.includes(keyword));
 
     let mlcData;
-    let numLeaves = 40; // Default number of leaves
+    let numLeaves = 40;
     const leafHeightPx = 1.0 * scale;
     const totalMlcHeightPx = numLeaves * leafHeightPx;
     let currentY = centerY - (totalMlcHeightPx / 2);
 
-    // Determine MLC Data Source based on field type
     if (isDynamicMLC) {
-        // Dynamic: Use default open leaves as base, will add noise later
         mlcData = MOCK_MLC_DATA['default'];
     } else if (isComplexStatic) {
-        // Complex Static: Use specific shaped data (e.g., for Hip/Femur)
         mlcData = MOCK_MLC_DATA['Static_Shaped_Generic'];
     } else {
-        // Simple Static: Will align with jaws, no mock data array needed
-        mlcData = null; 
+        mlcData = null; // Simple Static
     }
 
-    // Update MLC Mode display
     document.getElementById('mlc-mode-display').textContent = `MLC: ${isDynamicMLC ? 'Dynamic (IMRT/VMAT)' : 'Static'}`;
-
     ctx.fillStyle = 'rgba(90, 90, 90, 0.95)'; // Leaf color
 
     for (let i = 0; i < numLeaves; i++) {
-        let posA_cm, posB_cm; // X-coordinates in cm (neg=left, pos=right)
+        let posA_cm, posB_cm; 
 
         if (isDynamicMLC) {
-             // Base position + random noise during animation
-             posA_cm = mlcData.BankA[i];
-             posB_cm = mlcData.BankB[i];
+             posA_cm = mlcData.BankA[i]; posB_cm = mlcData.BankB[i];
              if (isAnimating && !hasWedge) {
                  const noise = (Math.random() - 0.5) * 0.8; 
                  posA_cm += noise; posB_cm += noise;
              }
         } else if (isComplexStatic && mlcData) {
-             // Static Shape: Use predefined positions, NO animation noise
-             posA_cm = mlcData.BankA[i];
-             posB_cm = mlcData.BankB[i];
+             posA_cm = mlcData.BankA[i]; posB_cm = mlcData.BankB[i];
         } else {
-             // Simple Static: Align exactly with X Jaws
-             posA_cm = jaws.X1;
-             posB_cm = jaws.X2;
+             // Simple Static: Align exactly with X Jaws (using robust min/max)
+             posA_cm = Math.min(jaws.X1, jaws.X2);
+             posB_cm = Math.max(jaws.X1, jaws.X2);
         }
 
-        const posA_px = centerX + (posA_cm * scale); // Convert X-coord to pixels
+        const posA_px = centerX + (posA_cm * scale);
         const posB_px = centerX + (posB_cm * scale);
 
-        // Draw Bank A Leaf (Left side) - from left edge to posA_px
-        ctx.fillRect(0, currentY, posA_px, leafHeightPx - 0.5);
-        // Draw Bank B Leaf (Right side) - from posB_px to right edge
-        ctx.fillRect(posB_px, currentY, width - posB_px, leafHeightPx - 0.5);
-        
+        // Only draw if within the open Y-field area
+        if (currentY >= field_top_px && currentY + leafHeightPx <= field_bottom_px) {
+             // Bank A (Left)
+             ctx.fillRect(0, currentY, posA_px, leafHeightPx - 0.5);
+             // Bank B (Right)
+             ctx.fillRect(posB_px, currentY, width - posB_px, leafHeightPx - 0.5);
+        }
         currentY += leafHeightPx;
     }
 
 
-    // --- DRAW JAWS (Second, semi-transparent on top of MLCs) ---
-    ctx.fillStyle = 'rgba(40, 40, 40, 0.8)'; // Dark, semi-transparent jaw material
-    
-    // Calculate pixel boundaries based on IEC coordinate system where:
-    // +Y is Up (Superior), -Y is Down (Inferior). Canvas Y increases downwards.
-    // Y2 is Superior (positive cm). Subtract from CenterY to move up in pixels.
-    const y2_boundary_px = centerY - (jaws.Y2 * scale);
-    // Y1 is Inferior (negative cm). Subtracting a negative adds to CenterY, moving down.
-    // Use currentY1 because this is the one that might animate (wedge).
-    const y1_boundary_px = centerY - (currentY1 * scale);
-    // X1 is Left (negative cm). Add to CenterX to move left.
-    const x1_boundary_px = centerX + (jaws.X1 * scale);
-    // X2 is Right (positive cm). Add to CenterX to move right.
-    const x2_boundary_px = centerX + (jaws.X2 * scale);
+    // --- DRAW JAWS (Second, semi-transparent on top) ---
+    ctx.fillStyle = 'rgba(40, 40, 40, 0.8)';
 
-    // Top Jaw Block (Y2)
-    ctx.fillRect(0, 0, width, y2_boundary_px);
-    // Bottom Jaw Block (Y1)
-    ctx.fillRect(0, y1_boundary_px, width, height - y1_boundary_px);
-
-    // Calculate open height between Y jaws for X jaws
-    const openHeight = Math.max(0, y1_boundary_px - y2_boundary_px);
-
-    // Left Jaw Block (X1) - between Y boundary lines
-    ctx.fillRect(0, y2_boundary_px, x1_boundary_px, openHeight);
-    // Right Jaw Block (X2) - between Y boundary lines
-    ctx.fillRect(x2_boundary_px, y2_boundary_px, width - x2_boundary_px, openHeight);
+    // Top Jaw Block (above field top)
+    ctx.fillRect(0, 0, width, field_top_px);
+    // Bottom Jaw Block (below field bottom)
+    ctx.fillRect(0, field_bottom_px, width, height - field_bottom_px);
+    // Left Jaw Block (left of field left, between top and bottom boundaries)
+    ctx.fillRect(0, field_top_px, field_left_px, field_height_px);
+    // Right Jaw Block (right of field right, between top and bottom boundaries)
+    ctx.fillRect(field_right_px, field_top_px, width - field_right_px, field_height_px);
 
 
-    // --- Draw Jaw Labels (X1, X2, Y1, Y2) ---
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Light grey text
+    // --- Draw Jaw Labels ---
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     
-    if (y2_boundary_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, y2_boundary_px - 5); }
-    if (y1_boundary_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, y1_boundary_px + 5); }
-    if (x1_boundary_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", x1_boundary_px - 5, centerY); }
-    if (x2_boundary_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", x2_boundary_px + 5, centerY); }
+    if (field_top_px > 10) { ctx.textBaseline = 'bottom'; ctx.fillText("Y2", centerX, field_top_px - 5); }
+    if (field_bottom_px < height - 10) { ctx.textBaseline = 'top'; ctx.fillText("Y1", centerX, field_bottom_px + 5); }
+    if (field_left_px > 10) { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText("X1", field_left_px - 5, centerY); }
+    if (field_right_px < width - 10) { ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText("X2", field_right_px + 5, centerY); }
 }
 
 
