@@ -1,55 +1,91 @@
 document.addEventListener('DOMContentLoaded', () => {
-const patientFiles = [
-     'James_Wilson_PelvisProstate.json',
-     'Linda_Jones_ThoraxIMRT.json',
-     'Jane_Smith_SVCS.json',
-     'Robert_Miller_ThoraxSBRT.json',
-     'George_Harris_SkeletalSpine.json',
-     'Alice_Brown_SkeletalExtremity.json',
-     // Other files omitted for brevity as they aren't used in the main list generation loop in the original code
-];
-const scheduleBody = document.getElementById('schedule-body');
+    // This array MUST match the exact filenames in your 'data' folder.
+    // Updated with the files from your recent uploads.
+    const patientFiles = [
+         'Alice_Brown_SkeletalExtremity.json',
+         'James_Wilson_PelvisProstate.json',
+         'Jane_Smith_SVCS.json',
+         'George_Harris_SkeletalSpine.json',
+         'Linda_Jones_ThoraxIMRT.json',
+         'Robert_Miller_ThoraxSBRT.json'
+    ];
+
+    const scheduleBody = document.getElementById('schedule-body');
     scheduleBody.innerHTML = ''; // Clear the "Loading..." message
 
+    // Create a promise for each file fetch
     const fetchPromises = patientFiles.map(file =>
+        // Ensure the path 'data/' matches your actual folder structure
         fetch(`data/${file}`).then(response => {
             if (!response.ok) {
-                throw new Error(`Network response was not ok for ${file}`);
+                // Helpful error message if a file isn't found
+                throw new Error(`Failed to load ${file} (404 Not Found)`);
             }
             return response.json();
+        }).then(data => {
+            // Attach the source filename to the data object for linking later
+            data._sourceFilename = file;
+            return data;
         })
     );
 
+    // When all files are fetched, populate the table
     Promise.all(fetchPromises)
         .then(patients => {
-            patients.sort((a, b) => a.demographics.name.localeCompare(b.demographics.name));
+            // Sort patients alphabetically by name
+            patients.sort((a, b) => {
+                const nameA = a.demographics?.name || 'ZZZ';
+                const nameB = b.demographics?.name || 'ZZZ';
+                return nameA.localeCompare(nameB);
+            });
 
-            let time = 9; // Start time
+            let timeBase = 9 * 60; // Start time 9:00 AM in minutes from midnight
+            
             patients.forEach((patient, index) => {
-                const appointmentTime = `${time + Math.floor(index / 4)}:${(index % 4) * 15}`.padStart(5, '0');
-                const patientFileName = patientFiles.find(f => f.toLowerCase().includes(patient.demographics.name.split(' ')[0].toLowerCase()));
+                // Calculate appointment time (15-minute intervals)
+                const appointmentMins = timeBase + (index * 15);
+                const hours = Math.floor(appointmentMins / 60);
+                const mins = appointmentMins % 60;
+                // Format time as HH:MMam/pm
+                const timeString = `${hours > 12 ? hours - 12 : hours}:${mins.toString().padStart(2, '0')}${hours >= 12 ? 'pm' : 'am'}`;
 
                 const row = document.createElement('div');
                 row.className = 'table-row';
 
-                // UPDATED LINK TO point to patient_v2.html
-                const patientLink = `patient_v2.html?file=${patientFileName}`;
+                // Link to the new patient view layout
+                // Uses the filename we attached earlier
+                const patientLink = `patient_v2.html?file=${patient._sourceFilename}`;
 
-                const primaryDiagnosis = (patient.diagnosis && patient.diagnosis.primary) ? patient.diagnosis.primary : 'N/A';
+                // Safely access data fields with fallbacks
+                const demo = patient.demographics || {};
+                const plan = patient.treatmentPlan || {};
+                const diagnosis = patient.diagnosis || {};
+
+                const patientName = demo.name || 'Unknown';
+                const patientId = patient.patientId || 'N/A';
+                const primaryDiagnosis = diagnosis.primary || 'N/A';
+                const radOnc = plan.radOnc || 'N/A';
+                const site = plan.treatmentSite || 'N/A';
 
                 row.innerHTML = `
-                    <div class="row-item">${appointmentTime}am</div>
-                    <div class="row-item patient-name"><a href="${patientLink}">${patient.demographics.name} (${patient.patientId})</a></div>
+                    <div class="row-item appointment-time">${timeString}</div>
+                    <div class="row-item patient-name"><a href="${patientLink}">${patientName} (${patientId})</a></div>
                     <div class="row-item">${primaryDiagnosis}</div>
-                    <div class="row-item">${patient.treatmentPlan.radOnc}</div>
-                    <div class="row-item">${patient.treatmentPlan.treatmentSite}</div>
-                    <div class="row-item">Checked In</div>
+                    <div class="row-item">${radOnc}</div>
+                    <div class="row-item">${site}</div>
+                    <div class="row-item status-cell"><span class="status-indicator status-checked-in">Checked In</span></div>
                 `;
                 scheduleBody.appendChild(row);
             });
         })
         .catch(error => {
             console.error('Error fetching patient data:', error);
-            scheduleBody.innerHTML = `<div class="table-row"><div class="row-item" style="color: red; text-align: center;">Failed to load patient data.</div></div>`;
+            // Display an error message on the page if loading fails
+            scheduleBody.innerHTML = `
+                <div class="table-row" style="display: block; text-align: center; padding: 20px; color: #dc3545;">
+                    <strong>Failed to load patient schedule.</strong><br>
+                    <small>Check console for details (likely missing files in 'data' folder).</small>
+                </div>
+            `;
         });
 });
