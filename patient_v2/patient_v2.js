@@ -46,13 +46,12 @@ function initializeTreatmentConsole(patient) {
     const fields = plan.treatmentFields || [];
     populateFieldList(fields);
 
-    // C. Update Fraction Counter (Simulated logic based on delivery records)
+    // C. Update Fraction Counter
     let deliveredFx = 0;
     if (patient.radiationOncologyData && patient.radiationOncologyData.treatmentDelivery) {
          deliveredFx = (patient.radiationOncologyData.treatmentDelivery.fractions || []).length;
     }
     const totalFx = plan.prescription ? plan.prescription.numberOfFractions : '-';
-    // Showing next fraction to deliver
     document.getElementById('fx-counter').textContent = deliveredFx + 1;
     document.getElementById('fx-total').textContent = totalFx;
 }
@@ -69,7 +68,6 @@ function populateFieldList(fields) {
 
     fields.forEach((field, index) => {
         const li = document.createElement('li');
-        // First field is active by default
         if (index === 0) li.classList.add('active');
         
         li.innerHTML = `
@@ -77,13 +75,9 @@ function populateFieldList(fields) {
             <span>0.0 / ${field.monitorUnits}</span>
         `;
 
-        // Click handler to switch fields
         li.addEventListener('click', () => {
-            // Remove active class from all items
             listContainer.querySelectorAll('li').forEach(item => item.classList.remove('active'));
-            // Add to clicked item
             li.classList.add('active');
-            // Update parameter displays
             updateFieldParameters(field);
         });
 
@@ -96,48 +90,40 @@ function populateFieldList(fields) {
 
 
 function updateFieldParameters(field) {
-    // Helper for formatting numbers and handling missing data
     const formatVal = (val, fixed = 1) => (val !== undefined && val !== null) ? Number(val).toFixed(fixed) : '-';
     const formatText = (val) => (val !== undefined && val !== null) ? val : '-';
 
     // --- 1. Update BEAM Parameters (Red Container) ---
     
-    // Beam Type & Energy
     const beamType = formatText(field.beamTypeDisplay);
     document.getElementById('beam-type-plan').textContent = beamType;
-    document.getElementById('beam-type-actual').textContent = beamType; // Simulated match
+    document.getElementById('beam-type-actual').textContent = beamType;
 
     const energy = formatText(field.energyDisplay);
     document.getElementById('energy-plan').textContent = energy;
     document.getElementById('energy-actual').textContent = energy;
 
-    // Monitor Units (Total and Split)
     const totalMU = formatVal(field.monitorUnits, 1);
     document.getElementById('mu-total-plan').textContent = totalMU;
     
     const muSplitContainer = document.getElementById('mu-split-actual');
     if (field.splitMU) {
-        // If split MU data exists, show it
         muSplitContainer.innerHTML = `
             <div class="mu-val">MU 1<br>${formatVal(field.splitMU.mu1, 1)}</div>
             <div class="mu-val">MU 2<br>${formatVal(field.splitMU.mu2, 1)}</div>
         `;
     } else {
-        // Otherwise, just show the total MU in the "Actual" slot
         muSplitContainer.innerHTML = `<div class="mu-val">${totalMU}</div>`;
     }
 
-    // Dose Rate & Time
     const doseRate = formatVal(field.doseRate, 0);
     document.getElementById('dose-rate-plan').textContent = doseRate;
     document.getElementById('dose-rate-actual').textContent = doseRate;
 
     const time = formatVal(field.estimatedTime_min, 2);
     document.getElementById('time-plan').textContent = time;
-    // Simulate time counting up (just showing final time for now)
     document.getElementById('time-actual').textContent = formatVal(0.00, 2); 
 
-    // Wedge & Bolus
     const wedge = formatText(field.wedgeInfo);
     document.getElementById('wedge-plan').textContent = wedge;
     document.getElementById('wedge-actual').textContent = wedge;
@@ -149,7 +135,6 @@ function updateFieldParameters(field) {
 
     // --- 2. Update GEOMETRY Parameters (Yellow Container) ---
 
-    // Angles
     const gantry = formatText(field.gantryAngle);
     document.getElementById('gantry-plan').textContent = gantry;
     document.getElementById('gantry-actual').textContent = gantry;
@@ -162,7 +147,6 @@ function updateFieldParameters(field) {
     document.getElementById('couch-rtn-plan').textContent = couchRtn;
     document.getElementById('couch-rtn-actual').textContent = couchRtn;
 
-    // Jaws
     const jaws = field.jawPositions_cm || {};
     document.getElementById('y1-plan').textContent = formatVal(jaws.Y1);
     document.getElementById('y1-actual').textContent = formatVal(jaws.Y1);
@@ -173,7 +157,6 @@ function updateFieldParameters(field) {
     document.getElementById('x2-plan').textContent = formatVal(jaws.X2);
     document.getElementById('x2-actual').textContent = formatVal(jaws.X2);
 
-    // Couch Coordinates
     const couch = field.couchCoordinates_cm || {};
     document.getElementById('couch-vrt-plan').textContent = formatVal(couch.vertical, 2);
     document.getElementById('couch-vrt-actual').textContent = formatVal(couch.vertical, 2);
@@ -181,20 +164,23 @@ function updateFieldParameters(field) {
     document.getElementById('couch-lng-actual').textContent = formatVal(couch.longitudinal, 2);
     document.getElementById('couch-lat-plan').textContent = formatVal(couch.lateral, 2);
     document.getElementById('couch-lat-actual').textContent = formatVal(couch.lateral, 2);
+
+    // Couch Pitch & Roll (NEW)
+    document.getElementById('couch-pitch-plan').textContent = formatVal(field.pitchAngle, 1);
+    document.getElementById('couch-pitch-actual').textContent = formatVal(field.pitchAngle, 1);
+    document.getElementById('couch-roll-plan').textContent = formatVal(field.rollAngle, 1);
+    document.getElementById('couch-roll-actual').textContent = formatVal(field.rollAngle, 1);
 }
 
 
 function initializeBottomRibbon() {
-    // 1. Wire up "Close Patient" button
     const closeBtn = document.getElementById('btn-close-patient');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
-            // Navigate back to the schedule index page
             window.location.href = 'index_v2.html';
         });
     }
 
-    // 2. Wire up other buttons with placeholder actions
     const wiredBtns = document.querySelectorAll('.wired-btn');
     wiredBtns.forEach(btn => {
         btn.addEventListener('click', () => {
