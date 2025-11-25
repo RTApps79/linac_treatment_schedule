@@ -8,38 +8,37 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: #333; /* Darker background for better contrast */
       height: 100vh;
+      width: 100vw;
+      overflow: hidden; /* Prevent scrolling */
     }
 
     .tool-container {
       background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 500px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
       text-align: center;
     }
 
     h3 {
-      margin-top: 0;
-      color: #003366;
+      margin: 0;
+      padding: 1rem;
+      background-color: #003366;
+      color: white;
+      flex-shrink: 0;
     }
 
     /* Alignment Container Styles */
     .overlay-container {
       position: relative;
+      flex-grow: 1; /* Fills available space */
       width: 100%;
-      height: 300px; /* Increased height for better visibility */
       background: black;
       overflow: hidden;
-      border-radius: 4px;
-      border: 2px solid #ccc;
-      margin-bottom: 1rem;
+      border-bottom: 1px solid #ccc;
     }
 
     .overlay-container img {
@@ -48,8 +47,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      pointer-events: none; /* Prevent dragging images */
+      object-fit: contain; /* Keeps aspect ratio so image isn't cropped */
+      pointer-events: none;
     }
 
     .base-image {
@@ -59,28 +58,35 @@
     .overlay-image {
       z-index: 2;
       opacity: 0.5;
-      /* Starting slightly offset to require alignment */
       transform: translate(10px, 10px); 
     }
 
-    /* Controls Styling */
+    /* Control Area Styles */
+    .controls-area {
+      background: #f8f9fa;
+      padding: 1rem;
+      flex-shrink: 0; /* Prevents controls from shrinking */
+      border-top: 2px solid #ddd;
+    }
+
     .image-controls {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       gap: 5px;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     button {
-      padding: 0.5rem 1rem;
+      padding: 0.8rem 1.2rem; /* Larger touch targets */
       background: #003366;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.1rem;
       transition: background 0.2s;
+      min-width: 50px;
     }
 
     button:hover {
@@ -91,11 +97,11 @@
       transform: translateY(1px);
     }
 
-    /* Feedback Message Styling */
     #alignmentMessage {
       font-weight: bold;
-      margin-top: 10px;
-      min-height: 1.2em; /* Prevent jumping when text appears */
+      margin: 0;
+      min-height: 1.2em;
+      padding-top: 5px;
     }
   </style>
 </head>
@@ -112,27 +118,28 @@
     <img src="https://www.cancer.gov/sites/g/files/xnrzdm211/files/styles/cgov_social_media/public/cgov_image/media_image/2023-12/Cancer%20Currents-nasopharyngeal%20carcinoma-.jpg" id="overlayImage" class="overlay-image" alt="Overlay CT">
   </div>
 
-  <div class="image-controls">
-    <div style="width: 100%; display: flex; justify-content: center; gap: 5px; margin-bottom: 5px;">
-        <button onclick="moveOverlay(0,-1)" title="Move Up">↑</button>
+  <div class="controls-area">
+    <div class="image-controls">
+      <div style="display: flex; gap: 10px;">
+          <button onclick="moveOverlay(0,-1)" title="Move Up">↑</button>
+      </div>
+      <div style="display: flex; gap: 10px;">
+          <button onclick="moveOverlay(-1,0)" title="Move Left">←</button>
+          <button onclick="moveOverlay(0,1)" title="Move Down">↓</button>
+          <button onclick="moveOverlay(1,0)" title="Move Right">→</button>
+      </div>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+          <button onclick="checkAlignment()" style="background-color: #28a745;">Check</button>
+          <button onclick="resetAlignment()" style="background-color: #6c757d;">Reset</button>
+      </div>
     </div>
-    <div style="width: 100%; display: flex; justify-content: center; gap: 5px; margin-bottom: 5px;">
-        <button onclick="moveOverlay(-1,0)" title="Move Left">←</button>
-        <button onclick="moveOverlay(0,1)" title="Move Down">↓</button>
-        <button onclick="moveOverlay(1,0)" title="Move Right">→</button>
-    </div>
-    <div style="width: 100%; margin-top: 10px;">
-        <button onclick="checkAlignment()" style="background-color: #28a745;">Check Alignment</button>
-        <button onclick="resetAlignment()" style="background-color: #6c757d;">Reset</button>
-    </div>
-  </div>
 
-  <p id="alignmentMessage">Adjust overlay to match base image.</p>
+    <p id="alignmentMessage">Adjust overlay to match base image.</p>
+  </div>
 </div>
 
 <script>
   // Initial offset state
-  // We purposefully start with a misalignment for the simulation
   let offsetX = 15;
   let offsetY = -15;
 
@@ -142,13 +149,12 @@
   });
 
   function moveOverlay(dx, dy) {
-    // Shift pixels per click
-    const step = 1; 
+    // Shift pixels per click - increased for visibility on larger screens
+    const step = 2; 
     offsetX += dx * step;
     offsetY += dy * step;
     updateOverlayPosition();
     
-    // Clear message when moving to encourage re-checking
     document.getElementById('alignmentMessage').textContent = "Adjusting...";
     document.getElementById('alignmentMessage').style.color = "#666";
   }
@@ -159,10 +165,9 @@
   }
 
   function checkAlignment() {
-    const tolerance = 2; // pixels tolerance
+    const tolerance = 4; // Increased tolerance slightly for usability
     const msg = document.getElementById('alignmentMessage');
     
-    // Check if offsets are close to 0 (perfect alignment)
     if (Math.abs(offsetX) <= tolerance && Math.abs(offsetY) <= tolerance) {
       msg.textContent = "✅ Overlay aligned successfully!";
       msg.style.color = "green";
@@ -173,7 +178,6 @@
   }
 
   function resetAlignment() {
-    // Reset to initial bad values
     offsetX = 15;
     offsetY = -15;
     updateOverlayPosition();
