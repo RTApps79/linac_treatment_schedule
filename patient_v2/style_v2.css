@@ -395,3 +395,32 @@ li.imaging-field { background-color: #3a4a5e; border-left: 3px solid #4a90e2; co
 .modal-tab.active { color: white; border-bottom-color: #4a90e2; background-color: rgba(74, 144, 226, 0.1); }
 .modal-tab-container { border-top: none; }
 .info-group { margin-bottom: 15px; } .info-group h3 { font-size: 1rem; color: #4a90e2; margin-bottom: 5px; border-bottom: 1px solid #3a5a7a; } .info-group p, .info-group li { margin-bottom: 4px; color: #ccc; }
+
+/* ... [Previous CSS ends here] ... */
+
+/* =========================================
+   DRAG AND DROP STYLES
+   ========================================= */
+/* Visual feedback while dragging a card */
+.schedule-card.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--primary-color);
+    box-shadow: var(--shadow-md);
+    /* Ensure it's above other elements */
+    z-index: 100; 
+}
+
+/* Ensure gap slots look anchored and different from movable cards */
+.schedule-card.gap-slot {
+    cursor: not-allowed;
+    user-select: none;
+}
+
+/* Cursor hint for draggable items */
+.schedule-card:not(.gap-slot) {
+    cursor: grab;
+}
+
+.schedule-card:not(.gap-slot):active {
+    cursor: grabbing;
+}
