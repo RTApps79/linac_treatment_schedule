@@ -1,114 +1,74 @@
 {
-  "patientId": "SVCS-002",
+  "patientId": "JS12345",
   "demographics": {
     "name": "Jane Smith",
-    "dob": "1975-03-20",
+    "dob": "1975-02-10",
     "gender": "Female",
-    "address": "321 Pine Lane, Anytown, USA",
-    "phone": "555-2345",
-    "insurance": "UnitedHealthcare - Policy #UHC-JS-750320",
-    "referringPhysician": "Dr. Thomas Williams (Pulmonology)",
-    "emergencyContact": "Robert Smith (Husband) - 555-5432",
-    "advanceDirectives": "Full Code (On File, verified 04/13/2025)",
-    "supportServices": "Inpatient admission to oncology floor. Respiratory therapy consult placed for breathing support. Social work engaged for patient and family support.",
-    "mobility": "Impaired due to severe shortness of breath (dyspnea) at rest. Requires wheelchair for all transport. Unable to lie flat."
+    "address": "101 Pine Ln, Cityburg",
+    "phone": "555-1234",
+    "insurance": "United Healthcare",
+    "emergencyContact": "Tom Smith (Brother) - 555-1235"
   },
   "diagnosis": {
-    "primary": "Superior Vena Cava (SVC) Syndrome secondary to a compressive mediastinal mass; likely Lymphoma or Lung Cancer (biopsy pending).",
-    "location": "Mediastinum",
-    "datePathologicDiagnosis": "04/13/2025 (Clinical diagnosis on imaging, tissue diagnosis pending)",
-    "pathologicStage": "Staging deferred pending biopsy results.",
-    "symptomsAtPresentation": "Patient presented to the Emergency Department with a 1-week history of rapidly progressing facial and neck swelling (plethora), shortness of breath that is worse when lying down (orthopnea), a persistent cough, and a feeling of fullness in her head.",
-    "relevantHistory": "No significant prior medical history. Non-smoker.",
-    "baselineStatus": "Acutely ill. ECOG Performance Status 3 (confined to bed/chair >50% of waking hours). Patient is anxious and in respiratory distress."
+    "primary": "Small Cell Lung Cancer (SCLC)",
+    "location": "Mediastinum (causing SVC obstruction)",
+    "overallStage": "Limited Stage",
+    "tnmStage": "T4 N2 M0",
+    "pathologyFindings": [
+      "Small cell carcinoma confirmed by FNA",
+      "High grade neuroendocrine tumor"
+    ],
+    "baselineStatus": "ECOG 2. Presenting with facial swelling and dyspnea.",
+    "comorbidities": "Hypertension, Anxiety.",
+    "relevantHistory": "Urgent start due to Superior Vena Cava Syndrome symptoms."
   },
   "treatmentPlan": {
-    "radOnc": "Dr. Laura Brown",
-    "pulmonologist": "Dr. Thomas Williams",
-    "treatmentSite": "Mediastinum",
-    "intent": "Palliative (Emergent)",
-    "modality": "External Beam Radiation Therapy (EBRT)",
-    "totalDose": "30 Gy",
+    "radOnc": "Dr. Alan Grant",
+    "planId": "JS_SVCS_Emerg",
+    "treatmentSite": "Mediastinum / SVC",
+    "intent": "Palliative / Urgent",
+    "modality": "AP/PA Fixed Fields",
     "fractionation": "10 fx",
-    "rtRxDetails": "Initial emergent course: 30 Gy in 10 fractions (3 Gy/fx). Plan may be adapted after first few fractions and once tissue diagnosis is obtained.",
-    "targetVolumeSummary": "The PTV encompasses the entire mediastinal mass seen on CT that is causing compression of the superior vena cava, with a small margin.",
-    "techniqueSummary": "A simple 3D-Conformal AP/PA (Anterior-Posterior/Posterior-Anterior) technique is used for rapid planning and treatment initiation. The primary goal is to quickly deliver dose to the compressive tumor.",
-    "concurrentChemo": "None initially (pending diagnosis).",
-    "medications": [
-      "Dexamethasone 8mg IV every 6 hours, started in the ED to reduce inflammation and edema around the tumor.",
-      "Supplemental oxygen via nasal cannula.",
-      "Furosemide (Lasix) to help reduce fluid retention and swelling."
-    ],
-    "therapistAlerts": [
-      "This is an oncologic emergency. Patient is acutely symptomatic with shortness of breath.",
-      "Patient cannot lie flat. Treat with the head of the couch elevated as much as possible, as documented in simulation.",
-      "Oxygen and suction must be available in the treatment room at all times.",
-      "Assess patient's breathing and mental status before and after treatment. Report any worsening symptoms immediately.",
-      "Minimize time on the table. Be efficient with setup and imaging."
+    "billingCodes": "77407, 77427",
+    "treatmentFields": [
+      {
+        "fieldName": "AP Mediastinum",
+        "beamTypeDisplay": "STATIC (Static Photon)",
+        "energyDisplay": "6X",
+        "monitorUnits": 210,
+        "doseRate": 600,
+        "estimatedTime_min": 0.35,
+        "gantryAngle": 0,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 26.0, "longitudinal": 118.0, "lateral": 100.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -8.0, "X2": 8.0, "Y1": -10.0, "Y2": 12.0 }
+      },
+      {
+        "fieldName": "PA Mediastinum",
+        "beamTypeDisplay": "STATIC (Static Photon)",
+        "energyDisplay": "6X",
+        "monitorUnits": 225,
+        "doseRate": 600,
+        "estimatedTime_min": 0.38,
+        "gantryAngle": 180,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 26.0, "longitudinal": 118.0, "lateral": 100.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -8.0, "X2": 8.0, "Y1": -10.0, "Y2": 12.0 }
+      }
     ]
   },
   "radiationOncologyData": {
     "ctSimulation": {
-      "simulationDate": "04/13/2025",
-      "setupInstructions": "Supine with arms up on wingboard as tolerated. Head of couch elevated 30 degrees to alleviate orthopnea. SAD setup.",
-      "immobilization": "Vac-Lok bag cradle.",
-      "referenceMarks": "3-point tattoos placed for daily alignment (anterior midline, R/L lateral).",
-      "scanner": "GE Discovery RT",
-      "ctNotes": "Emergent CT simulation performed for rapid 3D-CRT planning. Patient had significant difficulty lying flat; scan was acquired with head elevated. IV contrast from the diagnostic scan was used for planning. The primary goal was to obtain a dataset for immediate treatment planning."
-    },
-    "dosimetry": {
-      "planId": "JSSVCS002_SVC",
-      "planStatus": "Final (Rapid Plan)",
-      "rx": "30 Gy / 10 fx",
-      "technique": "3D-CRT",
-      "energy": "6MV",
-      "tps": "Monaco",
-      "constraints": "Spinal Cord Max < 30 Gy; Heart V25 < 40%; Total Lung V20 < 25%",
-      "planNotes": "Emergent palliative RT plan for SVC syndrome. Plan was generated rapidly to facilitate immediate treatment. Dose constraints are respected but coverage of the compressive mass is the priority.",
-      "igrtProtocol": {
-        "frequency": "Daily",
-        "type": "kV Imaging (Orthogonal Pair)",
-        "alignment": "Match to bony anatomy of the thoracic spine and carina.",
-        "tolerances": "Translational: +/- 5mm"
-      },
-      "fieldDetails": [
-        { "fieldName": "AP Mediastinum", "fieldSize": "14.0 x 16.0 cm", "gantryAngle": "0", "collimatorAngle": "0", "couchAngle": "0", "energy": "6MV", "monitorUnits": 160, "ssd": "92.0 cm" },
-        { "fieldName": "PA Mediastinum", "fieldSize": "14.0 x 16.0 cm", "gantryAngle": "180", "collimatorAngle": "0", "couchAngle": "0", "energy": "6MV", "monitorUnits": 175, "ssd": "88.5 cm" }
-      ]
+      "setupInstructions": "Supine, head first. Arms down by sides due to patient discomfort with arms up. Head on standard headrest (B). Align to anterior chest tattoo. Verify coverage with weekly port films."
     },
     "treatmentDelivery": {
-      "fractions": [
-        {
-          "fractionNumber": 1, "totalFractions": 10, "date": "2025-04-13", "machine": "LINAC1", "therapistInitials": "JL, MW",
-          "recordedFields": [{ "fieldName": "AP/PA Mediastinum", "deliveredMu": 335 }],
-          "energiesUsed": "6MV", "setupVerification": "Tolerances Met", "immobilizationDevicesChecked": "Vac-Lok cradle", "setupAdjustments": "None", "organTargetChecks": "kV images matched to spine. Gross target covered.", "imagingType": "kV Pair", "igrtMatchQuality": "Good", "igrtApprovedBy": "LB (Physician)",
-          "patientTolerance": "Poor", "generalSideEffects": "Severe dyspnea, anxiety.", "siteSpecificSideEffects": "Facial plethora and edema present.", "painAssessment": "Chest discomfort 5/10", "patientConcerns": "Difficulty breathing.", "instructionsGiven": "Reassured patient that treatment is intended to help breathing. Encouraged to remain as still as possible.", "billingCodes": "77402, 77387", "dailyNotes": "Emergency treatment initiated on day of simulation. Patient required head of couch to be elevated. Oxygen in use during treatment. Tolerated procedure and transferred back to inpatient bed."
-        },
-        {
-          "fractionNumber": 2, "totalFractions": 10, "date": "2025-04-14", "machine": "LINAC1", "therapistInitials": "JL, MW",
-          "recordedFields": [{ "fieldName": "AP/PA Mediastinum", "deliveredMu": 335 }],
-          "energiesUsed": "6MV", "setupVerification": "Tolerances Met", "immobilizationDevicesChecked": "Vac-Lok cradle", "setupAdjustments": "None", "organTargetChecks": "kV images matched to spine.", "imagingType": "kV Pair", "igrtMatchQuality": "Good", "igrtApprovedBy": "Therapist",
-          "patientTolerance": "Fair", "generalSideEffects": "Dyspnea slightly improved.", "siteSpecificSideEffects": "Facial swelling seems slightly less pronounced.", "painAssessment": "Chest discomfort 4/10", "patientConcerns": "Feeling a little better than yesterday.", "instructionsGiven": "Continue to elevate head of bed. Report any changes.", "billingCodes": "77402, 77387", "dailyNotes": "Patient reports subjective improvement after one fraction. Setup was smoother today."
-        },
-        {
-          "fractionNumber": 5, "totalFractions": 10, "date": "2025-04-17", "machine": "LINAC1", "therapistInitials": "JL, MW",
-          "recordedFields": [{ "fieldName": "AP/PA Mediastinum", "deliveredMu": 335 }],
-          "energiesUsed": "6MV", "setupVerification": "Tolerances Met", "immobilizationDevicesChecked": "Vac-Lok cradle", "setupAdjustments": "None", "organTargetChecks": "kV images matched to spine.", "imagingType": "kV Pair", "igrtMatchQuality": "Good", "igrtApprovedBy": "LB (Physician)",
-          "patientTolerance": "Good", "generalSideEffects": "Mild fatigue.", "siteSpecificSideEffects": "Facial swelling and shortness of breath have significantly improved. Now able to lie flatter.", "painAssessment": "Chest discomfort 1/10", "patientConcerns": "Feeling much better.", "instructionsGiven": "Continue treatment course. Biopsy results are back.", "billingCodes": "77402, 77387, 77427", "dailyNotes": "OTV today. Dramatic clinical improvement in SVC symptoms. Biopsy confirmed Diffuse Large B-Cell Lymphoma. Patient will complete this course of RT and then transition to systemic chemotherapy."
-        }
-      ]
+      "fractions": [{}, {}]
     }
-  },
-  "imagingAndReports": [
-    { "date": "04/13/2025", "type": "CT Chest with IV Contrast", "summary": "Large anterior mediastinal mass causing severe compression of the superior vena cava.", "reportDetails": { "accessionNumber": "CT-25-12345", "protocol": "CT Angiography Chest", "findings": "A large, heterogeneously enhancing anterior mediastinal mass measuring 12 x 8 cm is identified. The mass completely encases and causes severe stenosis of the superior vena cava, with numerous collateral vessels noted in the chest wall. There is also mild compression of the right pulmonary artery.", "impression": "Findings are diagnostic of Superior Vena Cava Syndrome secondary to a large mediastinal mass, suspicious for lymphoma or other aggressive malignancy." } },
-    { "date": "04/15/2025", "type": "Biopsy Report", "summary": "Biopsy confirms Diffuse Large B-Cell Lymphoma (DLBCL), Non-GCB type.", "reportDetails": { "accessionNumber": "P-25-5432", "specimen": "CT-guided core needle biopsy, mediastinal mass", "diagnosis": "Diffuse Large B-Cell Lymphoma, Not Otherwise Specified (Non-Germinal Center B-Cell-like by Hans algorithm).", "microscopicDescription": "The specimen is extensively infiltrated by sheets of large, atypical lymphoid cells with vesicular nuclei, prominent nucleoli, and scant cytoplasm. Mitotic activity is brisk. Immunohistochemistry shows the tumor cells are positive for CD20, PAX5, BCL6, and MUM1, and negative for CD10 and CD3. The proliferation index (Ki-67) is approximately 80%.", "impression": "High-grade B-cell lymphoma, consistent with DLBCL. These tumors are often highly sensitive to radiation and chemotherapy." } }
-  ],
-  "labResults": [
-    { "date": "04/13/2025", "test": "CBC", "value": "WNL", "notes": "Drawn in Emergency Department. No significant abnormalities." },
-    { "date": "04/13/2025", "test": "LDH", "value": "450", "units": "U/L", "range": "140-280", "notes": "Elevated, can be a marker of high tumor burden in lymphoma." }
-  ],
-  "progressNotes": [
-    { "date": "04/13/2025", "author": "ED Physician", "type": "ED Note", "summary": "Patient presented with classic signs and symptoms of SVC syndrome. She is in respiratory distress. CT chest confirmed severe SVC compression by a large mediastinal mass. Patient started on high-dose steroids and oxygen. An emergent radiation oncology consultation was initiated." },
-    { "date": "04/13/2025", "author": "Dr. Laura Brown", "type": "Radiation Oncology Consult", "summary": "Called for emergent consult for SVC syndrome. Patient is symptomatic with facial plethora and orthopnea. Reviewed CT scan confirming diagnosis. Recommend proceeding with immediate palliative radiation therapy to the mediastinum for rapid decompression. Plan is for 30 Gy in 10 fractions, but we will start immediately with the first fraction today after a rapid CT simulation. Discussed goals and risks with patient and husband at the bedside. They are in agreement to proceed." }
-  ]
+  }
 }
