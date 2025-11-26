@@ -1,0 +1,132 @@
+/* =========================================
+   SCHEDULE.CSS - Styles for the Dashboard View
+   ========================================= */
+
+/* --- 1. GLOBAL VARIABLES & RESET --- */
+:root {
+    --bg-dark: #1a1c23;
+    --bg-card: #232730;
+    --bg-slot: #2c313a;
+    --bg-hover: #363c48;
+    --primary-color: #3498db;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12; 
+    --text-light: #ecf0f1;
+    --text-muted: #a0aec0;
+    --border-color: #3a3f4a;
+    --font-stack: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* --- 2. FULL SCREEN APP LAYOUT --- */
+body {
+    font-family: var(--font-stack);
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    /* Force full viewport height and lock scrolling */
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr; /* Header takes needed space, content fills rest */
+}
+
+/* Utility Classes */
+.text-success { color: var(--success-color) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.hidden { display: none !important; }
+
+/* --- Navigation Bar --- */
+.navbar {
+    background-color: var(--bg-card);
+    padding: 10px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* Never shrink navbar */
+}
+.brand-logo { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.logo-icon { color: var(--primary-color); font-size: 1.5rem; }
+.date-display { font-weight: 500; color: var(--text-muted); font-size: 0.9rem; }
+
+
+/* --- 3. MAIN 3-COLUMN GRID WRAPPER --- */
+.main-content-wrapper {
+    display: grid;
+    grid-template-columns: 240px 280px 1fr; /* Calendar | Staging | Schedule */
+    gap: 20px;
+    padding: 20px;
+    height: 100%; /* Fill the available grid row height */
+    overflow: hidden; /* Contain internal scrolls */
+}
+
+/* --- Common Sidebar Styles --- */
+.sidebar-column {
+    display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
+    border-right: 1px solid var(--border-color); padding-right: 15px;
+}
+.sidebar-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; }
+
+/* Column 1: Calendar Widget */
+.card-container { background-color: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 15px; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9rem; font-weight: 600; }
+.calendar-weekdays, .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 2px; }
+.calendar-weekdays div { font-size: 0.75rem; color: var(--text-muted); padding-bottom: 5px; }
+.calendar-days div { padding: 8px 4px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.calendar-days div:hover:not(.prev-month, .next-month) { background-color: var(--bg-slot); }
+.calendar-days .today { background-color: var(--primary-color); color: white; font-weight: 700; }
+.calendar-days .prev-month, .calendar-days .next-month { color: var(--border-color); }
+
+/* Column 2: Staging Area */
+.staging-list {
+    list-style: none; display: flex; flex-direction: column; gap: 10px;
+    min-height: 200px; padding-bottom: 20px;
+}
+/* Visual cue for dropping back to staging */
+.staging-list.drag-over { background-color: var(--bg-hover); border-radius: 8px; border: 2px dashed var(--warning-color); }
+
+/* Column 3: Main Schedule Area */
+.schedule-content { display: flex; flex-direction: column; height: 100%; overflow: hidden; padding-left: 5px;}
+.dept-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; flex-shrink: 0; }
+.tab-btn {
+    background: none; border: none; color: var(--text-muted); padding: 8px 12px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-family: var(--font-stack); transition: all 0.2s ease;
+}
+.tab-btn:hover { background-color: var(--bg-slot); color: var(--text-light); }
+.tab-btn.active { background-color: rgba(52, 152, 219, 0.15); color: var(--primary-color); }
+
+/* LINAC Grid System */
+.linac-rooms-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; flex-grow: 1; overflow: hidden; }
+.room-column { display: flex; flex-direction: column; gap: 10px; height: 100%; overflow: hidden; }
+.room-title { font-size: 1.1rem; font-weight: 600; color: var(--text-light); display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+.schedule-list-container { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
+.schedule-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+
+/* --- 4. SCHEDULE COMPONENTS (Rows, Cards) --- */
+.schedule-time-row { display: flex; background-color: var(--bg-card); border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); min-height: 65px; }
+.fixed-time-label { flex: 0 0 80px; background-color: var(--bg-slot); display: flex; align-items: center; justify-content: center; border-left: 4px solid var(--border-color); font-size: 0.85rem; font-weight: 700; user-select: none; }
+.schedule-time-row.occupied .fixed-time-label { border-left-color: var(--primary-color); }
+.schedule-time-row.status-ready .fixed-time-label { border-left-color: var(--success-color); }
+
+.patient-drop-zone { flex: 1; display: flex; align-items: stretch; background-color: transparent; transition: all 0.2s ease; }
+.patient-drop-zone.drag-over { background-color: var(--bg-hover); border: 2px dashed var(--primary-color); }
+
+/* Draggable Card */
+.draggable-patient-card { flex: 1; display: flex; background-color: var(--bg-card); cursor: grab; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; transition: all 0.2s ease; min-height: 65px; }
+.draggable-patient-card:active { cursor: grabbing; }
+.draggable-patient-card.dragging { opacity: 0.5; background-color: var(--bg-slot); border: 2px dashed var(--primary-color);}
+/* Different border color when in staging area */
+.staging-list .draggable-patient-card { border-left: 4px solid var(--warning-color); }
+
+.patient-info { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+.patient-info h3 { font-size: 0.95rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.patient-details { color: var(--text-muted); font-size: 0.75rem; display: flex; flex-direction: column; gap: 2px; }
+.patient-details span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.card-actions { flex: 0 0 50px; background-color: var(--bg-slot); padding: 5px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; border-left: 1px solid var(--border-color); }
+.btn-action { width: 30px; height: 30px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; transition: background-color 0.2s; }
+.btn-mark-ready { background-color: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); }
+.btn-mark-ready:hover { background-color: var(--success-color); color: white; border-color: transparent;}
+.btn-open-chart { background-color: var(--primary-color); color: white; text-decoration: none; }
+.btn-open-chart:hover { background-color: #2980b9; }
