@@ -1,3 +1,245 @@
+/* =========================================
+   GLOBAL STYLES & VARIABLES
+   ========================================= */
+:root {
+    --bg-dark: #1a1c23;      /* Deep background */
+    --bg-card: #232730;      /* Card background */
+    --bg-slot: #2c313a;      /* Slightly lighter for slots/actions */
+    --primary-color: #3498db; /* Bright Blue for buttons/accents */
+    --secondary-color: #2c3e50;
+    --success-color: #2ecc71; /* Green for Ready status */
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --text-light: #ecf0f1;
+    --text-muted: #a0aec0;
+    --border-color: #3a3f4a; /* Subtle border color */
+    --shadow-sm: 0 2px 5px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 15px rgba(0,0,0,0.3);
+    --font-stack: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-stack);
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    padding-bottom: 40px;
+}
+
+/* --- Navigation Bar --- */
+.navbar {
+    background-color: var(--bg-card);
+    color: var(--text-light);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.brand-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+}
+
+.date-display {
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+
+/* =========================================
+   SCHEDULE PAGE STYLES (Updated)
+   ========================================= */
+.schedule-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.schedule-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* --- Schedule Card Container --- */
+.schedule-card {
+    display: flex;
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 110px; /* Ensure consistent height */
+}
+
+.schedule-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+/* --- Left Side: Time Slot with Colored Border --- */
+.time-slot {
+    flex: 0 0 190px; /* Fixed width for alignment */
+    background-color: var(--bg-slot);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Default border color (e.g., for Scheduled) */
+    border-left: 6px solid var(--primary-color); 
+}
+
+/* Style for the active/ready card */
+.schedule-card.active .time-slot {
+    border-left-color: var(--success-color);
+}
+
+.time-slot .time {
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.time-slot .duration {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.time-slot .duration i {
+    font-size: 0.8rem;
+}
+
+/* --- Center: Patient Info --- */
+.patient-info {
+    flex: 1; /* Takes remaining space */
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--border-color);
+}
+
+.patient-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--text-light);
+}
+
+.patient-details {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.patient-details span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.patient-details i {
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+/* --- Right Side: Actions & Status --- */
+.card-actions {
+    flex: 0 0 180px; /* Fixed width */
+    background-color: var(--bg-slot);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end; /* Align items to the right */
+    gap: 15px;
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* Default status style */
+    background-color: rgba(52, 152, 219, 0.15);
+    color: var(--primary-color);
+}
+
+/* Style for "Ready" status based on parent active class */
+.schedule-card.active .status-badge {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: var(--success-color);
+}
+
+.btn-open {
+    text-decoration: none;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-open:hover {
+    background-color: #2980b9;
+}
+
+
+/* =========================================
+   PATIENT TREATMENT PAGE STYLES (Kept for context)
+   ========================================= */
+/* ... (The rest of your CSS for the patient page remains here unchanged) ... */
+.patient-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 25px;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+    height: calc(100vh - 100px);
+}
+/* ... [Keep the rest of the original CSS file below this line] ... */
+
 /* --- Reset and Base Styles --- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background-color: #1e2124; color: #e0e0e0; overflow: hidden; }
