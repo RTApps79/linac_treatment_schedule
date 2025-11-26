@@ -67,7 +67,6 @@
         // ============================================
         // 1. MASTER DATA STRUCTURE
         // ============================================
-        // FIX APPLIED: All 'gap' items now have a 'time' property for sorting.
         let scheduleData = [
             // --- LINAC 1 Data ---
             { id: 'l1-1', roomId: 'linac1', type: 'appt', time: '08:00 - 08:30', ptName: 'Alice Brown', ptDetails: 'Rt Proximal Femur (3D-CRT)', status: 'Scheduled', chartLink: 'Alice_Brown_SkeletalExtremity.json' },
@@ -122,7 +121,6 @@
             });
 
             // Sort data by time to ensure correct order display
-            // This will now work because all items have a 'time' string.
             scheduleData.sort((a, b) => a.time.localeCompare(b.time));
 
             // Loop through data and generate HTML
@@ -164,106 +162,114 @@
                 }
                 listContainer.insertAdjacentHTML('beforeend', html);
             });
-
-            // Re-initialize listeners after rendering
-            initializeEventHandlers();
+            // NOTE: We no longer need to re-initialize event handlers here because we use delegation!
         }
 
 
         // ============================================
-        // 3. EVENT HANDLERS (Drag & Drop + Clicks)
+        // 3. INITIALIZATION & GLOBAL EVENT HANDLERS (Delegation)
         // ============================================
-        function initializeEventHandlers() {
-            
-            // --- A. Mark Ready Click Handler ---
-            // Use a fresh querySelectorAll to get the newly created buttons
-            document.querySelectorAll('.btn-mark-ready').forEach(btn => {
-                // Remove any existing listeners to prevent duplicates (though re-rendering usually handles this)
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
+        document.addEventListener('DOMContentLoaded', () => {
+            // A. Set date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
 
-                newBtn.addEventListener('click', function(e) {
-                    const patientCard = e.target.closest('.draggable-patient-card');
+            // B. Initial Render
+            renderSchedule();
+
+            // C. Global Event Delegation Setup
+
+            // --- C1. Click Handler (for "Mark Ready" buttons) ---
+            document.addEventListener('click', function(e) {
+                // Check if clicked element is a Mark Ready button
+                const markReadyBtn = e.target.closest('.btn-mark-ready');
+                if (markReadyBtn) {
+                    const patientCard = markReadyBtn.closest('.draggable-patient-card');
                     const patientId = patientCard.getAttribute('data-patient-id');
                     // Update Data
                     const dataItem = scheduleData.find(item => item.id === patientId);
-                    if (dataItem) { dataItem.status = 'Ready'; }
-                    // Re-render
-                    renderSchedule();
-                });
+                    if (dataItem) { 
+                        dataItem.status = 'Ready'; 
+                        // Re-render to reflect changes based on data
+                        renderSchedule();
+                    }
+                }
             });
 
 
-            // --- B. Drag and Drop Handlers ---
-            const draggables = document.querySelectorAll('.draggable-patient-card');
-            const dropZones = document.querySelectorAll('.patient-drop-zone');
+            // --- C2. Drag & Drop Handlers (Document Level) ---
 
-            // 1. Drag Start/End on Patient Cards
-            draggables.forEach(draggable => {
-                draggable.addEventListener('dragstart', (e) => {
+            // Drag Start
+            document.addEventListener('dragstart', function(e) {
+                const draggable = e.target.closest('.draggable-patient-card');
+                if (draggable) {
                     draggable.classList.add('dragging');
                     // Store the patient ID being dragged
                     e.dataTransfer.setData('text/plain', draggable.getAttribute('data-patient-id'));
-                });
-                draggable.addEventListener('dragend', () => {
-                    draggable.classList.remove('dragging');
-                     // Clean up any leftover hover effects
-                    dropZones.forEach(dz => dz.classList.remove('drag-over'));
-                });
+                    // Set drag image effect
+                    e.dataTransfer.effectAllowed = 'move';
+                }
             });
 
-            // 2. Drag Over/Leave on Drop Zones
-            dropZones.forEach(zone => {
-                zone.addEventListener('dragover', e => {
-                    e.preventDefault(); // Allow dropping
-                    // Only show hover effect if zone is empty
-                    if (zone.children.length === 0) {
-                         zone.classList.add('drag-over');
+            // Drag End
+            document.addEventListener('dragend', function(e) {
+                const draggable = e.target.closest('.draggable-patient-card');
+                if (draggable) {
+                    draggable.classList.remove('dragging');
+                    // Clean up visual cues on all drop zones
+                    document.querySelectorAll('.patient-drop-zone').forEach(dz => dz.classList.remove('drag-over'));
+                }
+            });
+
+            // Drag Over (Must prevent default to allow dropping)
+            document.addEventListener('dragover', function(e) {
+                const dropZone = e.target.closest('.patient-drop-zone');
+                // Only allow if it's a drop zone AND it is empty
+                if (dropZone && dropZone.children.length === 0) {
+                    e.preventDefault(); 
+                    e.dataTransfer.dropEffect = 'move';
+                    dropZone.classList.add('drag-over');
+                }
+            });
+
+            // Drag Leave (Visual cue cleanup)
+            document.addEventListener('dragleave', function(e) {
+                const dropZone = e.target.closest('.patient-drop-zone');
+                if (dropZone) {
+                     // Only remove if we are actually leaving the zone, not just entering a child element
+                    if (!dropZone.contains(e.relatedTarget)) {
+                        dropZone.classList.remove('drag-over');
                     }
-                });
-                zone.addEventListener('dragleave', e => {
-                     zone.classList.remove('drag-over');
-                });
+                }
+            });
 
-                // 3. Drop Action
-                zone.addEventListener('drop', e => {
+            // Drop Action (The data update)
+            document.addEventListener('drop', function(e) {
+                const dropZone = e.target.closest('.patient-drop-zone');
+                
+                // Ensure we are dropping into an valid, empty drop zone
+                if (dropZone && dropZone.children.length === 0) {
                     e.preventDefault();
-                    zone.classList.remove('drag-over');
-
-                    // Ensure drop zone is empty before accepting
-                    if (zone.children.length > 0) return;
-
+                    
                     const patientId = e.dataTransfer.getData('text/plain');
                     
                     // Find the new context based on where it was dropped
-                    const newTimeRow = zone.closest('.schedule-time-row');
+                    const newTimeRow = dropZone.closest('.schedule-time-row');
                     const newTimeStr = newTimeRow.getAttribute('data-time');
-                    const newRoomList = zone.closest('.schedule-list');
+                    const newRoomList = dropZone.closest('.schedule-list');
                     const newRoomId = newRoomList.getAttribute('data-room-id');
 
                     // Update Master Data Structure
                     const patientData = scheduleData.find(item => item.id === patientId);
                     if (patientData) {
+                        console.log(`Moving patient ${patientId} to Room: ${newRoomId}, Time: ${newTimeStr}`);
                         patientData.time = newTimeStr;
                         patientData.roomId = newRoomId;
                         // Re-render updated schedule
                         renderSchedule();
                     }
-                });
+                }
             });
-        }
-
-
-        // ============================================
-        // 4. INITIAL LOAD
-        // ============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set date
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
-
-            // Initial Render
-            renderSchedule();
         });
     </script>
 </body>
