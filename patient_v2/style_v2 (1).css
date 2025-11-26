@@ -18,15 +18,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* Base Body Styles (Shared by all pages) */
 body {
     font-family: var(--font-stack);
     background-color: var(--bg-dark);
     color: var(--text-light);
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    display: grid;
-    grid-template-rows: auto 1fr;
+    line-height: 1.6;
 }
 
 /* --- Utility Classes --- */
@@ -34,7 +31,7 @@ body {
 .text-muted { color: var(--text-muted) !important; }
 .hidden { display: none !important; }
 
-/* --- Navigation Bar --- */
+/* --- Navigation Bar (Shared) --- */
 .navbar {
     background-color: var(--bg-card);
     padding: 10px 20px;
@@ -42,7 +39,8 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
+    /* Ensure navbar doesn't shrink on app layout */
+    flex-shrink: 0; 
 }
 .brand-logo { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 .logo-icon { color: var(--primary-color); font-size: 1.5rem; }
@@ -50,19 +48,31 @@ body {
 
 
 /* =========================================
-   MAIN LAYOUT GRID (New 3-Column Layout)
+   SCHEDULE APP SPECIFIC LAYOUT
+   These rules ONLY apply to pages with <body class="schedule-app-layout">
    ========================================= */
-.main-content-wrapper {
+
+/* Force full viewport height and prevent outer scrolling for the dashboard */
+body.schedule-app-layout {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr; /* Header takes needed space, content fills rest */
+}
+
+/* The 3-column grid container */
+body.schedule-app-layout .main-content-wrapper {
     display: grid;
     /* Calendar (240px) | Staging (280px) | Schedule (Flexible) */
     grid-template-columns: 240px 280px 1fr; 
     gap: 20px;
     padding: 20px;
-    height: 100%;
-    overflow: hidden;
+    height: 100%; /* Fill the available grid row height */
+    overflow: hidden; /* Contain internal scrolls */
 }
 
-/* --- Common Sidebar Styles --- */
+/* --- Common Sidebar Styles (Schedule App) --- */
 .sidebar-column {
     display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
     border-right: 1px solid var(--border-color);
@@ -129,7 +139,8 @@ body {
 
 
 /* =========================================
-   SCHEDULE ROW & DROP ZONES
+   SCHEDULE ELEMENTS (Rows, Cards, Drop Zones)
+   Used primarily on the schedule page, but component styles are safe globally.
    ========================================= */
 .schedule-time-row {
     display: flex;
@@ -165,10 +176,7 @@ body {
     color: var(--text-muted); font-size: 0.85rem; font-style: italic; pointer-events: none;
 }
 
-
-/* =========================================
-   DRAGGABLE PATIENT CARD STYLES
-   ========================================= */
+/* --- Draggable Patient Card --- */
 .draggable-patient-card {
     flex: 1; display: flex; background-color: var(--bg-card);
     cursor: grab; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden;
@@ -205,3 +213,29 @@ body {
 .btn-mark-ready:hover { background-color: var(--success-color); color: white; border-color: transparent;}
 .btn-open-chart { background-color: var(--primary-color); color: white; text-decoration: none; }
 .btn-open-chart:hover { background-color: #2980b9; }
+
+/* =========================================
+   PATIENT CHART PAGE SPECIFIC STYLES
+   ========================================= */
+/* Ensure the patient container still works as intended on its own page */
+.patient-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 25px;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+    /* Removed fixed height constraint so it scrolls naturally */
+    /* height: calc(100vh - 100px); */ 
+}
+
+/* Ensure sidebars on patient page scroll if long */
+.patient-sidebar {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+/* ... (The rest of the specific patient page styles for treatments/modals etc from original file should be below here) ... */
+/* Since I don't have the full original CSS file history in this turn, 
+   ensure any styles specific to patient_v2.html that were NOT conflicting 
+   are maintained below this point. 
+   Based on our history, the critical conflict was the body height/overflow. */
