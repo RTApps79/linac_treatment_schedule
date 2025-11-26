@@ -26,242 +26,242 @@
             <div class="calendar-widget card-container">
                 <div class="calendar-header">
                     <i class="fa-solid fa-chevron-left"></i>
-                    <h3>November 2024</h3>
+                    <span>November 2024</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
-                <div class="calendar-weekdays">
-                    <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
-                </div>
+                <div class="calendar-weekdays"><div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div></div>
                 <div class="calendar-days">
                     <div class="prev-month">27</div><div class="prev-month">28</div><div class="prev-month">29</div><div class="prev-month">30</div><div class="prev-month">31</div>
                     <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div><div>23</div><div>24</div>
-                    <div class="today">25</div> <div>26</div><div>27</div><div>28</div><div>29</div><div>30</div>
-                    <div class="next-month">1</div>
+                    <div class="today">25</div>
+                    <div>26</div><div>27</div><div>28</div><div>29</div><div>30</div><div class="next-month">1</div>
                 </div>
             </div>
         </aside>
 
         <section class="schedule-content">
             
-            <h1 class="page-title">Department Schedule</h1>
-
             <div class="dept-tabs">
                 <button class="tab-btn active"><i class="fa-solid fa-x-ray"></i> LINAC Treatment</button>
                 <button class="tab-btn"><i class="fa-solid fa-procedures"></i> Simulation (CT/MR)</button>
-                <button class="tab-btn"><i class="fa-solid fa-user-doctor"></i> Consults & Follow-ups</button>
-                <button class="tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> HDR & Special Proc</button>
+                <button class="tab-btn"><i class="fa-solid fa-user-doctor"></i> Consults</button>
+                <button class="tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> HDR/Special</button>
             </div>
 
             <div class="linac-rooms-grid">
 
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 1 (TrueBeam A)</h2>
-                    <ul class="schedule-list">
-                        <li class="schedule-card active">
-                            <div class="time-slot">
-                                <span class="time">08:00 - 08:30</span>
-                            </div>
-                            <div class="patient-info">
-                                <h3>Alice Brown</h3>
-                                <div class="patient-details">
-                                    <span>ID: ABM22334</span>
-                                    <span>Rt Proximal Femur</span>
+                    <div class="schedule-list-container">
+                        <ul class="schedule-list">
+                            <li class="schedule-card" data-patient-id="ABM22334">
+                                <div class="time-slot">08:00 - 08:30</div>
+                                <div class="patient-info"><h3>Alice Brown</h3><div class="patient-details"><span>Rt Proximal Femur (3D-CRT)</span></div></div>
+                                <div class="card-actions">
+                                    <span class="status-badge">Scheduled</span>
+                                    <button class="btn-action btn-mark-ready" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
+                                    <a href="patient_v2.html?file=Alice_Brown_SkeletalExtremity.json" class="btn-action btn-open-chart hidden" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
                                 </div>
-                            </div>
-                            <div class="card-actions">
-                                <span class="status-badge">Ready</span>
-                                <a href="patient_v2.html?file=Alice_Brown_SkeletalExtremity.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                            </div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">08:30 - 09:00</span></div>
-                            <div class="patient-info">
-                                <h3>Linda Jones</h3>
-                                <div class="patient-details"><span>ID: LJ77889</span><span>Thorax IMRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">09:00 - 09:30</span></div>
-                            <div class="patient-info">
-                                <h3>Michael Chen</h3>
-                                <div class="patient-details"><span>ID: MC55443</span><span>Head & Neck VMAT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">09:30 - 10:00</span></div>
-                            <div class="patient-info">
-                                <h3>Sarah Davis</h3>
-                                <div class="patient-details"><span>ID: SD99887</span><span>Breast 3D-CRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">10:00 - 10:45</span></div>
-                            <div class="patient-info">
-                                <h3>William Thompson</h3>
-                                <div class="patient-details"><span>ID: WT11223</span><span>Rectum VMAT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">10:45 - 11:30</span></div>
-                            <div class="patient-info">
-                                <h3>Emily Wilson</h3>
-                                <div class="patient-details"><span>ID: EW44556</span><span>Cervix VMAT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                    </ul>
+                            </li>
+                            <li class="schedule-card">
+                                <div class="time-slot">08:30 - 08:45</div>
+                                <div class="patient-info"><h3>Linda Jones</h3><div class="patient-details"><span>Thorax IMRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">08:45 - 09:15</div>
+                                <div class="patient-info"><h3>Michael Chen</h3><div class="patient-details"><span>Head & Neck VMAT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card gap-slot">09:15 - 09:30 | Morning QA Check</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">09:30 - 10:00</div>
+                                <div class="patient-info"><h3>Sarah Davis</h3><div class="patient-details"><span>Breast 3D-CRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">10:00 - 10:30</div>
+                                <div class="patient-info"><h3>William Thompson</h3><div class="patient-details"><span>Rectum VMAT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card">
+                                <div class="time-slot">10:30 - 11:15</div>
+                                <div class="patient-info"><h3>Emily Wilson</h3><div class="patient-details"><span>Cervix VMAT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card gap-slot">11:15 - 12:30 | Lunch Break / Physics QA</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">12:30 - 13:00</div>
+                                <div class="patient-info"><h3>David Anderson</h3><div class="patient-details"><span>Esophagus IMRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card">
+                                <div class="time-slot">13:00 - 13:30</div>
+                                <div class="patient-info"><h3>Amanda Thomas</h3><div class="patient-details"><span>Sarcoma IMRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">13:30 - 14:00</div>
+                                <div class="patient-info"><h3>Patrick Moore</h3><div class="patient-details"><span>Bladder VMAT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">14:00 - 14:45</div>
+                                <div class="patient-info"><h3>Jennifer Jackson</h3><div class="patient-details"><span>Spine SBRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card gap-slot">14:45 - 15:15 | Machine Break</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">15:15 - 15:45</div>
+                                <div class="patient-info"><h3>Brian Martin</h3><div class="patient-details"><span>Lymphoma IS</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">15:45 - 16:30</div>
+                                <div class="patient-info"><h3>Elizabeth Lee</h3><div class="patient-details"><span>Whole Brain (Hippocampal Avoidance)</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 2 (TrueBeam B)</h2>
-                    <ul class="schedule-list">
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">08:00 - 09:00</span></div>
-                            <div class="patient-info">
-                                <h3>Robert Miller</h3>
-                                <div class="patient-details"><span>ID: RM99112</span><span>Lung SBRT</span></div>
-                            </div>
-                            <div class="card-actions">
-                                <span class="status-badge">Scheduled</span>
-                                <a href="patient_v2.html?file=Robert_Miller_ThoraxSBRT.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                            </div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">09:00 - 10:00</span></div>
-                            <div class="patient-info">
-                                <h3>Jessica Martinez</h3>
-                                <div class="patient-details"><span>ID: JM22334</span><span>Brain SRS</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">10:00 - 11:00</span></div>
-                            <div class="patient-info">
-                                <h3>Christopher Taylor</h3>
-                                <div class="patient-details"><span>ID: CT55667</span><span>Pancreas SBRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">11:00 - 11:45</span></div>
-                            <div class="patient-info">
-                                <h3>Daniel Hernandez</h3>
-                                <div class="patient-details"><span>ID: DH11223</span><span>Prostate SBRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">11:45 - 12:30</span></div>
-                            <div class="patient-info">
-                                <h3>Melissa White</h3>
-                                <div class="patient-details"><span>ID: MW44556</span><span>Liver SBRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">12:30 - 13:15</span></div>
-                            <div class="patient-info">
-                                <h3>Jennifer Jackson</h3>
-                                <div class="patient-details"><span>ID: JJ22334</span><span>Spine SBRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                    </ul>
+                    <div class="schedule-list-container">
+                        <ul class="schedule-list">
+                            <li class="schedule-card">
+                                <div class="time-slot">08:00 - 09:00</div>
+                                <div class="patient-info"><h3>Robert Miller</h3><div class="patient-details"><span>Lung SBRT (RUL)</span></div></div>
+                                <div class="card-actions">
+                                    <span class="status-badge">Scheduled</span>
+                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
+                                    <a href="patient_v2.html?file=Robert_Miller_ThoraxSBRT.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                                </div>
+                            </li>
+                            <li class="schedule-card gap-slot">09:00 - 09:30 | Room Cleaning / Setup</li>
+                            <li class="schedule-card">
+                                <div class="time-slot">09:30 - 10:30</div>
+                                <div class="patient-info"><h3>Jessica Martinez</h3><div class="patient-details"><span>Brain SRS (Multiple Mets)</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">10:30 - 11:30</div>
+                                <div class="patient-info"><h3>Christopher Taylor</h3><div class="patient-details"><span>Pancreas SBRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card gap-slot">11:30 - 13:00 | Lunch Break / Physics Support</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">13:00 - 14:00</div>
+                                <div class="patient-info"><h3>Daniel Hernandez</h3><div class="patient-details"><span>Prostate SBRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">14:00 - 15:15</div>
+                                <div class="patient-info"><h3>Melissa White</h3><div class="patient-details"><span>Liver SBRT (Breath Hold)</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card gap-slot">15:15 - 17:00 | Physics QA / Service</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-stop text-muted"></i> LINAC 3 (Halcyon)</h2>
-                    <ul class="schedule-list">
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">08:15 - 08:45</span></div>
-                            <div class="patient-info">
-                                <h3>Jane Smith</h3>
-                                <div class="patient-details"><span>ID: JS12345</span><span>SVCS</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">08:45 - 09:30</span></div>
-                            <div class="patient-info">
-                                <h3>David Anderson</h3>
-                                <div class="patient-details"><span>ID: DA77889</span><span>Esophagus IMRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">09:30 - 10:15</span></div>
-                            <div class="patient-info">
-                                <h3>James Wilson</h3>
-                                <div class="patient-details">
-                                    <span>ID: JW55667</span>
-                                    <span>Prostate VMAT</span>
+                    <div class="schedule-list-container">
+                         <ul class="schedule-list">
+                             <li class="schedule-card gap-slot">08:00 - 08:30 | Morning Warmup</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">08:30 - 09:00</div>
+                                <div class="patient-info"><h3>Jane Smith</h3><div class="patient-details"><span>Urgent SVCS (AP/PA)</span></div></div>
+                                <div class="card-actions">
+                                    <span class="status-badge">Scheduled</span>
+                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
+                                    <a href="patient_v2.html?file=Jane_Smith_SVCS.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
                                 </div>
-                            </div>
-                            <div class="card-actions">
-                                <span class="status-badge">Scheduled</span>
-                                <a href="patient_v2.html?file=James_Wilson_PelvisProstate.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                            </div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">10:15 - 11:00</span></div>
-                            <div class="patient-info">
-                                <h3>George Harris</h3>
-                                <div class="patient-details">
-                                    <span>ID: GH88991</span>
-                                    <span>L3 Spine</span>
+                            </li>
+                            <li class="schedule-card">
+                                <div class="time-slot">09:00 - 09:30</div>
+                                <div class="patient-info"><h3>James Wilson</h3><div class="patient-details"><span>Prostate VMAT</span></div></div>
+                                <div class="card-actions">
+                                    <span class="status-badge">Scheduled</span>
+                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
+                                    <a href="patient_v2.html?file=James_Wilson_PelvisProstate.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
                                 </div>
-                            </div>
-                            <div class="card-actions">
-                                <span class="status-badge">Scheduled</span>
-                                <a href="patient_v2.html?file=George_Harris_SkeletalSpine.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                            </div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">11:00 - 11:45</span></div>
-                            <div class="patient-info">
-                                <h3>Amanda Thomas</h3>
-                                <div class="patient-details"><span>ID: AT88990</span><span>Sarcoma IMRT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">11:45 - 12:30</span></div>
-                            <div class="patient-info">
-                                <h3>Patrick Moore</h3>
-                                <div class="patient-details"><span>ID: PM77889</span><span>Bladder VMAT</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                         <li class="schedule-card">
-                            <div class="time-slot"><span class="time">12:30 - 13:00</span></div>
-                            <div class="patient-info">
-                                <h3>Brian Martin</h3>
-                                <div class="patient-details"><span>ID: BM55667</span><span>Lymphoma IS</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                        <li class="schedule-card">
-                            <div class="time-slot"><span class="time">13:00 - 13:45</span></div>
-                            <div class="patient-info">
-                                <h3>Elizabeth Lee</h3>
-                                <div class="patient-details"><span>ID: EL88990</span><span>Whole Brain</span></div>
-                            </div>
-                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                        </li>
-                    </ul>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">09:30 - 10:00</div>
+                                <div class="patient-info"><h3>George Harris</h3><div class="patient-details"><span>L3 Spine (Palliative)</span></div></div>
+                                <div class="card-actions">
+                                    <span class="status-badge">Scheduled</span>
+                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
+                                    <a href="patient_v2.html?file=George_Harris_SkeletalSpine.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                                </div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">10:00 - 10:30</div>
+                                <div class="patient-info"><h3>Barbara Garcia</h3><div class="patient-details"><span>Whole Breast (Tangents)</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card gap-slot">10:30 - 12:00 | Mid-day Break / Therapist Meeting</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">12:00 - 12:30</div>
+                                <div class="patient-info"><h3>Richard Davis</h3><div class="patient-details"><span>Prostate Bed VMAT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">12:30 - 13:00</div>
+                                <div class="patient-info"><h3>Susan Clark</h3><div class="patient-details"><span>Chest Wall + Nodes</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card">
+                                <div class="time-slot">13:00 - 13:30</div>
+                                <div class="patient-info"><h3>Joseph Hall</h3><div class="patient-details"><span>Lung IMRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                             <li class="schedule-card gap-slot">13:30 - 14:30 | Machine Break</li>
+                             <li class="schedule-card">
+                                <div class="time-slot">14:30 - 15:00</div>
+                                <div class="patient-info"><h3>Margaret Allen</h3><div class="patient-details"><span>Rectum 3D-CRT</span></div></div>
+                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                            </li>
+                            <li class="schedule-card gap-slot">15:00 - 17:00 | End of Day QA</li>
+                        </ul>
+                    </div>
                 </div>
 
             </div> </section>
     </div>
 
     <script>
-        // Simple script to set current date
+        // 1. Set current date
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
+
+        // 2. Handle "Mark Ready" functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const markReadyButtons = document.querySelectorAll('.btn-mark-ready');
+
+            markReadyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Find the parent schedule card
+                    const card = this.closest('.schedule-card');
+                    
+                    // Update status badge
+                    const badge = card.querySelector('.status-badge');
+                    badge.textContent = 'Ready';
+                    
+                    // Add active styling to the card (green border)
+                    card.classList.add('active');
+                    
+                    // Hide the "Mark Ready" button
+                    this.classList.add('hidden');
+                    
+                    // Show the "Open Chart" button
+                    const openBtn = card.querySelector('.btn-open-chart');
+                    openBtn.classList.remove('hidden');
+                });
+            });
+        });
     </script>
 </body>
 </html>
