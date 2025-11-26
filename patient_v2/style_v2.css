@@ -2,381 +2,265 @@
    GLOBAL STYLES & VARIABLES
    ========================================= */
 :root {
-    --bg-dark: #1a1c23;      /* Deep background */
-    --bg-card: #232730;      /* Card background */
-    --bg-slot: #2c313a;      /* Slightly lighter for slots/actions */
-    --primary-color: #3498db; /* Bright Blue for buttons/accents */
-    --secondary-color: #2c3e50;
-    --success-color: #2ecc71; /* Green for Ready status */
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
+    --bg-dark: #1a1c23;
+    --bg-card: #232730;
+    --bg-slot: #2c313a;
+    --primary-color: #3498db;
+    --success-color: #2ecc71;
     --text-light: #ecf0f1;
     --text-muted: #a0aec0;
-    --border-color: #3a3f4a; /* Subtle border color */
-    --shadow-sm: 0 2px 5px rgba(0,0,0,0.2);
-    --shadow-md: 0 4px 15px rgba(0,0,0,0.3);
+    --border-color: #3a3f4a;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
     --font-stack: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: var(--font-stack);
     background-color: var(--bg-dark);
     color: var(--text-light);
-    line-height: 1.6;
-    /* padding-bottom: 40px; Removed global padding */
-    height: 100vh; /* Full viewport height */
-    display: flex;
-    flex-direction: column;
+    /* FULL SCREEN SETUP */
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Prevent body scroll */
+    display: grid;
+    grid-template-rows: auto 1fr; /* Header takes space it needs, content takes rest */
 }
 
-/* --- Generic Utility Classes --- */
+/* --- Utility Classes --- */
 .text-success { color: var(--success-color) !important; }
 .text-muted { color: var(--text-muted) !important; }
-.card-container {
-    background-color: var(--bg-card);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    padding: 20px;
-}
-
+/* Utility to hide elements dynamically */
+.hidden { display: none !important; }
 
 /* --- Navigation Bar --- */
 .navbar {
     background-color: var(--bg-card);
-    color: var(--text-light);
-    padding: 15px 30px;
+    padding: 10px 20px; /* Reduced padding */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--shadow-sm);
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0; /* Prevent navbar shrinking */
+    flex-shrink: 0;
 }
 
 .brand-logo {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 10px;
 }
-
-.logo-icon {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-}
-
-.date-display {
-    font-weight: 500;
-    color: var(--text-muted);
-    font-size: 0.95rem;
-}
+.logo-icon { color: var(--primary-color); font-size: 1.5rem; }
+.date-display { font-weight: 500; color: var(--text-muted); font-size: 0.9rem; }
 
 
 /* =========================================
-   SCHEDULE PAGE LAYOUT (New Grid Structure)
+   MAIN LAYOUT GRID
    ========================================= */
 .main-content-wrapper {
     display: grid;
-    grid-template-columns: 300px 1fr; /* Fixed sidebar, flexible content */
-    gap: 30px;
-    max-width: 1600px; /* Increased max width for multi-columns */
-    margin: 30px auto;
-    padding: 0 30px;
-    flex-grow: 1; /* Fill remaining vertical space */
-    overflow: hidden; /* Prevent outer scrollbar */
+    grid-template-columns: 260px 1fr; /* Sidebar fixed width, content flexible */
+    gap: 20px;
+    padding: 20px;
+    height: 100%; /* Fill the grid row */
+    overflow: hidden; /* Contain internal scrolls */
 }
 
-/* --- Sidebar & Calendar --- */
+/* --- Sidebar & Calendar (Compact) --- */
 .sidebar {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 20px;
+    overflow-y: auto;
 }
 
-.calendar-widget {
-    /* Inherits card-container styles */
+.card-container {
+    background-color: var(--bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 15px;
 }
 
 .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; font-size: 0.9rem; font-weight: 600;
 }
 
 .calendar-weekdays, .calendar-days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    gap: 5px;
+    display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 2px;
 }
-
-.calendar-weekdays div {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 600;
-    padding-bottom: 10px;
-}
-
+.calendar-weekdays div { font-size: 0.75rem; color: var(--text-muted); padding-bottom: 5px; }
 .calendar-days div {
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 0.9rem;
+    padding: 8px 4px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;
 }
-
-.calendar-days div:hover:not(.prev-month, .next-month) {
-    background-color: var(--bg-slot);
-}
-
-.calendar-days .today {
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: 700;
-}
-
-.calendar-days .prev-month, .calendar-days .next-month {
-    color: var(--border-color);
-}
+.calendar-days div:hover:not(.prev-month, .next-month) { background-color: var(--bg-slot); }
+.calendar-days .today { background-color: var(--primary-color); color: white; font-weight: 700; }
+.calendar-days .prev-month, .calendar-days .next-month { color: var(--border-color); }
 
 
 /* --- Main Schedule Content Area --- */
 .schedule-content {
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Scroll only this area if needed */
-    padding-right: 10px; /* Space for scrollbar */
+    height: 100%; /* Fill height */
+    overflow: hidden;
 }
 
-.page-title {
-    /* text-align: center; Removed center alignment */
-    margin-bottom: 25px;
-    font-size: 1.8rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
+.page-title { margin-bottom: 15px; font-size: 1.4rem; font-weight: 600; }
 
-/* --- Department Tabs --- */
+/* --- Department Tabs (Compact) --- */
 .dept-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
+    display: flex; gap: 5px; margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color); padding-bottom: 5px;
+    flex-shrink: 0;
 }
-
 .tab-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    padding: 10px 15px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-stack);
+    background: none; border: none; color: var(--text-muted);
+    padding: 8px 12px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-stack); transition: all 0.2s ease;
 }
+.tab-btn:hover { background-color: var(--bg-slot); color: var(--text-light); }
+.tab-btn.active { background-color: rgba(52, 152, 219, 0.15); color: var(--primary-color); }
 
-.tab-btn i { font-size: 0.9rem; }
-
-.tab-btn:hover {
-    background-color: var(--bg-slot);
-    color: var(--text-light);
-}
-
-.tab-btn.active {
-    background-color: rgba(52, 152, 219, 0.15);
-    color: var(--primary-color);
-}
-
-/* --- LINAC Rooms Grid --- */
+/* --- LINAC Rooms Grid (Full Height) --- */
 .linac-rooms-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns for rooms */
-    gap: 25px;
-    align-items: start; /* Align columns to the top */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    flex-grow: 1; /* Take remaining height */
+    overflow: hidden; /* Important: ensure rooms don't spill out */
 }
 
 .room-column {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
+    height: 100%;
+    overflow: hidden;
 }
 
 .room-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-light);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
+    font-size: 1.1rem; font-weight: 600; color: var(--text-light);
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
 }
-.room-title i { font-size: 0.9rem; }
+.room-title i { font-size: 0.85rem; }
 
+/* The scrollable area within a room column if it overflows standard hours */
+.schedule-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+.schedule-list {
+    list-style: none; display: flex; flex-direction: column; gap: 8px;
+}
 
 /* =========================================
-   SCHEDULE CARD STYLES (Adjusted for columns)
+   COMPACT SCHEDULE CARD STYLES
    ========================================= */
-.schedule-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Reduced gap */
-}
-
-/* --- Schedule Card Container --- */
 .schedule-card {
     display: flex;
     background-color: var(--bg-card);
-    border-radius: 10px; /* Slightly smaller radius */
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: var(--shadow-sm); /* Lighter shadow */
     border: 1px solid var(--border-color);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    min-height: 90px; /* Reduced min-height */
+    /* Compact height to fit 8-5 without scrolling */
+    min-height: 65px; 
+    transition: all 0.2s ease;
 }
 
-.schedule-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-/* --- Left Side: Time Slot --- */
-.time-slot {
-    flex: 0 0 110px; /* Reduced fixed width */
-    background-color: var(--bg-slot);
-    padding: 15px; /* Reduced padding */
-    display: flex;
-    flex-direction: column;
+/* Gap/Break Slot Style */
+.schedule-card.gap-slot {
+    background-color: transparent;
+    border: 1px dashed var(--border-color);
+    min-height: 40px;
+    align-items: center;
     justify-content: center;
-    border-left: 5px solid var(--primary-color); /* Slightly thinner border */
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-style: italic;
 }
 
-/* Style for the active/ready card */
-.schedule-card.active .time-slot {
-    border-left-color: var(--success-color);
+/* --- Left: Time Slot --- */
+.time-slot {
+    flex: 0 0 90px;
+    background-color: var(--bg-slot);
+    padding: 0 10px;
+    display: flex; align-items: center; justify-content: center;
+    border-left: 4px solid var(--primary-color); /* Default Scheduled Color */
+    font-size: 0.85rem; font-weight: 700;
 }
 
-.time-slot .time {
-    font-size: 0.95rem; /* Reduced font size */
-    font-weight: 700;
-    display: block;
-    /* margin-bottom: 5px; Removed margin */
-    white-space: nowrap; /* Keep time on one line if possible */
-}
-
-/* Removed Duration for tighter fit in columns, can re-add if needed */
-/* .time-slot .duration { display: none; } */
-
+/* Ready State Color */
+.schedule-card.active .time-slot { border-left-color: var(--success-color); }
 
 /* --- Center: Patient Info --- */
 .patient-info {
-    flex: 1; 
-    padding: 15px 20px; /* Reduced padding */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex: 1;
+    padding: 8px 12px;
+    display: flex; flex-direction: column; justify-content: center;
     border-right: 1px solid var(--border-color);
-    overflow: hidden; /* Hide overflow text */
+    overflow: hidden;
 }
-
 .patient-info h3 {
-    font-size: 1.1rem; /* Reduced font size */
-    margin-bottom: 5px;
-    color: var(--text-light);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.95rem; margin-bottom: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
 .patient-details {
-    color: var(--text-muted);
-    font-size: 0.85rem; /* Reduced font size */
-    display: flex;
-    flex-direction: column; /* Stack details vertically in narrow columns */
-    gap: 5px;
+    color: var(--text-muted); font-size: 0.75rem;
+    display: flex; flex-direction: column; gap: 2px;
 }
+.patient-details span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.patient-details span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
-/* --- Right Side: Actions & Status --- */
+/* --- Right: Actions & Status --- */
 .card-actions {
-    flex: 0 0 90px; /* Significantly reduced fixed width */
+    flex: 0 0 75px;
     background-color: var(--bg-slot);
-    padding: 15px 10px; /* Reduced padding */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; /* Center align actions */
-    gap: 10px;
+    padding: 5px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center; gap: 6px;
 }
 
 .status-badge {
-    padding: 4px 10px; /* Smaller badge */
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background-color: rgba(52, 152, 219, 0.15);
-    color: var(--primary-color);
+    padding: 3px 8px; border-radius: 10px;
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    background-color: rgba(52, 152, 219, 0.15); color: var(--primary-color);
 }
 
 .schedule-card.active .status-badge {
-    background-color: rgba(46, 204, 113, 0.15);
-    color: var(--success-color);
+    background-color: rgba(46, 204, 113, 0.15); color: var(--success-color);
 }
 
-.btn-open {
-    text-decoration: none;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-weight: 600;
+/* Interactive Action Buttons (Circular) */
+.btn-action {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
     font-size: 0.9rem;
     transition: background-color 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 
-/* Smaller button icon style for tight spaces */
-.btn-open.btn-sm {
-    padding: 8px;
-    font-size: 1rem;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%; /* Circular button */
+/* Mark Ready Button (Checkmark) */
+.btn-mark-ready {
+    background-color: var(--bg-card); color: var(--text-muted);
+    border: 1px solid var(--border-color);
 }
+.btn-mark-ready:hover { background-color: var(--success-color); color: white; border-color: transparent;}
 
-.btn-open:hover {
-    background-color: #2980b9;
+/* Open Chart Button (Arrow) */
+.btn-open-chart {
+    background-color: var(--primary-color); color: white;
+    text-decoration: none;
 }
+.btn-open-chart:hover { background-color: #2980b9; }
 
 
 /* =========================================
