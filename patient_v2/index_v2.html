@@ -47,37 +47,26 @@
             </div>
 
             <div class="linac-rooms-grid">
-
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 1 (TrueBeam A)</h2>
-                    <div class="schedule-list-container">
-                        <ul class="schedule-list" id="linac1-list"></ul>
-                    </div>
+                    <div class="schedule-list-container"><ul class="schedule-list" id="linac1-list" data-room-id="linac1"></ul></div>
                 </div>
-
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 2 (TrueBeam B)</h2>
-                    <div class="schedule-list-container">
-                         <ul class="schedule-list" id="linac2-list"></ul>
-                    </div>
+                    <div class="schedule-list-container"><ul class="schedule-list" id="linac2-list" data-room-id="linac2"></ul></div>
                 </div>
-
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-stop text-muted"></i> LINAC 3 (Halcyon)</h2>
-                    <div class="schedule-list-container">
-                         <ul class="schedule-list" id="linac3-list"></ul>
-                    </div>
+                    <div class="schedule-list-container"><ul class="schedule-list" id="linac3-list" data-room-id="linac3"></ul></div>
                 </div>
-
-            </div> </section>
+            </div> 
+        </section>
     </div>
 
     <script>
         // ============================================
-        // 1. MASTER DATA STRUCTURE (The "Brain")
+        // 1. MASTER DATA STRUCTURE
         // ============================================
-        // This array holds the state of the schedule. In the future, 
-        // clicking a calendar date will load different data into here.
         let scheduleData = [
             // --- LINAC 1 Data ---
             { id: 'l1-1', roomId: 'linac1', type: 'appt', time: '08:00 - 08:30', ptName: 'Alice Brown', ptDetails: 'Rt Proximal Femur (3D-CRT)', status: 'Scheduled', chartLink: 'Alice_Brown_SkeletalExtremity.json' },
@@ -123,13 +112,16 @@
 
 
         // ============================================
-        // 2. RENDERING ENGINE (The "View Builder")
+        // 2. RENDERING ENGINE (Generates HTML from Data)
         // ============================================
         function renderSchedule() {
             // Clear current lists
-            document.getElementById('linac1-list').innerHTML = '';
-            document.getElementById('linac2-list').innerHTML = '';
-            document.getElementById('linac3-list').innerHTML = '';
+            ['linac1', 'linac2', 'linac3'].forEach(roomId => {
+                document.getElementById(`${roomId}-list`).innerHTML = '';
+            });
+
+            // Sort data by time to ensure correct order display
+            scheduleData.sort((a, b) => a.time.localeCompare(b.time));
 
             // Loop through data and generate HTML
             scheduleData.forEach(item => {
@@ -137,43 +129,126 @@
                 let html = '';
 
                 if (item.type === 'gap') {
-                    html = `<li class="schedule-card gap-slot" data-id="${item.id}">${item.text}</li>`;
+                    // Gap rows are not draggable and have no drop zone
+                    html = `<li class="schedule-time-row gap-row">${item.text}</li>`;
                 } 
                 else if (item.type === 'appt') {
                     const isReady = item.status === 'Ready';
-                    const activeClass = isReady ? 'active' : '';
-                    // Determine which buttons to show based on status
+                    const statusClass = isReady ? 'status-ready' : '';
                     const readyBtnClass = isReady ? 'hidden' : '';
                     const openBtnClass = isReady ? '' : 'hidden';
-                    // Build the actual link if available, else #
                     const linkHref = item.chartLink && item.chartLink !== '#' ? `patient_v2.html?file=${item.chartLink}` : '#';
 
+                    // New Structure: Row -> Fixed Time Label + Drop Zone -> Draggable Patient Card
                     html = `
-                        <li class="schedule-card ${activeClass}" draggable="true" data-id="${item.id}" data-status="${item.status}">
-                            <div class="time-slot">${item.time}</div>
-                            <div class="patient-info">
-                                <h3>${item.ptName}</h3>
-                                <div class="patient-details"><span>${item.ptDetails}</span></div>
-                            </div>
-                            <div class="card-actions">
-                                <span class="status-badge">${item.status}</span>
-                                <button class="btn-action btn-mark-ready ${readyBtnClass}" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
-                                <a href="${linkHref}" class="btn-action btn-open-chart ${openBtnClass}" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                        <li class="schedule-time-row ${statusClass}" data-time="${item.time}">
+                            <div class="fixed-time-label">${item.time}</div>
+                            
+                            <div class="patient-drop-zone">
+                                <div class="draggable-patient-card" draggable="true" data-patient-id="${item.id}">
+                                    <div class="patient-info">
+                                        <h3>${item.ptName}</h3>
+                                        <div class="patient-details"><span>${item.ptDetails}</span></div>
+                                    </div>
+                                    <div class="card-actions">
+                                        <span class="status-badge">${item.status}</span>
+                                        <button class="btn-action btn-mark-ready ${readyBtnClass}" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
+                                        <a href="${linkHref}" class="btn-action btn-open-chart ${openBtnClass}" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </li>
                     `;
                 }
-                // Insert the generated HTML into the correct list
                 listContainer.insertAdjacentHTML('beforeend', html);
             });
 
-            // Re-initialize Drag and Drop listeners after rendering new HTML
-            initializeDragAndDrop();
+            // Re-initialize listeners after rendering
+            initializeEventHandlers();
         }
 
 
         // ============================================
-        // 3. INITIALIZATION & EVENT HANDLERS
+        // 3. EVENT HANDLERS (Drag & Drop + Clicks)
+        // ============================================
+        function initializeEventHandlers() {
+            
+            // --- A. Mark Ready Click Handler ---
+            document.querySelectorAll('.btn-mark-ready').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const patientCard = e.target.closest('.draggable-patient-card');
+                    const patientId = patientCard.getAttribute('data-patient-id');
+                    // Update Data
+                    const dataItem = scheduleData.find(item => item.id === patientId);
+                    if (dataItem) { dataItem.status = 'Ready'; }
+                    // Re-render
+                    renderSchedule();
+                });
+            });
+
+
+            // --- B. Drag and Drop Handlers ---
+            const draggables = document.querySelectorAll('.draggable-patient-card');
+            const dropZones = document.querySelectorAll('.patient-drop-zone');
+
+            // 1. Drag Start/End on Patient Cards
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    draggable.classList.add('dragging');
+                    // Store the patient ID being dragged
+                    e.dataTransfer.setData('text/plain', draggable.getAttribute('data-patient-id'));
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('dragging');
+                     // Clean up any leftover hover effects
+                    dropZones.forEach(dz => dz.classList.remove('drag-over'));
+                });
+            });
+
+            // 2. Drag Over/Leave on Drop Zones
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault(); // Allow dropping
+                    // Only show hover effect if zone is empty
+                    if (zone.children.length === 0) {
+                         zone.classList.add('drag-over');
+                    }
+                });
+                zone.addEventListener('dragleave', e => {
+                     zone.classList.remove('drag-over');
+                });
+
+                // 3. Drop Action
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+
+                    // Ensure drop zone is empty before accepting
+                    if (zone.children.length > 0) return;
+
+                    const patientId = e.dataTransfer.getData('text/plain');
+                    
+                    // Find the new context based on where it was dropped
+                    const newTimeRow = zone.closest('.schedule-time-row');
+                    const newTimeStr = newTimeRow.getAttribute('data-time');
+                    const newRoomList = zone.closest('.schedule-list');
+                    const newRoomId = newRoomList.getAttribute('data-room-id');
+
+                    // Update Master Data Structure
+                    const patientData = scheduleData.find(item => item.id === patientId);
+                    if (patientData) {
+                        patientData.time = newTimeStr;
+                        patientData.roomId = newRoomId;
+                        // Re-render updated schedule
+                        renderSchedule();
+                    }
+                });
+            });
+        }
+
+
+        // ============================================
+        // 4. INITIAL LOAD
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             // Set date
@@ -182,57 +257,7 @@
 
             // Initial Render
             renderSchedule();
-
-            // Handle "Mark Ready" clicks (Event Delegation)
-            document.querySelectorAll('.schedule-list').forEach(list => {
-                list.addEventListener('click', function(e) {
-                    const markReadyBtn = e.target.closest('.btn-mark-ready');
-                    if (markReadyBtn) {
-                        const card = markReadyBtn.closest('.schedule-card');
-                        const cardId = card.getAttribute('data-id');
-
-                        // Update the master data structure
-                        const dataItem = scheduleData.find(item => item.id === cardId);
-                        if (dataItem) {
-                            dataItem.status = 'Ready';
-                            // Re-render to reflect changes based on data
-                            renderSchedule();
-                        }
-                    }
-                });
-            });
         });
-
-        // --- Helper: Drag and Drop Initialization ---
-        function initializeDragAndDrop() {
-            const draggables = document.querySelectorAll('.schedule-card[draggable="true"]');
-            const containers = document.querySelectorAll('.schedule-list');
-
-            draggables.forEach(draggable => {
-                draggable.addEventListener('dragstart', () => { draggable.classList.add('dragging'); });
-                draggable.addEventListener('dragend', () => { draggable.classList.remove('dragging'); });
-            });
-
-            containers.forEach(container => {
-                container.addEventListener('dragover', e => {
-                    e.preventDefault();
-                    const afterElement = getDragAfterElement(container, e.clientY);
-                    const draggable = document.querySelector('.dragging');
-                    if (afterElement == null) { container.appendChild(draggable); } 
-                    else { container.insertBefore(draggable, afterElement); }
-                });
-            });
-        }
-
-        function getDragAfterElement(container, y) {
-            const draggableElements = [...container.querySelectorAll('.schedule-card:not(.dragging)')];
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } 
-                else { return closest; }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
     </script>
 </body>
 </html>
