@@ -1,481 +1,89 @@
 {
-  "patientId": "33445",
+  "patientId": "LJ77889",
   "demographics": {
     "name": "Linda Jones",
-    "dob": "1962-08-25",
+    "dob": "1965-11-30",
     "gender": "Female",
-    "address": "55 River Bend Rd, Anytown, USA, 12345",
-    "phone": "555-3344",
-    "insurance": "Cigna - Policy #CIG-LJ-24680",
-    "referringPhysician": "Dr. Paul Allen (Medical Oncology)",
-    "emergencyContact": "Robert Jones (Son) - 555-3345 (Relationship: Son). Primary contact for medical updates and support.",
-    "advanceDirectives": "Healthcare Proxy (Son, Robert Jones) and Living Will on file. Verified 02/25/2025 during initial consult. Advance care planning discussions complete.",
-    "supportServices": "Referred to Smoking Cessation program (Oncology Social Work). Nutrition consultation (02/20/2025) for management of weight loss and dietary recommendations during treatment. Oncology Social Worker referral made for emotional support and financial navigation.",
-    "mobility": "Ambulatory without assistance. ECOG Performance Status 1 at baseline. Able to perform light household chores, but tires with prolonged standing or heavy lifting."
+    "address": "88 Oak St, Sometown, USA",
+    "phone": "555-7788",
+    "insurance": "Aetna",
+    "emergencyContact": "Bob Jones (Husband) - 555-7789"
   },
   "diagnosis": {
-    "primary": "Non-Small Cell Lung Cancer (NSCLC) - Squamous Cell Carcinoma",
-    "location": "Left Hilum involving mediastinal nodes (Station 7, 4L)",
-    "datePathologicDiagnosis": "02/18/2025 (EBUS Biopsy)",
-    "tnmStage": "cT2b N2 M0",
-    "overallStage": "Stage IIIA (AJCC 8th Edition)",
-    "grade": "Moderately Differentiated Squamous Cell Carcinoma (Grade 2/3)",
-    "tumorSize": "4.8 cm (largest dimension of primary mass on diagnostic CT/PET)",
-    "vascularInvolvement": "Primary tumor abuts but does not overtly invade left main pulmonary artery. No distant vascular involvement. No distant metastases detected.",
-    "pathologicStage": "pT2b pN2 M0 (Clinical staging based on pre-treatment imaging and biopsy confirming N2 nodal disease).",
-    "symptomsAtPresentation": "Persistent dry cough (worse at night), increasing shortness of breath on exertion (e.g., walking up one flight of stairs), unintentional weight loss (10 lbs over 2 months, without trying). Occasional low-grade fevers. No hemoptysis or chest pain.",
+    "primary": "NSCLC",
+    "location": "Left Upper Lobe / Mediastinum",
+    "overallStage": "Stage IIIA",
+    "tnmStage": "T2a N2 M0",
     "pathologyFindings": [
-      "EBUS biopsy of Station 7 (subcarinal) lymph node positive for Squamous Cell Carcinoma. Biopsy shows nests of atypical squamous cells with keratinization.",
-      "PD-L1 Expression: 60% (Tumor Proportion Score - TPS), high expression, suggests potential benefit from immunotherapy.",
-      "Molecular: EGFR Wildtype, ALK Negative, ROS1 Negative, BRAF Wildtype, KRAS Wildtype (all tested on biopsy, results finalized 02/25/2025)."
+      "Squamous Cell Carcinoma",
+      "Positive subcarinal LN biopsy (EBUS)"
     ],
-    "relevantHistory": "50 pack-year smoking history (currently smokes 0.5 ppd, expressed desire to quit). History of Hypertension (managed with Lisinopril). Chronic Bronchitis. No prior cancer history. Former bartender, now retired.",
-    "baselineStatus": "ECOG 1 (Restricted in strenuous activity, ambulatory and able to perform light daily tasks). KPS 80.",
-    "comorbidities": "Hypertension, Chronic Obstructive Pulmonary Disease (COPD - moderate), Nicotine Dependence, Dyslipidemia."
+    "baselineStatus": "ECOG 1 due to dyspnea.",
+    "comorbidities": "COPD, history of DVT.",
+    "relevantHistory": "Concurrent chemoradiation protocol."
   },
   "treatmentPlan": {
-    "radOnc": "Dr. Sarah Jenkins",
-    "medOnc": "Dr. Paul Allen",
-    "surgOnc": "N/A (Patient not surgical candidate due to N2 disease and comorbidities)",
-    "treatmentSite": "Left Hilum Primary Tumor + Mediastinum (Involved nodes: Station 7, 4L; Elective nodes: Stations 2R, 2L, 4R, 10R)",
-    "intent": "Definitive (Curative) - Goal is local-regional tumor control and eradication of microscopic disease to achieve long-term survival.",
-    "modality": "External Beam Radiation Therapy (EBRT) with concurrent Chemotherapy",
-    "rtRxDetails": "60 Gy in 30 fractions (2 Gy/fx) to PTV_Primary+Nodes (GTV + 0.8cm CTV + 0.5cm PTV margin). Simultaneously Integrated Boost (SIB) approach not formally used in 3D-CRT but target volume design acts as such.",
-    "targetVolumeSummary": "Gross Tumor Volume (GTV) includes the primary left hilar mass and involved mediastinal lymph nodes (Station 7, 4L) identified on diagnostic PET/CT and CT simulation. Internal Target Volume (ITV) derived from 4D-CT to cover respiratory motion. Clinical Target Volume (CTV) is ITV + 0.8 cm margin for microscopic spread. Planning Target Volume (PTV) is CTV + 0.5 cm setup margin. Elective nodal CTVs include Station 2R/L, 4R/L, 10R to cover subclinical disease. Critical Organs at Risk (OARs) include Spinal Cord, Esophagus, Heart, and bilateral Lungs. Dose optimized to balance coverage and OAR sparing.",
-    "techniqueSummary": "Volumetric Modulated Arc Therapy (VMAT) utilizing two full arcs (CW/CCW). Technique optimized for high dose conformity to complex target volumes and efficient OAR sparing, especially heart, lungs, and esophagus in this central location. Dose calculated with Monte Carlo algorithm for accurate heterogeneity correction in thoracic region.",
-    "concurrentChemo": "Carboplatin/Paclitaxel",
-    "detailedConcurrentChemo": "Carboplatin AUC 5 IV (Cycle 1, Day 1) + Paclitaxel 200 mg/m^2 IV (Cycle 1, Day 1) and Carboplatin AUC 5 IV (Cycle 2, Day 22) + Paclitaxel 200 mg/m^2 IV (Cycle 2, Day 22). Total 2 cycles of planned chemotherapy. Managed by Dr. Allen's Medical Oncology team. Patient pre-medicated and hydrated as per protocol.",
-    "potentialConsolidationTherapy": "Durvalumab (immunotherapy) 10 mg/kg IV every 2 weeks, starting 1-42 days after chemoradiation completion, for up to 1 year (Managed by Dr. Allen). Indicated for Stage III NSCLC with PD-L1 expression >1% who have not progressed after chemoRT. Patient is a candidate given PD-L1 60%.",
-    "medications": [
-      "Ondansetron 8mg PO PRN Nausea/Vomiting (Chemo related, prior to infusions and as needed)",
-      "Prochlorperazine 10mg PO PRN Nausea/Vomiting (Chemo related, as needed)",
-      "Esomeprazole 40mg PO Daily (Scheduled for esophagitis prophylaxis and treatment)",
-      "Loperamide 2mg PO PRN Diarrhea (Chemo related)",
-      "Cough Syrup (e.g., Dextromethorphan/Guaifenesin) PRN radiation-induced cough, especially at night.",
-      "Pain Medication (e.g., Hydrocodone-Acetaminophen PRN moderate throat/chest pain, scheduled around week 3-4)",
-      "Topical Aquaphor/Hydrocortisone Cream PRN skin reaction (dermatitis)"
-    ],
-    "therapistAlerts": [
-        "Patient is a current smoker; verbally encourage cessation daily and document. Provide updated cessation resources.",
-        "Assess for esophagitis (painful/difficult swallowing, retrosternal burning) daily; document score (Grade 0-3). Encourage use of Esomeprazole and pain meds as needed. Document oral intake and weight changes.",
-        "Monitor for cough (frequency, character - dry vs productive) and shortness of breath daily. Report significant worsening immediately.",
-        "High risk for fatigue due to chemo and large treatment volume; encourage rest but also light activity. Document energy level.",
-        "Monitor skin reaction (erythema, tenderness) in treatment portals on chest/back daily. Advise gentle cleansing.",
-        "Patient receiving VMAT; strict immobilization is critical. Report any mask discomfort or patient motion during treatment. Ensure shoulders are well retracted for optimal field shaping."
+    "radOnc": "Dr. Emily White",
+    "planId": "LJ_Thorax_IMRT",
+    "treatmentSite": "LUL Lung + Mediastinum",
+    "intent": "Definitive (Concurrent ChemoRT)",
+    "modality": "IMRT",
+    "fractionation": "30 fx",
+    "billingCodes": "77386, 77387, 77427",
+    "treatmentFields": [
+      {
+        "fieldName": "LPO IMRT",
+        "beamTypeDisplay": "DYNAMIC (IMRT Step-and-Shoot)",
+        "energyDisplay": "6X",
+        "monitorUnits": 120,
+        "doseRate": 400,
+        "estimatedTime_min": 1.2,
+        "gantryAngle": 45,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 23.5, "longitudinal": 120.0, "lateral": 99.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -6.0, "X2": 2.0, "Y1": -8.0, "Y2": 8.0 }
+      },
+      {
+        "fieldName": "LAO IMRT",
+        "beamTypeDisplay": "DYNAMIC (IMRT Step-and-Shoot)",
+        "energyDisplay": "6X",
+        "monitorUnits": 115,
+        "doseRate": 400,
+        "estimatedTime_min": 1.1,
+        "gantryAngle": 315,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 23.5, "longitudinal": 120.0, "lateral": 99.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -2.0, "X2": 6.0, "Y1": -8.0, "Y2": 8.0 }
+      },
+       {
+        "fieldName": "RPO IMRT",
+        "beamTypeDisplay": "DYNAMIC (IMRT Step-and-Shoot)",
+        "energyDisplay": "6X",
+        "monitorUnits": 130,
+        "doseRate": 400,
+        "estimatedTime_min": 1.3,
+        "gantryAngle": 135,
+        "collimatorAngle": 0,
+        "couchAngle": 0,
+        "couchCoordinates_cm": { "vertical": 23.5, "longitudinal": 120.0, "lateral": 99.0 },
+        "pitchAngle": 0.0,
+        "rollAngle": 0.0,
+        "jawPositions_cm": { "X1": -7.0, "X2": 7.0, "Y1": -7.0, "Y2": 7.0 }
+      }
     ]
   },
   "radiationOncologyData": {
     "ctSimulation": {
-      "simulationDate": "03/01/2025",
-      "setupInstructions": "Supine in BodyFix vacuum bag with arms up on wingboard and secured in arm rests. Patient instructed on shallow breathing for 4D-CT acquisition. SAD setup. Room lasers aligned to external marks on body bag.",
-      "immobilization": "BodyFix vacuum bag (custom molded for torso), Wingboard (Arms Up), Headrest (Type B).",
-      "referenceMarks": "3-point tattoos placed at anterior chest and bilateral mid-axillary line at isocenter projections. Isocenter derived from 4D-CT Mid-Ventilation phase: L-2.0 (lateral), L-1.0 (anterior-posterior), V+0.0 (superior-inferior) from CT sim reference point. Verification photos taken.",
-      "setupImages": [
-        { "type": "AP", "url": "https://placehold.co/250x200/EEE/31343C?text=AP+Setup+Photo_LJ33445" },
-        { "type": "Lateral", "url": "https://placehold.co/250x200/EEE/31343C?text=Lateral+Setup+Photo_LJ33445" }
-      ],
-      "scanner": "Canon Aquilion Exceed LB (Large Bore for patient comfort and image quality)",
-      "sliceThickness": "2.5 mm (for optimal contouring and dose calculation). 1.5 mm for 4D-CT acquisition to capture tumor motion accurately.",
-      "contrastUsed": "IV Contrast (100ml Omnipaque 350mgI/ml) administered for enhanced visualization of primary tumor and nodal volumes. Bolus tracking used for optimal enhancement during contrast phase.",
-      "ctNotes": "4D-CT acquired for VMAT planning. Respiratory motion assessed (tumor motion ~0.8cm in SI direction, managed with ITV). Fused with diagnostic PET/CT (02/20/2025) for accurate GTV delineation. Patient tolerated supine position well. Vacuum bag molded effectively for reproducibility. Good quality imaging for planning."
-    },
-    "dosimetry": {
-      "planId": "LJ33445_Lung_VMAT",
-      "planStatus": "Final - Approved by Dr. Sarah Jenkins (03/04/2025)",
-      "rx": "60 Gy / 30 fx (2 Gy/fx daily)",
-      "technique": "VMAT (Volumetric Modulated Arc Therapy, 2 arcs: CW/CCW)",
-      "energy": "6MV FFF (Flattening Filter Free for higher dose rate and sharper penumbra)",
-      "numberOfFieldsOrArcs": 2,
-      "gantryAngles": "Arc 1: 181-179 CW; Arc 2: 179-181 CCW (Full 358-degree arcs)",
-      "collAngles": "Variable (optimized by TPS to shape beams to MLC contours and minimize OAR dose)",
-      "couchAngles": "0 (Patient supine)",
-      "isoCoords": "L-2.0, L-1.0, V+0.0 (Lateral, Anterior-Posterior, Superior-Inferior relative to CT sim reference point, located centrally within PTV)",
-      "tps": "RayStation 10.0 (Treatment Planning System)",
-      "algorithm": "Monte Carlo (Advanced algorithm for accurate dose calculation in heterogeneous media like lung)",
-      "hetero": "Yes (Full heterogeneity correction applied)",
-      "norm": "PTV Mean 95% (95% of PTV_Primary+Nodes receives 60 Gy).",
-      "constraints": "Spinal Cord Max < 45 Gy (achieved 40.5 Gy); Esophagus Mean < 34 Gy (achieved 31.2 Gy); Heart V30 < 40% (achieved 38.5%, Mean Heart Dose 18.2 Gy); Total Lung V20 < 30% (achieved 26.5%, Mean Lung Dose 14.8 Gy). Brachial Plexus Max < 66 Gy (achieved 59.0 Gy). All constraints met within acceptable clinical limits. Great Vessel Max < 66 Gy (achieved 61.5 Gy).",
-      "planNotes": "VMAT for locally advanced lung SCCa. Motion managed with ITV approach on 4D-CT. Patient to receive concurrent Carboplatin/Paclitaxel. Plan optimized for target coverage and critical OAR sparing. Daily CBCT for IGRT. Plan quality excellent with high conformity.",
-      "igrtProtocol": {
-        "frequency": "Daily",
-        "type": "Cone Beam CT (CBCT) - Thorax CBCT",
-        "alignment": "Primary match to bony anatomy of thoracic spine (vertebral bodies T4-T8). Secondary check to fiducials/surgical clips if present, or to soft tissue match (e.g., tumor/nodal shifts relative to ribs). Shifts approved by therapists within pre-set tolerance, physician approval for larger shifts or rotational errors.",
-        "tolerances": "Translational: +/- 3mm; Rotational: +/- 2 degrees. Action taken for out-of-tolerance shifts (e.g., re-imaging, physician review)."
-      },
-      "qaChecks": [
-        { "date": "2025-03-04", "type": "Initial Chart Check", "by": "Physics Staff (JL)", "result": "Pass - Rx, volumes, constraints, and plan notes verified per protocol." },
-        { "date": "2025-03-04", "type": "Patient Specific QA (Mobius 3D, ArcCheck)", "by": "Physics Staff (JL)", "result": "Pass (Gamma 99.5% @ 3%/2mm); Absolute dose match within 1.5%." },
-        { "date": "2025-03-04", "type": "Dry Run Verification", "by": "Lead Therapist (MJ)", "result": "Pass - Machine parameters, arc delivery, and couch movements verified on LINAC. Patient position and mask fit verified." }
-      ],
-      "fieldDetails": [
-        {
-          "fieldName": "Arc 1 (CW)",
-          "fieldSize": "Dynamic MLC (variable field shape)",
-          "gantryAngle": "181-179 CW",
-          "collimatorAngle": "30",
-          "couchAngle": "0",
-          "energy": "6MV FFF",
-          "monitorUnits": 450,
-          "ssd": "Variable (VMAT isocenter is fixed, SSD varies dynamically)"
-        },
-        {
-          "fieldName": "Arc 2 (CCW)",
-          "fieldSize": "Dynamic MLC (variable field shape)",
-          "gantryAngle": "179-181 CCW",
-          "collimatorAngle": "330",
-          "couchAngle": "0",
-          "energy": "6MV FFF",
-          "monitorUnits": 440,
-          "ssd": "Variable (VMAT isocenter is fixed, SSD varies dynamically)"
-        }
-      ],
-      "imagingFields": [
-        { "fieldName": "CBCT (Full Thorax)", "gantryAngle": "Full Arc", "fieldSize": "Volume", "energy": "kV", "monitorUnits": "N/A" }
-      ]
+      "setupInstructions": "Supine, head first. Arms up in wingboard with handles (position B). Indexing bars set at H4. Align to chest tattoos. Free breathing scan. Daily kV/kV imaging for bony alignment to spine/carina."
     },
     "treatmentDelivery": {
-      "fractions": [
-        {
-          "fractionNumber": 1,
-          "totalFractions": 30,
-          "date": "2025-03-05",
-          "machine": "LINAC1",
-          "therapistInitials": "MJ, TN",
-          "overallMUs": 890,
-          "setupVerification": "Tolerances Met",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "None (initial setup highly accurate)",
-          "organTargetChecks": "Daily CBCT reviewed, excellent bony and soft tissue match to plan. Tumor/nodal region alignment confirmed.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - No Shifts Required",
-          "shiftsApplied": "None",
-          "igrtApprovedBy": "SJ (Physician)",
-          "igrtVerificationNotes": "First treatment. CBCT match excellent. Patient tolerated setup well. Reviewed pre-meds for chemo. Patient comfortable.",
-          "patientTolerance": "Good",
-          "generalSideEffects": "No acute side effects after first fraction.",
-          "siteSpecificSideEffects": "None.",
-          "painAssessment": "0/10.",
-          "patientConcerns": "Expressed nervousness about the duration of treatment.",
-          "instructionsGiven": "Educated on daily RT, weekly chemo, and need for prompt symptom reporting. Emphasized importance of smoking cessation and provided resources.",
-          "billingCodes": "77386, 77387",
-          "dailyNotes": "Patient tolerated first treatment and concurrent chemotherapy well. Quick setup. Confirmed she had received her weekly chemo prior to arriving. Encouraged relaxation techniques during treatment. Provided updated smoking cessation pamphlets.",
-          "energiesUsed": "6MV FFF",
-          "recordedFields": [
-            { "fieldName": "Arc 1 (CW)", "deliveredMu": 450, "notes": "OK" },
-            { "fieldName": "Arc 2 (CCW)", "deliveredMu": 440, "notes": "OK" }
-          ]
-        },
-        {
-          "fractionNumber": 5,
-          "totalFractions": 30,
-          "date": "2025-03-11",
-          "machine": "LINAC1",
-          "therapistInitials": "MJ, TN",
-          "overallMUs": 890,
-          "setupVerification": "Tolerances Met",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "None",
-          "organTargetChecks": "Daily CBCT reviewed, good bony and soft tissue match.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - No Shifts Required",
-          "shiftsApplied": "None",
-          "igrtApprovedBy": "MJ (Therapist)",
-          "igrtVerificationNotes": "Routine CBCT, no significant shifts. Patient cooperative.",
-          "patientTolerance": "Good",
-          "generalSideEffects": "Mild fatigue.",
-          "siteSpecificSideEffects": "None.",
-          "painAssessment": "0/10.",
-          "patientConcerns": "None.",
-          "instructionsGiven": "Continue good hydration. Emphasized use of anti-nausea medication before chemo." ,
-          "billingCodes": "77386, 77387",
-          "dailyNotes": "Patient cooperative and comfortable during treatment. No acute skin reaction or cough. Weekly labs to be drawn tomorrow.",
-          "energiesUsed": "6MV FFF",
-          "recordedFields": [
-            { "fieldName": "Arc 1 (CW)", "deliveredMu": 450, "notes": "OK" },
-            { "fieldName": "Arc 2 (CCW)", "deliveredMu": 440, "notes": "OK" }
-          ]
-        },
-        {
-          "fractionNumber": 10,
-          "totalFractions": 30,
-          "date": "2025-03-18",
-          "machine": "LINAC1",
-          "therapistInitials": "RS, KL",
-          "overallMUs": 890,
-          "setupVerification": "Adjustments Made",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "V:-0.1 cm, L:0 cm, S:0.2 cm shifts applied based on CBCT. Minor roll adjustment for optimal match.",
-          "organTargetChecks": "Daily CBCT reviewed, matched to vertebral bodies and tumor/nodal volumes. Good correlation.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - Shifts Applied",
-          "shiftsApplied": "V:-0.1, L:0, S:0.2",
-          "igrtApprovedBy": "SJ (Physician)",
-          "igrtVerificationNotes": "Physician approved daily shifts. Patient reports mild throat soreness. Tolerated treatment without issues.",
-          "patientTolerance": "Good",
-          "generalSideEffects": "Increasing fatigue. Mild sore throat/chest with swallowing.",
-          "siteSpecificSideEffects": "Early Grade 1 esophagitis.",
-          "painAssessment": "1/10 (with swallowing).",
-          "patientConcerns": "Reported some difficulty swallowing dry foods and mild discomfort in chest.",
-          "instructionsGiven": "Advised on soft diet. Encouraged frequent sips of water. Discussed starting Esomeprazole if symptoms worsen.",
-          "billingCodes": "77386, 77387",
-          "dailyNotes": "Patient cooperative. Able to take full breaths during verification images. No significant skin changes observed. Weekly OTV tomorrow with Dr. Jenkins. Labs acceptable for chemo.",
-          "energiesUsed": "6MV FFF",
-          "recordedFields": [
-            { "fieldName": "Arc 1 (CW)", "deliveredMu": 450, "notes": "OK" },
-            { "fieldName": "Arc 2 (CCW)", "deliveredMu": 440, "notes": "OK" }
-          ]
-        },
-        {
-          "fractionNumber": 15,
-          "totalFractions": 30,
-          "date": "2025-03-25",
-          "machine": "LINAC1",
-          "therapistInitials": "RS, KL",
-          "overallMUs": 890,
-          "setupVerification": "Adjustments Made",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "V:0.3 cm, L:-0.1 cm, S:0.2 cm shifts applied.",
-          "organTargetChecks": "Daily CBCT reviewed. Larger shifts than typical, but within tolerance for bony and soft tissue match. Confirmed target coverage.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - Shifts Applied",
-          "shiftsApplied": "V:0.3, L:-0.1, S:0.2",
-          "igrtApprovedBy": "SJ (Physician)",
-          "igrtVerificationNotes": "Shifts applied to maintain bony registration. Dr. Jenkins approved. Patient reports moderate throat/chest soreness when swallowing. Chemo hold discussed due to low counts.",
-          "patientTolerance": "Fair",
-          "generalSideEffects": "Moderate fatigue. Moderate throat/chest pain with swallowing. Cough persists.",
-          "siteSpecificSideEffects": "Grade 2 esophagitis (painful, difficult swallowing). Skin intact, no erythema yet.",
-          "painAssessment": "4/10 (when swallowing).",
-          "patientConcerns": "Expressing more discomfort with swallowing. Asked about pain medication options. Worried about low blood counts.",
-          "instructionsGiven": "Advised liberal use of Esomeprazole. Discussed starting PRN pain medication (Hydrocodone-Acetaminophen) with Dr. Jenkins during OTV. Emphasized importance of hydration." ,
-          "billingCodes": "77386, 77387, 77427",
-          "dailyNotes": "OTV today. Discussed chemo hold with Med Onc due to low counts. Patient coping with increasing symptoms. Encouraged to continue smoking cessation efforts. Remained still for treatment."
-        },
-        {
-          "fractionNumber": 20,
-          "totalFractions": 30,
-          "date": "2025-04-01",
-          "machine": "LINAC1",
-          "therapistInitials": "MJ, TN",
-          "overallMUs": 890,
-          "setupVerification": "Tolerances Met",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "None.",
-          "organTargetChecks": "Daily CBCT reviewed. Good match. Tumor motion stable. Lung volumes appear consistent.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - No Shifts Required",
-          "shiftsApplied": "None",
-          "igrtApprovedBy": "SJ (Physician)",
-          "igrtVerificationNotes": "Routine CBCT. Patient comfortable. Physician reviewed setup. Cleared.",
-          "patientTolerance": "Poor",
-          "generalSideEffects": "Significant fatigue. Moderate to severe esophagitis. Persistent cough. Mild nausea managed.",
-          "siteSpecificSideEffects": "Grade 2 esophagitis (painful, difficult swallowing). Grade 1 skin erythema in right axilla.",
-          "painAssessment": "5/10 (when swallowing and general fatigue).",
-          "patientConcerns": "Difficulty eating. Asked about PEG tube (patient declined).",
-          "instructionsGiven": "Advised liquid diet, use of nutritional supplements (Ensure/Boost). Reinforced scheduled pain medication use and Esomeprazole.",
-          "billingCodes": "77386, 77387",
-          "dailyNotes": "OTV today with Dr. Jenkins. Labs show nadir counts, Med Onc confirms chemo hold. Patient coping, but struggling with side effects. Advised on soft foods/liquid diet. Encouraged continued oral care."
-        },
-        {
-          "fractionNumber": 25,
-          "totalFractions": 30,
-          "date": "2025-04-08",
-          "machine": "LINAC1",
-          "therapistInitials": "RS, KL",
-          "overallMUs": 890,
-          "setupVerification": "Adjustments Made",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "V:0.2 cm, L:-0.2 cm, S:0.1 cm shifts applied. Smallest shifts in days.",
-          "organTargetChecks": "Daily CBCT reviewed. Alignment confirmed. No concerning anatomical changes.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - Shifts Applied",
-          "shiftsApplied": "V:0.2, L:-0.2, S:0.1",
-          "igrtApprovedBy": "SJ (Physician)",
-          "igrtVerificationNotes": "Minor shifts. Patient holding still very well despite discomfort. Dr. Jenkins approved. Patient is strong.",
-          "patientTolerance": "Poor",
-          "generalSideEffects": "Severe fatigue. Severe esophagitis. Persistent cough. Mild nausea managed.",
-          "siteSpecificSideEffects": "Grade 2 moist desquamation (skin break down) in axilla and inframammary fold on treated side. Grade 3 esophagitis (painful, significant difficulty swallowing).",
-          "painAssessment": "6/10 (constant discomfort).",
-          "patientConcerns": "Struggling significantly with pain and fatigue. Asked about finishing treatment.",
-          "instructionsGiven": "Advised to continue all supportive measures. Discussed importance of completing full course. Emphasized gentle skin care.",
-          "billingCodes": "77386, 77387, 77427",
-          "dailyNotes": "Weekly OTV with Dr. Jenkins today. Labs still low, Med Onc extended chemo hold. Patient very motivated to finish. Maintained position well for treatment."
-        },
-        {
-          "fractionNumber": 30,
-          "totalFractions": 30,
-          "date": "2025-04-15",
-          "machine": "LINAC1",
-          "therapistInitials": "MJ, TN",
-          "overallMUs": 890,
-          "setupVerification": "Tolerances Met",
-          "immobilizationDevicesChecked": "BodyFix bag, wingboard, arm rests",
-          "setupAdjustments": "None",
-          "organTargetChecks": "Final CBCT reviewed, excellent alignment. Tumor/nodal region stable. Lungs clear.",
-          "imagingType": "CBCT",
-          "igrtMatchQuality": "Good - No Shifts Required",
-          "shiftsApplied": "None",
-          "igrtApprovedBy": "SJ (Physician)",
-          "igrtVerificationNotes": "Final fraction verification. Excellent consistency. Patient relieved to be done. Plan completed.",
-          "patientTolerance": "Poor",
-          "generalSideEffects": "Profound fatigue. Severe esophagitis. Persistent cough. Mild diarrhea.",
-          "siteSpecificSideEffects": "Grade 2 moist desquamation in axilla. Grade 3 esophagitis (painful swallowing, barely tolerating liquids).",
-          "painAssessment": "7/10 (managed with scheduled meds).",
-          "patientConcerns": "Very relieved to finish. Anxious about recovery and side effects improving. Asked about when she can eat solid food again.",
-          "instructionsGiven": "Reinforced all post-treatment instructions. Emphasized continued use of Esomeprazole, cough syrup, anti-diarrhea meds, and scheduled pain meds. Provided contact info for urgent concerns. Scheduled follow-up appointments with Radiation Oncology and Medical Oncology for consolidation Durvalumab. Stressed importance of continued hydration/nutrition via supplements.",
-          "billingCodes": "77386, 77387, 77427",
-          "dailyNotes": "Completed 30/30 fractions of definitive RT with concurrent chemotherapy. Patient was very relieved. Provided completion certificate. Instructions on continued supportive care, especially nutrition and symptom management, were emphasized. Patient to be seen by Med Onc for consolidation immunotherapy. Discussed post-RT plan for monitoring and follow-up imaging."
-        }
-      ]
+      "fractions": [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
     }
-  },
-  "imagingAndReports": [
-    {
-      "date": "02/18/2025",
-      "type": "EBUS Biopsy Report",
-      "summary": "Squamous Cell Carcinoma identified in Station 7 lymph node sample. Molecular pending.",
-      "reportDetails": {
-        "lab": "ANYTOWN PATHOLOGY SERVICES",
-        "accessionNumber": "EBUS-25-001",
-        "specimen": "Endobronchial Ultrasound-Guided Fine Needle Aspiration (EBUS-FNA) of Station 7 (Subcarinal) Lymph Node",
-        "diagnosis": "SQUAMOUS CELL CARCINOMA, NON-KERATINIZING. (Consistent with primary lung origin).",
-        "microscopicDescription": "Smears and cell block show clusters and single malignant cells with squamous differentiation, including dense cytoplasm, irregular nuclear contours, and focal keratinization. Prominent nucleoli and frequent mitotic figures are noted. Background includes lymphoid cells. Immunohistochemical stains for TTF-1 and Napsin A are negative. p40 and CK5/6 are positive. PD-L1 expression testing sent out. No small cell features identified.",
-        "grossDescription": "Received in Cytolyt, scant tan aspirate labeled 'Station 7 Lymph Node FNA'.",
-        "comment": "Invasive squamous cell carcinoma involving a subcarinal lymph node. Primary lung origin suspected given immunohistochemical profile. Molecular testing for PD-L1 sent. Recommend correlation with clinical and radiologic findings.",
-        "signedBy": "Dr. E. BiopsyPath, 02/20/2025",
-        "reviewedBy": "Dr. Paul Allen (Med Onc)"
-      }
-    },
-    {
-      "date": "02/20/2025",
-      "type": "Diagnostic PET/CT Scan (Staging)",
-      "summary": "Hypermetabolic left hilar mass (SUVmax 16.5) and mediastinal nodes (Station 7: 1.8cm, SUVmax 14.0; Station 4L: 1.2cm, SUVmax 10.5). No distant metastases.",
-      "reportDetails": {
-        "accessionNumber": "PETCT-25-003",
-        "protocol": "FDG PET/CT, Skull Base to Mid-thigh, for Staging",
-        "findings": "Highly hypermetabolic mass in the left hilum, measuring 4.8 x 4.0 cm (SUVmax 16.5), suggestive of primary lung malignancy. Corresponding hypermetabolic lymph nodes identified in the subcarinal region (Station 7 - 1.8 cm, SUVmax 14.0) and left paratracheal region (Station 4L - 1.2 cm, SUVmax 10.5). No other suspicious lymphadenopathy in the neck, contralateral hilum, or supraclavicular regions. No evidence of distant metastatic disease in brain (correlate with dedicated brain imaging), lungs, liver, bones, or adrenal glands. Mild degenerative changes in spine.",
-        "impression": "Locally advanced NSCLC, Squamous Cell Carcinoma type. cT2b N2 M0. No evidence of distant metastatic disease. This study will be used for fusion with RT planning CT.",
-        "signedBy": "Dr. T. Radiologist, 02/21/2025"
-      }
-    },
-    {
-      "date": "02/25/2025",
-      "type": "Molecular Pathology Report",
-      "summary": "PD-L1 Expression: 60% (TPS). No actionable mutations.",
-      "reportDetails": {
-        "lab": "ONCOGENE DIAGNOSTICS",
-        "accessionNumber": "MOL-25-015",
-        "specimen": "Station 7 Lymph Node Biopsy Tissue (from EBUS-25-001)",
-        "testPerformed": "PD-L1 Immunohistochemistry and Next-Generation Sequencing (NGS) for Lung Cancer Panel.",
-        "results": {
-          "PDL1_IHC_TPS": "60% (Positive, High Expression) - Strong, diffuse membrane staining in tumor cells.",
-          "EGFR": "Wildtype.",
-          "ALK": "Negative (FISH).",
-          "ROS1": "Negative (FISH).",
-          "BRAF": "Wildtype.",
-          "KRAS": "Wildtype.",
-          "NTRK_Fusion": "Negative."
-        },
-        "interpretation": "PD-L1 expression is high (TPS 60%), indicating potential eligibility for consolidation immunotherapy with Durvalumab if patient completes concurrent chemoradiation without progression. No other actionable driver mutations identified.",
-        "signedBy": "Dr. G. MolecularPath, 02/25/2025"
-      }
-    },
-    {
-      "date": "02/28/2025",
-      "type": "Diagnostic Brain MRI",
-      "summary": "No evidence of brain metastases.",
-      "reportDetails": {
-        "accessionNumber": "MRI-Brain-25-002",
-        "protocol": "MRI Brain with and without contrast",
-        "findings": "Normal brain parenchyma. No enhancing lesions, areas of restricted diffusion, or abnormal signal changes suggestive of metastatic disease. Ventricular system is normal. No acute intracranial abnormality. Pituitary gland appears unremarkable.",
-        "impression": "Normal brain MRI. No evidence of intracranial metastases. Performed for staging given lung primary.",
-        "signedBy": "Dr. S. Neuroradiologist, 02/28/2025"
-      }
-    }
-  ],
-  "dicomImages": [
-    {
-      "description": "CT Simulation (Thorax 4D - 03/01/2025)",
-      "seriesType": "CT",
-      "imageUrls": [
-        "https://raw.githubusercontent.com/cornerstonejs/cornerstone-wado-image-loader/master/examples/images/CT000000.dcm"
-      ],
-      "ohifViewerUrl": "https://viewer.ohif.org/viewer/latest",
-      "accessionNumber": "CT-20250301-THORAX"
-    },
-    {
-      "description": "Diagnostic PET/CT (Thorax - 02/20/2025)",
-      "seriesType": "PET/CT",
-      "imageUrls": [],
-      "ohifViewerUrl": "https://viewer.ohif.org/viewer/latest?studyUIDs=1.2.826.0.1.3680043.8.498.5085351717327429184518715878414407864"
-    }
-  ],
-  "labResults": [
-    { "date": "02/25/2025", "test": "CBC - WBC", "value": "7.8", "units": "K/mcL", "notes": "Pre-ChemoRT Baseline" },
-    { "date": "02/25/2025", "test": "CBC - Hemoglobin", "value": "13.5", "units": "g/dL", "notes": "Pre-ChemoRT Baseline" },
-    { "date": "02/25/2025", "test": "CBC - Platelet count", "value": "290", "units": "K/mcL", "notes": "Pre-ChemoRT Baseline" },
-    { "date": "02/25/2025", "test": "Creatinine", "value": "0.9", "units": "mg/dL", "notes": "Pre-ChemoRT Baseline - Good renal function." },
-    { "date": "02/25/2025", "test": "Liver Function Tests (LFTs)", "value": "WNL", "units": "N/A", "notes": "Pre-ChemoRT Baseline." },
-    { "date": "03/05/2025", "test": "CBC - WBC", "value": "7.0", "units": "K/mcL", "notes": "Pre-Chemo C1 (Day 1 RT). Absolute Neutrophil Count (ANC): 4.2 K/mcL. Cleared for chemo." },
-    { "date": "03/05/2025", "test": "Creatinine", "value": "0.9", "units": "mg/dL", "notes": "Pre-Chemo C1. Stable." },
-    { "date": "03/12/2025", "test": "CBC - WBC", "value": "4.5", "units": "K/mcL", "notes": "Weekly monitoring (Week 1 Post-C1 Chemo). ANC: 2.8 K/mcL. Mild leukopenia." },
-    { "date": "03/12/2025", "test": "Platelet count", "value": "210", "units": "K/mcL", "notes": "Weekly monitoring (Week 1 Post-C1 Chemo). Mild thrombocytopenia." },
-    { "date": "03/19/2025", "test": "CBC - WBC", "value": "3.1", "units": "K/mcL", "notes": "Weekly monitoring (Week 2). ANC: 1.5 K/mcL. Moderate leukopenia/neutropenia. Cleared for Chemo C2." },
-    { "date": "03/19/2025", "test": "Creatinine", "value": "1.0", "units": "mg/dL", "notes": "Pre-Chemo C2. Mild elevation, still acceptable." },
-    { "date": "03/25/2025", "test": "CBC - WBC", "value": "2.5", "units": "K/mcL", "notes": "Weekly monitoring (Week 3 Post-C2 Chemo). ANC: 1.0 K/mcL. Significant leukopenia/neutropenia. Chemo hold recommended." },
-    { "date": "03/25/2025", "test": "Platelet count", "value": "95", "units": "K/mcL", "notes": "Weekly monitoring (Week 3 Post-C2 Chemo). Moderate to severe thrombocytopenia. Chemo hold required." }
-  ],
-  "progressNotes": [
-    { "date": "02/25/2025", "author": "Dr. Sarah Jenkins (Rad Onc)", "type": "Initial Consult", "summary": "Reviewed case cT2bN2M0 NSCLC SCCa in 62yo female active smoker. Pathology confirms SCCa in Station 7 node. PD-L1 60%. Agreed w/ Med Onc plan for definitive concurrent Carboplatin/Paclitaxel chemoRT followed by consolidation Durvalumab. Discussed RT details (VMAT, 60Gy/30fx to primary & involved nodes), motion management (4D/ITV), potential RT side effects (fatigue, cough, esophagitis, pneumonitis, skin), and chemotherapy side effects (nausea, fatigue, myelosuppression, neuropathy). Patient verbalizes understanding of risks/benefits and agrees to proceed. Strongly encouraged smoking cessation and referred to resources. 4D-CT Sim scheduled. Coordinated with Med Onc for chemo start and weekly labs.", "patientTolerance": "Good", "generalSideEffects": "None.", "siteSpecificSideEffects": "Mild persistent cough.", "painAssessment": "1/10 (occasional chest pressure).", "patientConcerns": "Expressed concern about overall treatment duration and long-term side effects impacting quality of life. Asked about hair loss.", "instructionsGiven": "Provided Lung RT patient education booklet. Advised on importance of smoking cessation and provided resources. Reassured about hair thinning rather than complete loss with Paclitaxel. Encouraged proactive symptom reporting." },
-    { "date": "03/01/2025", "author": "Radiation Therapist Lead", "type": "Simulation Note", "summary": "4D-CT Simulation for Thorax RT completed. Patient supine in BodyFix bag on wingboard. Respiratory motion assessed during 4D-CT (tumor motion ~0.8cm), suitable for ITV approach. Reference tattoos placed. Patient very cooperative. Images sent to dosimetry for VMAT planning. Fused with diagnostic PET/CT and diagnostic Brain MRI (negative). Oral hygiene emphasized.", "patientTolerance": "Good", "generalSideEffects": "None.", "siteSpecificSideEffects": "None.", "painAssessment": "0/10.", "patientConcerns": "Asked if she needs to stop smoking before treatment starts.", "instructionsGiven": "Strongly advised immediate and complete smoking cessation. Explained it improves RT effectiveness and reduces complications. Provided nicotine replacement therapy options and counseling referral." },
-    { "date": "03/05/2025", "author": "Radiation Therapist", "type": "Daily Treatment Note - Fx 1", "summary": "First treatment delivered. Daily CBCT for soft tissue alignment. Good match achieved after minor V/S shifts. Patient reports taking Carboplatin/Paclitaxel prior to arriving. No acute RT side effects during treatment. Treatment time 18 minutes. Patient remained still and cooperative. Provided smoking cessation pamphlet again.", "patientTolerance": "Good", "generalSideEffects": "No acute side effects after Fx 1.", "siteSpecificSideEffects": "None.", "painAssessment": "0/10.", "patientConcerns": "None.", "instructionsGiven": "Reinforced daily RT attendance, weekly chemo, and need for prompt symptom reporting. Encouraged fluid intake and high-calorie diet." },
-    { "date": "03/12/2025", "author": "Dr. Sarah Jenkins (Rad Onc)", "type": "On Treatment Visit (OTV) - Week 1", "summary": "Patient completed 5/30 fx. Mild fatigue (2/10). No mucositis yet. Mild cough persists, managed with cough syrup. Skin intact, no redness. Labs reviewed with Med Onc (WBC 4.5, Plt 210k), acceptable. Continue plan. Reinforce smoking cessation. Discussed initial lung/esophagus reaction expectations. Patient tolerating daily treatments well.", "patientTolerance": "Good", "generalSideEffects": "Mild fatigue, mild cough.", "siteSpecificSideEffects": "None.", "painAssessment": "1/10 (cough related).", "patientConcerns": "Still smoking occasionally. Asked about dry mouth.", "instructionsGiven": "Strongly reiterated importance of smoking cessation. Advised on managing dry mouth (frequent water sips, sugar-free lozenges). Scheduled Speech Path follow-up for swallow exercises." },
-    { "date": "03/19/2025", "author": "Dr. Sarah Jenkins (Rad Onc)", "type": "On Treatment Visit (OTV) - Week 2", "summary": "Patient completed 10/30 fx. Increasing fatigue (4/10). Starting to experience mild sore throat/chest with swallowing. Cough persists. Labs reviewed with Med Onc (WBC 3.1, Cr 1.0), acceptable for Chemo C2. Skin intact. Continue RT. Reinforce oral care and nutrition. Next Cisplatin cycle due.", "patientTolerance": "Good", "generalSideEffects": "Increasing fatigue, mild sore throat/chest.", "siteSpecificSideEffects": "Early Grade 1 esophagitis.", "painAssessment": "2/10 (with swallowing).", "patientConcerns": "Concerned about throat pain worsening and increasing fatigue.", "instructionsGiven": "Emphasized regular use of Esomeprazole. Advised soft, bland diet. Encouraged liberal fluid intake. Discussed PRN pain medication (Hydrocodone-Acetaminophen) if pain increases significantly." },
-    { "date": "03/25/2025", "author": "Radiation Therapist", "type": "Daily Treatment Note - Fx 15", "summary": "Treatment delivered. Daily CBCT match. Shifts V:0.3, L:-0.1, S:0.2. Corrected. Patient reporting moderate throat/chest pain. OTV with Dr. Jenkins today. Discussed chemo hold due to low counts. Patient reports still smoking 0.25ppd. No acute issues during treatment. Skin showing early redness.", "patientTolerance": "Fair", "generalSideEffects": "Moderate fatigue. Moderate throat/chest pain with swallowing. Cough persists.", "siteSpecificSideEffects": "Grade 2 esophagitis (painful, difficult swallowing). Skin Grade 1 erythema on chest wall.", "painAssessment": "4/10.", "patientConcerns": "Expressing more discomfort with swallowing. Asked about pain medication options. Worried about low blood counts. Expressed difficulty with smoking cessation due to stress.", "instructionsGiven": "Advised liberal use of Esomeprazole. Discussed starting PRN pain medication (Hydrocodone-Acetaminophen) with Dr. Jenkins during OTV. Emphasized importance of hydration. Re-referred to smoking cessation counselor." },
-    { "date": "03/26/2025", "author": "Dr. Paul Allen (Med Onc)", "type": "Chemotherapy Cycle 3 Decision Note", "summary": "Patient seen today for planned Cycle 3 Cisplatin. Labs reviewed (WBC 2.5, Plt 95k). ANC 1.0, Platelets 95k. Due to significant myelosuppression (Grade 3 neutropenia/thrombocytopenia), decided to HOLD chemotherapy this week. Will recheck labs next week and re-evaluate. Patient is tolerating RT with increasing esophagitis and fatigue. Continue RT. Close monitoring.", "patientTolerance": "Fair", "generalSideEffects": "Severe fatigue, moderate pain.", "siteSpecificSideEffects": "Grade 2 esophagitis. Mild skin erythema.", "painAssessment": "4/10.", "patientConcerns": "Worried about holding chemo affecting outcome. Reassured patient that RT is the primary modality.", "instructionsGiven": "Emphasized infection precautions and reporting fever immediately. Encouraged fluid intake." },
-    { "date": "04/01/2025", "author": "Dr. Sarah Jenkins (Rad Onc)", "type": "On Treatment Visit (OTV) - Week 4", "summary": "Patient completed 20/30 fx. Significant fatigue (6/10). Moderate to severe esophagitis (5/10) requiring scheduled Hydrocodone. Cough persists. Skin with early desquamation. Labs reviewed (WBC 3.1, Plt 105k), improving, but Med Onc continues chemo hold. Continue RT. Reinforce pain management and hydration. Discussed importance of maintaining weight.", "patientTolerance": "Poor", "generalSideEffects": "Significant fatigue. Moderate to severe esophagitis. Persistent cough.", "siteSpecificSideEffects": "Grade 2 esophagitis. Grade 1 dry desquamation.", "painAssessment": "5/10 (with pain meds).", "patientConcerns": "Difficulty eating solid foods. Asked about appetite stimulants. Worried about losing more weight.", "instructionsGiven": "Advised liquid diet, use of nutritional supplements (Ensure/Boost). Reinforced scheduled pain medication use and Esomeprazole. Referred to Nutritionist for aggressive management." },
-    { "date": "04/08/2025", "author": "Dr. Sarah Jenkins (Rad Onc)", "type": "On Treatment Visit (OTV) - Week 5", "summary": "Patient completed 25/30 fx. Fatigue severe (7/10). Esophagitis severe (6/10). Oral intake very limited, relying on nutritional supplements. Skin with moist desquamation. Labs improving, Med Onc cleared for final chemo cycle. Continue RT. Reinforce aggressive supportive care.", "patientTolerance": "Poor", "generalSideEffects": "Severe fatigue. Severe esophagitis. Persistent cough.", "siteSpecificSideEffects": "Grade 2 moist desquamation in axilla and inframammary fold on treated side. Grade 3 esophagitis.", "painAssessment": "6/10 (constant discomfort).", "patientConcerns": "Struggling significantly with pain and fatigue. Asked about finishing treatment.", "instructionsGiven": "Advised to continue all supportive measures. Discussed importance of completing full course. Emphasized gentle skin care. Reviewed final chemo cycle timing." },
-    { "date": "04/15/2025", "author": "Dr. Sarah Jenkins (Rad Onc)", "type": "On Treatment Visit (OTV) - End of Treatment", "summary": "Completed 30/30 fractions of definitive RT with concurrent chemotherapy (2 cycles received, 1 held). Patient was very relieved. Profound fatigue (8/10). Esophagitis severe (6/10). Skin Grade 2 moist desquamation in axilla. Provided post-treatment instructions. Scheduled follow-up for consolidation Durvalumab. Commended patient on excellent compliance despite severe side effects. Emphasized continued smoking cessation.", "patientTolerance": "Poor", "generalSideEffects": "Profound fatigue. Severe esophagitis. Persistent cough. Mild diarrhea.",
-          "siteSpecificSideEffects": "Grade 2 moist desquamation in axilla. Grade 3 esophagitis (painful swallowing, barely tolerating liquids).",
-          "painAssessment": "7/10 (managed with scheduled meds).",
-          "patientConcerns": "Very relieved to finish. Anxious about recovery and side effects improving. Asked about when she can eat solid food again. Inquired about long-term prognosis.",
-          "instructionsGiven": "Reinforced all post-treatment instructions, including skin care, fatigue management, continued symptom management (Esomeprazole, cough syrup, anti-diarrhea, pain meds). Provided contact info for urgent concerns. Scheduled follow-up appointments with Radiation Oncology and Medical Oncology for consolidation Durvalumab. Stressed importance of continued hydration/nutrition via supplements. Reassured about good prognosis for HPV-related cancer, but highlighted importance of follow-up." }
-  ],
-  "patientEducation": {
-    "goalsDiscussed": "Definitive concurrent chemoradiation for locally advanced NSCLC (Squamous Cell Carcinoma) with curative intent. This aggressive treatment aims to eradicate the primary tumor and involved lymph nodes. Followed by consolidation immunotherapy (Durvalumab) to reduce recurrence risk. Emphasized multidisciplinary approach to care.",
-    "sideEffectsReviewed": "Common & Severe: Fatigue (can be debilitating, often peaks weeks after RT), radiation pneumonitis (inflammation of lungs, delayed onset, causing cough/SOB/fever), severe esophagitis (inflammation of esophagus, leading to painful/difficult swallowing, sometimes requiring feeding tube), skin irritation/redness (dermatitis, potentially moist desquamation in folds), cough (may worsen during and after RT). Chemotherapy-related: Nausea/vomiting, myelosuppression (low blood counts increasing infection/anemia/bleeding risk), peripheral neuropathy (tingling/numbness in hands/feet), muscle/joint pain, hair thinning/loss. Long-term: Chronic dry cough, lung fibrosis (scarring, impacting breathing), chronic esophagitis/swallowing issues, fatigue, lymphedema (swelling in neck), hypothyroidism (requiring medication), dental issues (due to dry mouth), potential secondary cancers (rare).",
-    "safetyConsiderations": "Critical: **Complete and permanent smoking cessation** is paramount for treatment effectiveness and reducing complications. Strict adherence to daily RT and chemotherapy schedule. Immediate reporting of fever (>100.4°F), chills, severe cough/SOB, new significant pain, or worsening swallowing difficulty due to risk of infection or pneumonitis. Meticulous skin care (gentle cleansing, prescribed creams, avoid sun exposure, harsh chemicals/friction). Close pain management (scheduled pain medications as needed). Daily weight monitoring for hydration/nutrition status. Regular communication of symptoms to the care team.",
-    "patientResponsibilities": "Attend all daily RT appointments. Attend all scheduled weekly chemotherapy infusions. Take all prescribed oral medications (anti-emetics, cough meds, Esomeprazole, pain meds) as instructed. Maintain good nutrition and hydration (soft foods, liquid supplements). Report any new or worsening symptoms promptly. Continue smoking cessation efforts actively. Attend all follow-up appointments and undergo prescribed imaging/blood tests.",
-    "medicationCompliance": "Crucial to take anti-nausea meds prior to chemotherapy. Use Esomeprazole daily and cough suppressants proactively as symptoms develop. Adhere to pain medication schedule as needed to maintain comfort. Discuss any challenges with medication adherence or side effects with the care team promptly. Understand that chemotherapy doses or schedules might be adjusted based on blood counts, which is normal management."
-  },
-  "scheduling": [
-    { "date": "02/18/2025", "type": "EBUS Biopsy (Left Hilum)", "location": "Pulmonology Suite", "status": "Completed" },
-    { "date": "02/20/2025", "type": "Diagnostic PET/CT (Staging)", "location": "Imaging Department", "status": "Completed" },
-    { "date": "02/22/2025", "type": "MDT Review (Lung Tumor Board)", "location": "Conference Room A", "status": "Completed" },
-    { "date": "02/25/2025", "type": "Rad Onc Consult", "location": "Radiation Oncology Clinic - Exam Room 2", "status": "Completed" },
-    { "date": "02/28/2025", "type": "Diagnostic Brain MRI", "location": "Imaging Department", "status": "Completed" },
-    { "date": "03/01/2025", "type": "4D-CT Simulation Thorax", "location": "Radiation Oncology Sim Room", "status": "Completed" },
-    { "date": "03/05/2025", "type": "First Treatment (Fx 1/30) & Chemo Cycle 1", "location": "Linear Accelerator #1 / Infusion Center", "status": "Completed" },
-    { "date": "03/12/2025", "type": "Chemo Cycle 2 & OTV - Week 1", "location": "Infusion Center / Radiation Oncology Clinic - Exam Room 1", "status": "Completed" },
-    { "date": "03/19/2025", "type": "Chemo Cycle 3 & OTV - Week 2", "location": "Infusion Center / Radiation Oncology Clinic - Exam Room 1", "status": "Completed" },
-    { "date": "03/25/2025", "type": "On Treatment Visit (OTV) - Week 3 & Chemo Hold", "location": "Radiation Oncology Clinic - Exam Room 2", "status": "Completed" },
-    { "date": "04/01/2025", "type": "On Treatment Visit (OTV) - Week 4", "location": "Radiation Oncology Clinic - Exam Room 2", "status": "Completed" },
-    { "date": "04/08/2025", "type": "Chemo Cycle 4 & OTV - Week 5", "location": "Infusion Center / Radiation Oncology Clinic - Exam Room 1", "status": "Completed" },
-    { "date": "04/15/2025", "type": "End of Treatment (Fx 30/30)", "location": "Linear Accelerator #1", "status": "Completed" },
-    { "date": "05/13/2025", "type": "Post-RT Follow-up (Rad Onc)", "location": "Radiation Oncology Clinic - Exam Room 1", "status": "Scheduled" },
-    { "date": "05/20/2025", "type": "Post-RT Follow-up (Med Onc) & Durvalumab Consult", "location": "Medical Oncology Clinic", "status": "Scheduled" },
-    { "date": "06/03/2025", "type": "First Durvalumab Infusion", "location": "Infusion Center", "status": "Scheduled" },
-    { "date": "07/15/2025", "type": "Post-Treatment PET/CT Scan (3-Month Follow-up)", "location": "Imaging Department", "status": "Scheduled" }
-  ],
-  "cptCharges": [
-    { "code": "77290", "description": "Simulation, Complex (4D-CT Thorax for Lung IMRT)", "frequency": "Once per course" },
-    { "code": "77334", "description": "Treatment device, Complex (BodyFix Vacuum Bag & Wingboard)", "frequency": "Once per course" },
-    { "code": "77301", "description": "IMRT planning", "frequency": "Once per course" },
-    { "code": "77386", "description": "Intensity modulated radiation treatment delivery, complex", "frequency": "30 fractions" },
-    { "code": "77387", "description": "Image Guided RT (IGRT) - Daily CBCT", "frequency": "30 fractions" },
-    { "code": "77427", "description": "Radiation treatment management, 5 treatments", "frequency": "Weekly (6x)" },
-    { "code": "96409", "description": "Chemotherapy administration, IV, for infusion technique (Paclitaxel portion)", "frequency": "2 infusions" },
-    { "code": "96413", "description": "Chemotherapy administration, IV infusion, initial 1 hour (Carboplatin portion)", "frequency": "2 infusions" },
-    { "code": "99213", "description": "Office visit for OTV (Established Patient, low complexity)", "frequency": "6 visits" }
-  ],
-  "diagnosisSearch": "Lung Cancer, NSCLC, Squamous Cell Carcinoma"
+  }
 }
