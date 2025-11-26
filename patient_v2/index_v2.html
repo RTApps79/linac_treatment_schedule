@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule - OncoCare Radiotherapy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style_v2.css">
+    <link rel="stylesheet" href="style_v2 (1).css">
 </head>
 <body>
 
@@ -14,22 +14,19 @@
             <i class="fa-solid fa-radiation logo-icon"></i>
             <span>OncoCare Radiotherapy Center</span>
         </div>
-        <div class="date-display" id="current-date">
-            </div>
+        <div class="date-display" id="current-date"></div>
     </header>
 
     <div class="main-content-wrapper">
 
-        <aside class="sidebar">
+        <aside class="sidebar-column">
             <div class="calendar-widget card-container">
                 <div class="calendar-header">
-                    <i class="fa-solid fa-chevron-left"></i>
-                    <span>November 2024</span>
-                    <i class="fa-solid fa-chevron-right"></i>
+                    <i class="fa-solid fa-chevron-left"></i><span>November 2024</span><i class="fa-solid fa-chevron-right"></i>
                 </div>
                 <div class="calendar-weekdays"><div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div></div>
                 <div class="calendar-days">
-                    <div class="prev-month">27</div><div class="prev-month">28</div><div class="prev-month">29</div><div class="prev-month">30</div><div class="prev-month">31</div>
+                     <div class="prev-month">27</div><div class="prev-month">28</div><div class="prev-month">29</div><div class="prev-month">30</div><div class="prev-month">31</div>
                     <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div><div>23</div><div>24</div>
                     <div class="today">25</div>
                     <div>26</div><div>27</div><div>28</div><div>29</div><div>30</div><div class="next-month">1</div>
@@ -37,26 +34,30 @@
             </div>
         </aside>
 
+        <aside class="sidebar-column" style="background-color: var(--bg-card);">
+            <h3 class="sidebar-title">Unscheduled Patients</h3>
+            <ul class="staging-list" id="staging-list-container">
+                </ul>
+        </aside>
+
         <section class="schedule-content">
-            
             <div class="dept-tabs">
                 <button class="tab-btn active"><i class="fa-solid fa-x-ray"></i> LINAC Treatment</button>
-                <button class="tab-btn"><i class="fa-solid fa-procedures"></i> Simulation (CT/MR)</button>
+                <button class="tab-btn"><i class="fa-solid fa-procedures"></i> Simulation</button>
                 <button class="tab-btn"><i class="fa-solid fa-user-doctor"></i> Consults</button>
-                <button class="tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> HDR/Special</button>
             </div>
 
             <div class="linac-rooms-grid">
                 <div class="room-column">
-                    <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 1 (TrueBeam A)</h2>
+                    <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 1</h2>
                     <div class="schedule-list-container"><ul class="schedule-list" id="linac1-list" data-room-id="linac1"></ul></div>
                 </div>
                 <div class="room-column">
-                    <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 2 (TrueBeam B)</h2>
+                    <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 2</h2>
                     <div class="schedule-list-container"><ul class="schedule-list" id="linac2-list" data-room-id="linac2"></ul></div>
                 </div>
                 <div class="room-column">
-                    <h2 class="room-title"><i class="fa-solid fa-circle-stop text-muted"></i> LINAC 3 (Halcyon)</h2>
+                    <h2 class="room-title"><i class="fa-solid fa-circle-stop text-muted"></i> LINAC 3</h2>
                     <div class="schedule-list-container"><ul class="schedule-list" id="linac3-list" data-room-id="linac3"></ul></div>
                 </div>
             </div> 
@@ -65,210 +66,195 @@
 
     <script>
         // ============================================
-        // 1. MASTER DATA STRUCTURE
+        // 1. DEFINITIONS & DATA
         // ============================================
-        let scheduleData = [
-            // --- LINAC 1 Data ---
-            { id: 'l1-1', roomId: 'linac1', type: 'appt', time: '08:00 - 08:30', ptName: 'Alice Brown', ptDetails: 'Rt Proximal Femur (3D-CRT)', status: 'Scheduled', chartLink: 'Alice_Brown_SkeletalExtremity.json' },
-            { id: 'l1-2', roomId: 'linac1', type: 'appt', time: '08:30 - 08:45', ptName: 'Linda Jones', ptDetails: 'Thorax IMRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-3', roomId: 'linac1', type: 'appt', time: '08:45 - 09:15', ptName: 'Michael Chen', ptDetails: 'Head & Neck VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-g1', roomId: 'linac1', type: 'gap', time: '09:15', text: '09:15 - 09:30 | Morning QA Check' },
-            { id: 'l1-4', roomId: 'linac1', type: 'appt', time: '09:30 - 10:00', ptName: 'Sarah Davis', ptDetails: 'Breast 3D-CRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-5', roomId: 'linac1', type: 'appt', time: '10:00 - 10:30', ptName: 'William Thompson', ptDetails: 'Rectum VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-6', roomId: 'linac1', type: 'appt', time: '10:30 - 11:15', ptName: 'Emily Wilson', ptDetails: 'Cervix VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-g2', roomId: 'linac1', type: 'gap', time: '11:15', text: '11:15 - 12:30 | Lunch Break / Physics QA' },
-            { id: 'l1-7', roomId: 'linac1', type: 'appt', time: '12:30 - 13:00', ptName: 'David Anderson', ptDetails: 'Esophagus IMRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-8', roomId: 'linac1', type: 'appt', time: '13:00 - 13:30', ptName: 'Amanda Thomas', ptDetails: 'Sarcoma IMRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-9', roomId: 'linac1', type: 'appt', time: '13:30 - 14:00', ptName: 'Patrick Moore', ptDetails: 'Bladder VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-10', roomId: 'linac1', type: 'appt', time: '14:00 - 14:45', ptName: 'Jennifer Jackson', ptDetails: 'Spine SBRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-g3', roomId: 'linac1', type: 'gap', time: '14:45', text: '14:45 - 15:15 | Machine Break' },
-            { id: 'l1-11', roomId: 'linac1', type: 'appt', time: '15:15 - 15:45', ptName: 'Brian Martin', ptDetails: 'Lymphoma IS', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-12', roomId: 'linac1', type: 'appt', time: '15:45 - 16:30', ptName: 'Elizabeth Lee', ptDetails: 'Whole Brain (Hippocampal Avoidance)', status: 'Scheduled', chartLink: '#' },
+        const timeSlots = [
+            '08:00 - 08:30', '08:30 - 09:00', '09:00 - 09:30', '09:30 - 10:00',
+            '10:00 - 10:30', '10:30 - 11:00', '11:00 - 11:30', '11:30 - 12:00',
+            '12:00 - 12:30', '12:30 - 13:00', '13:00 - 13:30', '13:30 - 14:00',
+            '14:00 - 14:30', '14:30 - 15:00', '15:00 - 15:30', '15:30 - 16:00',
+            '16:00 - 16:30', '16:30 - 17:00'
+        ];
 
-            // --- LINAC 2 Data ---
-            { id: 'l2-1', roomId: 'linac2', type: 'appt', time: '08:00 - 09:00', ptName: 'Robert Miller', ptDetails: 'Lung SBRT (RUL)', status: 'Scheduled', chartLink: 'Robert_Miller_ThoraxSBRT.json' },
-            { id: 'l2-g1', roomId: 'linac2', type: 'gap', time: '09:00', text: '09:00 - 09:30 | Room Cleaning / Setup' },
-            { id: 'l2-2', roomId: 'linac2', type: 'appt', time: '09:30 - 10:30', ptName: 'Jessica Martinez', ptDetails: 'Brain SRS (Multiple Mets)', status: 'Scheduled', chartLink: '#' },
-            { id: 'l2-3', roomId: 'linac2', type: 'appt', time: '10:30 - 11:30', ptName: 'Christopher Taylor', ptDetails: 'Pancreas SBRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l2-g2', roomId: 'linac2', type: 'gap', time: '11:30', text: '11:30 - 13:00 | Lunch Break / Physics Support' },
-            { id: 'l2-4', roomId: 'linac2', type: 'appt', time: '13:00 - 14:00', ptName: 'Daniel Hernandez', ptDetails: 'Prostate SBRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l2-5', roomId: 'linac2', type: 'appt', time: '14:00 - 15:15', ptName: 'Melissa White', ptDetails: 'Liver SBRT (Breath Hold)', status: 'Scheduled', chartLink: '#' },
-            { id: 'l2-g3', roomId: 'linac2', type: 'gap', time: '15:15', text: '15:15 - 17:00 | Physics QA / Service' },
-
-            // --- LINAC 3 Data ---
-            { id: 'l3-g1', roomId: 'linac3', type: 'gap', time: '08:00', text: '08:00 - 08:30 | Morning Warmup' },
-            { id: 'l3-1', roomId: 'linac3', type: 'appt', time: '08:30 - 09:00', ptName: 'Jane Smith', ptDetails: 'Urgent SVCS (AP/PA)', status: 'Scheduled', chartLink: 'Jane_Smith_SVCS.json' },
-            { id: 'l3-2', roomId: 'linac3', type: 'appt', time: '09:00 - 09:30', ptName: 'James Wilson', ptDetails: 'Prostate VMAT', status: 'Scheduled', chartLink: 'James_Wilson_PelvisProstate.json' },
-            { id: 'l3-3', roomId: 'linac3', type: 'appt', time: '09:30 - 10:00', ptName: 'George Harris', ptDetails: 'L3 Spine (Palliative)', status: 'Scheduled', chartLink: 'George_Harris_SkeletalSpine.json' },
-            { id: 'l3-4', roomId: 'linac3', type: 'appt', time: '10:00 - 10:30', ptName: 'Barbara Garcia', ptDetails: 'Whole Breast (Tangents)', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-g2', roomId: 'linac3', type: 'gap', time: '10:30', text: '10:30 - 12:00 | Mid-day Break / Therapist Meeting' },
-            { id: 'l3-5', roomId: 'linac3', type: 'appt', time: '12:00 - 12:30', ptName: 'Richard Davis', ptDetails: 'Prostate Bed VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-6', roomId: 'linac3', type: 'appt', time: '12:30 - 13:00', ptName: 'Susan Clark', ptDetails: 'Chest Wall + Nodes', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-7', roomId: 'linac3', type: 'appt', time: '13:00 - 13:30', ptName: 'Joseph Hall', ptDetails: 'Lung IMRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-g3', roomId: 'linac3', type: 'gap', time: '13:30', text: '13:30 - 14:30 | Machine Break' },
-            { id: 'l3-8', roomId: 'linac3', type: 'appt', time: '14:30 - 15:00', ptName: 'Margaret Allen', ptDetails: 'Rectum 3D-CRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-g4', roomId: 'linac3', type: 'gap', time: '15:00', text: '15:00 - 17:00 | End of Day QA' },
+        // Master Data: Some scheduled, some unscheduled
+        let patientData = [
+            // Scheduled Patients
+            { id: 'p1', roomId: 'linac1', time: '08:00 - 08:30', ptName: 'Alice Brown', ptDetails: 'Rt Proximal Femur', status: 'Scheduled', chartLink: 'Alice_Brown_SkeletalExtremity.json' },
+            { id: 'p2', roomId: 'linac2', time: '09:00 - 09:30', ptName: 'Robert Miller', ptDetails: 'Lung SBRT', status: 'Scheduled', chartLink: 'Robert_Miller_ThoraxSBRT.json' },
+            { id: 'p3', roomId: 'linac3', time: '08:30 - 09:00', ptName: 'Jane Smith', ptDetails: 'Urgent SVCS', status: 'Ready', chartLink: 'Jane_Smith_SVCS.json' },
+            
+            // Unscheduled Patients (Staging Area)
+            { id: 'p4', roomId: 'unscheduled', time: null, ptName: 'Michael Chen', ptDetails: 'Head & Neck VMAT', status: 'Pending', chartLink: '#' },
+            { id: 'p5', roomId: 'unscheduled', time: null, ptName: 'Sarah Davis', ptDetails: 'Breast 3D-CRT', status: 'Pending', chartLink: '#' },
+            { id: 'p6', roomId: 'unscheduled', time: null, ptName: 'William Thompson', ptDetails: 'Rectum VMAT', status: 'Pending', chartLink: '#' },
+            { id: 'p7', roomId: 'unscheduled', time: null, ptName: 'Emily Wilson', ptDetails: 'Cervix VMAT', status: 'Pending', chartLink: '#' },
+            { id: 'p8', roomId: 'unscheduled', time: null, ptName: 'David Anderson', ptDetails: 'Esophagus IMRT', status: 'Pending', chartLink: '#' },
+             { id: 'p9', roomId: 'unscheduled', time: null, ptName: 'James Wilson', ptDetails: 'Prostate VMAT', status: 'Pending', chartLink: 'James_Wilson_PelvisProstate.json' },
+            { id: 'p10', roomId: 'unscheduled', time: null, ptName: 'George Harris', ptDetails: 'L3 Spine', status: 'Pending', chartLink: 'George_Harris_SkeletalSpine.json' },
         ];
 
 
         // ============================================
-        // 2. RENDERING ENGINE (Generates HTML from Data)
+        // 2. RENDERING ENGINE
         // ============================================
         function renderSchedule() {
-            // Clear current lists
+            // A. Render Staging Area
+            const stagingContainer = document.getElementById('staging-list-container');
+            stagingContainer.innerHTML = '';
+            patientData.filter(p => p.roomId === 'unscheduled').forEach(pt => {
+                stagingContainer.insertAdjacentHTML('beforeend', generatePatientCardHTML(pt));
+            });
+
+            // B. Render Room Schedules
             ['linac1', 'linac2', 'linac3'].forEach(roomId => {
-                document.getElementById(`${roomId}-list`).innerHTML = '';
-            });
+                const roomContainer = document.getElementById(`${roomId}-list`);
+                roomContainer.innerHTML = '';
 
-            // Sort data by time to ensure correct order display
-            scheduleData.sort((a, b) => a.time.localeCompare(b.time));
-
-            // Loop through data and generate HTML
-            scheduleData.forEach(item => {
-                const listContainer = document.getElementById(`${item.roomId}-list`);
-                let html = '';
-
-                if (item.type === 'gap') {
-                    // Gap rows are not draggable and have no drop zone
-                    html = `<li class="schedule-time-row gap-row">${item.text}</li>`;
-                } 
-                else if (item.type === 'appt') {
-                    const isReady = item.status === 'Ready';
-                    const statusClass = isReady ? 'status-ready' : '';
-                    const readyBtnClass = isReady ? 'hidden' : '';
-                    const openBtnClass = isReady ? '' : 'hidden';
-                    const linkHref = item.chartLink && item.chartLink !== '#' ? `patient_v2.html?file=${item.chartLink}` : '#';
-
-                    // New Structure: Row -> Fixed Time Label + Drop Zone -> Draggable Patient Card
-                    html = `
-                        <li class="schedule-time-row ${statusClass}" data-time="${item.time}">
-                            <div class="fixed-time-label">${item.time}</div>
-                            
-                            <div class="patient-drop-zone">
-                                <div class="draggable-patient-card" draggable="true" data-patient-id="${item.id}">
-                                    <div class="patient-info">
-                                        <h3>${item.ptName}</h3>
-                                        <div class="patient-details"><span>${item.ptDetails}</span></div>
-                                    </div>
-                                    <div class="card-actions">
-                                        <span class="status-badge">${item.status}</span>
-                                        <button class="btn-action btn-mark-ready ${readyBtnClass}" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
-                                        <a href="${linkHref}" class="btn-action btn-open-chart ${openBtnClass}" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                                    </div>
+                timeSlots.forEach(slot => {
+                    // Find if a patient is assigned to this room and time
+                    const assignedPatient = patientData.find(p => p.roomId === roomId && p.time === slot);
+                    
+                    let slotHTML = '';
+                    if (assignedPatient) {
+                        // Occupied Slot
+                        const isReady = assignedPatient.status === 'Ready';
+                        slotHTML = `
+                            <li class="schedule-time-row occupied ${isReady ? 'status-ready' : ''}" data-time="${slot}">
+                                <div class="fixed-time-label">${slot.split(' - ')[0]}</div>
+                                <div class="patient-drop-zone">
+                                    ${generatePatientCardHTML(assignedPatient)}
                                 </div>
-                            </div>
-                        </li>
-                    `;
-                }
-                listContainer.insertAdjacentHTML('beforeend', html);
+                            </li>`;
+                    } else {
+                        // Empty Slot (Drop Zone)
+                        slotHTML = `
+                            <li class="schedule-time-row" data-time="${slot}">
+                                <div class="fixed-time-label">${slot.split(' - ')[0]}</div>
+                                <div class="patient-drop-zone"></div>
+                            </li>`;
+                    }
+                    roomContainer.insertAdjacentHTML('beforeend', slotHTML);
+                });
             });
-            // NOTE: We no longer need to re-initialize event handlers here because we use delegation!
+        }
+
+        // Helper to generate card HTML
+        function generatePatientCardHTML(pt) {
+            const isReady = pt.status === 'Ready';
+            const readyBtnClass = isReady ? 'hidden' : '';
+            const openBtnClass = isReady ? '' : 'hidden';
+            const linkHref = pt.chartLink && pt.chartLink !== '#' ? `patient_v2.html?file=${pt.chartLink}` : '#';
+            
+            // Don't show actions in staging area for simplicity in this demo
+            const showActions = pt.roomId !== 'unscheduled';
+
+            return `
+                <div class="draggable-patient-card" draggable="true" data-patient-id="${pt.id}">
+                    <div class="patient-info">
+                        <h3>${pt.ptName}</h3>
+                        <div class="patient-details"><span>${pt.ptDetails}</span></div>
+                    </div>
+                    ${showActions ? `
+                    <div class="card-actions">
+                        <button class="btn-action btn-mark-ready ${readyBtnClass}" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
+                        <a href="${linkHref}" class="btn-action btn-open-chart ${openBtnClass}" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                    </div>` : ''}
+                </div>`;
         }
 
 
         // ============================================
-        // 3. INITIALIZATION & GLOBAL EVENT HANDLERS (Delegation)
+        // 3. EVENT HANDLERS (Delegation)
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
-            // A. Set date
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
-
-            // B. Initial Render
+            // Set date
+            document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // Initial Render
             renderSchedule();
 
-            // C. Global Event Delegation Setup
+            // --- Event Delegation Setup ---
 
-            // --- C1. Click Handler (for "Mark Ready" buttons) ---
+            // 1. Mark Ready Click
             document.addEventListener('click', function(e) {
-                // Check if clicked element is a Mark Ready button
                 const markReadyBtn = e.target.closest('.btn-mark-ready');
                 if (markReadyBtn) {
-                    const patientCard = markReadyBtn.closest('.draggable-patient-card');
-                    const patientId = patientCard.getAttribute('data-patient-id');
-                    // Update Data
-                    const dataItem = scheduleData.find(item => item.id === patientId);
-                    if (dataItem) { 
-                        dataItem.status = 'Ready'; 
-                        // Re-render to reflect changes based on data
-                        renderSchedule();
-                    }
+                    const patientId = markReadyBtn.closest('.draggable-patient-card').getAttribute('data-patient-id');
+                    const pt = patientData.find(p => p.id === patientId);
+                    if (pt) { pt.status = 'Ready'; renderSchedule(); }
                 }
             });
 
-
-            // --- C2. Drag & Drop Handlers (Document Level) ---
-
-            // Drag Start
+            // 2. Drag Start
             document.addEventListener('dragstart', function(e) {
                 const draggable = e.target.closest('.draggable-patient-card');
                 if (draggable) {
                     draggable.classList.add('dragging');
-                    // Store the patient ID being dragged
                     e.dataTransfer.setData('text/plain', draggable.getAttribute('data-patient-id'));
-                    // Set drag image effect
                     e.dataTransfer.effectAllowed = 'move';
                 }
             });
 
-            // Drag End
+            // 3. Drag End
             document.addEventListener('dragend', function(e) {
                 const draggable = e.target.closest('.draggable-patient-card');
                 if (draggable) {
                     draggable.classList.remove('dragging');
-                    // Clean up visual cues on all drop zones
-                    document.querySelectorAll('.patient-drop-zone').forEach(dz => dz.classList.remove('drag-over'));
+                    document.querySelectorAll('.patient-drop-zone, .staging-list').forEach(dz => dz.classList.remove('drag-over'));
                 }
             });
 
-            // Drag Over (Must prevent default to allow dropping)
+            // 4. Drag Over (Drop Zones & Staging List)
             document.addEventListener('dragover', function(e) {
                 const dropZone = e.target.closest('.patient-drop-zone');
-                // Only allow if it's a drop zone AND it is empty
-                if (dropZone && dropZone.children.length === 0) {
-                    e.preventDefault(); 
-                    e.dataTransfer.dropEffect = 'move';
-                    dropZone.classList.add('drag-over');
-                }
-            });
+                const stagingList = e.target.closest('.staging-list');
 
-            // Drag Leave (Visual cue cleanup)
-            document.addEventListener('dragleave', function(e) {
-                const dropZone = e.target.closest('.patient-drop-zone');
-                if (dropZone) {
-                     // Only remove if we are actually leaving the zone, not just entering a child element
-                    if (!dropZone.contains(e.relatedTarget)) {
-                        dropZone.classList.remove('drag-over');
-                    }
-                }
-            });
-
-            // Drop Action (The data update)
-            document.addEventListener('drop', function(e) {
-                const dropZone = e.target.closest('.patient-drop-zone');
-                
-                // Ensure we are dropping into an valid, empty drop zone
-                if (dropZone && dropZone.children.length === 0) {
+                // Allow over empty drop zones OR the staging list
+                if ((dropZone && dropZone.children.length === 0) || stagingList) {
                     e.preventDefault();
-                    
-                    const patientId = e.dataTransfer.getData('text/plain');
-                    
-                    // Find the new context based on where it was dropped
-                    const newTimeRow = dropZone.closest('.schedule-time-row');
-                    const newTimeStr = newTimeRow.getAttribute('data-time');
-                    const newRoomList = dropZone.closest('.schedule-list');
-                    const newRoomId = newRoomList.getAttribute('data-room-id');
-
-                    // Update Master Data Structure
-                    const patientData = scheduleData.find(item => item.id === patientId);
-                    if (patientData) {
-                        console.log(`Moving patient ${patientId} to Room: ${newRoomId}, Time: ${newTimeStr}`);
-                        patientData.time = newTimeStr;
-                        patientData.roomId = newRoomId;
-                        // Re-render updated schedule
-                        renderSchedule();
-                    }
+                    e.dataTransfer.dropEffect = 'move';
+                    if(dropZone) dropZone.classList.add('drag-over');
+                    if(stagingList) stagingList.classList.add('drag-over');
                 }
+            });
+
+             // 5. Drag Leave
+             document.addEventListener('dragleave', function(e) {
+                const dropZone = e.target.closest('.patient-drop-zone');
+                const stagingList = e.target.closest('.staging-list');
+                if (dropZone && !dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-over');
+                if (stagingList && !stagingList.contains(e.relatedTarget)) stagingList.classList.remove('drag-over');
+            });
+
+
+            // 6. Drop Action (The Data Update)
+            document.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const patientId = e.dataTransfer.getData('text/plain');
+                const pt = patientData.find(p => p.id === patientId);
+                if (!pt) return;
+
+                const dropZone = e.target.closest('.patient-drop-zone');
+                const stagingList = e.target.closest('.staging-list');
+
+                // Case A: Dropped into a Schedule Slot
+                if (dropZone && dropZone.children.length === 0) {
+                    const timeRow = dropZone.closest('.schedule-time-row');
+                    const roomList = dropZone.closest('.schedule-list');
+                    
+                    pt.time = timeRow.getAttribute('data-time');
+                    pt.roomId = roomList.getAttribute('data-room-id');
+                    pt.status = 'Scheduled'; // Reset status on move
+                } 
+                // Case B: Dropped back to Staging Area
+                else if (stagingList) {
+                    pt.roomId = 'unscheduled';
+                    pt.time = null;
+                    pt.status = 'Pending';
+                }
+
+                // Re-render everything to show new state
+                renderSchedule();
             });
         });
     </script>
