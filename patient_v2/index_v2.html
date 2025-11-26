@@ -67,47 +67,48 @@
         // ============================================
         // 1. MASTER DATA STRUCTURE
         // ============================================
+        // FIX APPLIED: All 'gap' items now have a 'time' property for sorting.
         let scheduleData = [
             // --- LINAC 1 Data ---
             { id: 'l1-1', roomId: 'linac1', type: 'appt', time: '08:00 - 08:30', ptName: 'Alice Brown', ptDetails: 'Rt Proximal Femur (3D-CRT)', status: 'Scheduled', chartLink: 'Alice_Brown_SkeletalExtremity.json' },
             { id: 'l1-2', roomId: 'linac1', type: 'appt', time: '08:30 - 08:45', ptName: 'Linda Jones', ptDetails: 'Thorax IMRT', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-3', roomId: 'linac1', type: 'appt', time: '08:45 - 09:15', ptName: 'Michael Chen', ptDetails: 'Head & Neck VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-g1', roomId: 'linac1', type: 'gap', text: '09:15 - 09:30 | Morning QA Check' },
+            { id: 'l1-g1', roomId: 'linac1', type: 'gap', time: '09:15', text: '09:15 - 09:30 | Morning QA Check' },
             { id: 'l1-4', roomId: 'linac1', type: 'appt', time: '09:30 - 10:00', ptName: 'Sarah Davis', ptDetails: 'Breast 3D-CRT', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-5', roomId: 'linac1', type: 'appt', time: '10:00 - 10:30', ptName: 'William Thompson', ptDetails: 'Rectum VMAT', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-6', roomId: 'linac1', type: 'appt', time: '10:30 - 11:15', ptName: 'Emily Wilson', ptDetails: 'Cervix VMAT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-g2', roomId: 'linac1', type: 'gap', text: '11:15 - 12:30 | Lunch Break / Physics QA' },
+            { id: 'l1-g2', roomId: 'linac1', type: 'gap', time: '11:15', text: '11:15 - 12:30 | Lunch Break / Physics QA' },
             { id: 'l1-7', roomId: 'linac1', type: 'appt', time: '12:30 - 13:00', ptName: 'David Anderson', ptDetails: 'Esophagus IMRT', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-8', roomId: 'linac1', type: 'appt', time: '13:00 - 13:30', ptName: 'Amanda Thomas', ptDetails: 'Sarcoma IMRT', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-9', roomId: 'linac1', type: 'appt', time: '13:30 - 14:00', ptName: 'Patrick Moore', ptDetails: 'Bladder VMAT', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-10', roomId: 'linac1', type: 'appt', time: '14:00 - 14:45', ptName: 'Jennifer Jackson', ptDetails: 'Spine SBRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l1-g3', roomId: 'linac1', type: 'gap', text: '14:45 - 15:15 | Machine Break' },
+            { id: 'l1-g3', roomId: 'linac1', type: 'gap', time: '14:45', text: '14:45 - 15:15 | Machine Break' },
             { id: 'l1-11', roomId: 'linac1', type: 'appt', time: '15:15 - 15:45', ptName: 'Brian Martin', ptDetails: 'Lymphoma IS', status: 'Scheduled', chartLink: '#' },
             { id: 'l1-12', roomId: 'linac1', type: 'appt', time: '15:45 - 16:30', ptName: 'Elizabeth Lee', ptDetails: 'Whole Brain (Hippocampal Avoidance)', status: 'Scheduled', chartLink: '#' },
 
             // --- LINAC 2 Data ---
             { id: 'l2-1', roomId: 'linac2', type: 'appt', time: '08:00 - 09:00', ptName: 'Robert Miller', ptDetails: 'Lung SBRT (RUL)', status: 'Scheduled', chartLink: 'Robert_Miller_ThoraxSBRT.json' },
-            { id: 'l2-g1', roomId: 'linac2', type: 'gap', text: '09:00 - 09:30 | Room Cleaning / Setup' },
+            { id: 'l2-g1', roomId: 'linac2', type: 'gap', time: '09:00', text: '09:00 - 09:30 | Room Cleaning / Setup' },
             { id: 'l2-2', roomId: 'linac2', type: 'appt', time: '09:30 - 10:30', ptName: 'Jessica Martinez', ptDetails: 'Brain SRS (Multiple Mets)', status: 'Scheduled', chartLink: '#' },
             { id: 'l2-3', roomId: 'linac2', type: 'appt', time: '10:30 - 11:30', ptName: 'Christopher Taylor', ptDetails: 'Pancreas SBRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l2-g2', roomId: 'linac2', type: 'gap', text: '11:30 - 13:00 | Lunch Break / Physics Support' },
+            { id: 'l2-g2', roomId: 'linac2', type: 'gap', time: '11:30', text: '11:30 - 13:00 | Lunch Break / Physics Support' },
             { id: 'l2-4', roomId: 'linac2', type: 'appt', time: '13:00 - 14:00', ptName: 'Daniel Hernandez', ptDetails: 'Prostate SBRT', status: 'Scheduled', chartLink: '#' },
             { id: 'l2-5', roomId: 'linac2', type: 'appt', time: '14:00 - 15:15', ptName: 'Melissa White', ptDetails: 'Liver SBRT (Breath Hold)', status: 'Scheduled', chartLink: '#' },
-            { id: 'l2-g3', roomId: 'linac2', type: 'gap', text: '15:15 - 17:00 | Physics QA / Service' },
+            { id: 'l2-g3', roomId: 'linac2', type: 'gap', time: '15:15', text: '15:15 - 17:00 | Physics QA / Service' },
 
             // --- LINAC 3 Data ---
-            { id: 'l3-g1', roomId: 'linac3', type: 'gap', text: '08:00 - 08:30 | Morning Warmup' },
+            { id: 'l3-g1', roomId: 'linac3', type: 'gap', time: '08:00', text: '08:00 - 08:30 | Morning Warmup' },
             { id: 'l3-1', roomId: 'linac3', type: 'appt', time: '08:30 - 09:00', ptName: 'Jane Smith', ptDetails: 'Urgent SVCS (AP/PA)', status: 'Scheduled', chartLink: 'Jane_Smith_SVCS.json' },
             { id: 'l3-2', roomId: 'linac3', type: 'appt', time: '09:00 - 09:30', ptName: 'James Wilson', ptDetails: 'Prostate VMAT', status: 'Scheduled', chartLink: 'James_Wilson_PelvisProstate.json' },
             { id: 'l3-3', roomId: 'linac3', type: 'appt', time: '09:30 - 10:00', ptName: 'George Harris', ptDetails: 'L3 Spine (Palliative)', status: 'Scheduled', chartLink: 'George_Harris_SkeletalSpine.json' },
             { id: 'l3-4', roomId: 'linac3', type: 'appt', time: '10:00 - 10:30', ptName: 'Barbara Garcia', ptDetails: 'Whole Breast (Tangents)', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-g2', roomId: 'linac3', type: 'gap', text: '10:30 - 12:00 | Mid-day Break / Therapist Meeting' },
+            { id: 'l3-g2', roomId: 'linac3', type: 'gap', time: '10:30', text: '10:30 - 12:00 | Mid-day Break / Therapist Meeting' },
             { id: 'l3-5', roomId: 'linac3', type: 'appt', time: '12:00 - 12:30', ptName: 'Richard Davis', ptDetails: 'Prostate Bed VMAT', status: 'Scheduled', chartLink: '#' },
             { id: 'l3-6', roomId: 'linac3', type: 'appt', time: '12:30 - 13:00', ptName: 'Susan Clark', ptDetails: 'Chest Wall + Nodes', status: 'Scheduled', chartLink: '#' },
             { id: 'l3-7', roomId: 'linac3', type: 'appt', time: '13:00 - 13:30', ptName: 'Joseph Hall', ptDetails: 'Lung IMRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-g3', roomId: 'linac3', type: 'gap', text: '13:30 - 14:30 | Machine Break' },
+            { id: 'l3-g3', roomId: 'linac3', type: 'gap', time: '13:30', text: '13:30 - 14:30 | Machine Break' },
             { id: 'l3-8', roomId: 'linac3', type: 'appt', time: '14:30 - 15:00', ptName: 'Margaret Allen', ptDetails: 'Rectum 3D-CRT', status: 'Scheduled', chartLink: '#' },
-            { id: 'l3-g4', roomId: 'linac3', type: 'gap', text: '15:00 - 17:00 | End of Day QA' },
+            { id: 'l3-g4', roomId: 'linac3', type: 'gap', time: '15:00', text: '15:00 - 17:00 | End of Day QA' },
         ];
 
 
@@ -121,6 +122,7 @@
             });
 
             // Sort data by time to ensure correct order display
+            // This will now work because all items have a 'time' string.
             scheduleData.sort((a, b) => a.time.localeCompare(b.time));
 
             // Loop through data and generate HTML
@@ -174,8 +176,13 @@
         function initializeEventHandlers() {
             
             // --- A. Mark Ready Click Handler ---
+            // Use a fresh querySelectorAll to get the newly created buttons
             document.querySelectorAll('.btn-mark-ready').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+                // Remove any existing listeners to prevent duplicates (though re-rendering usually handles this)
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+
+                newBtn.addEventListener('click', function(e) {
                     const patientCard = e.target.closest('.draggable-patient-card');
                     const patientId = patientCard.getAttribute('data-patient-id');
                     // Update Data
