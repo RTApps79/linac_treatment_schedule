@@ -20,90 +20,243 @@
         </div>
     </header>
 
-    <main class="schedule-container">
-        <h1 class="page-title">Today's Treatment Schedule</h1>
+    <div class="main-content-wrapper">
 
-        <ul class="schedule-list" id="schedule-list">
-            <li class="schedule-card active">
-                <div class="time-slot">
-                    <span class="time">08:00 AM - 08:30 AM</span>
-                    <span class="duration"><i class="fa-regular fa-clock"></i> 30 min</span>
+        <aside class="sidebar">
+            <div class="calendar-widget card-container">
+                <div class="calendar-header">
+                    <i class="fa-solid fa-chevron-left"></i>
+                    <h3>November 2024</h3>
+                    <i class="fa-solid fa-chevron-right"></i>
                 </div>
-                <div class="patient-info">
-                    <h3>Alice Brown</h3>
-                    <div class="patient-details">
-                        <span><i class="fa-solid fa-id-card"></i> ID: ABM22334</span>
-                        <span><i class="fa-solid fa-notes-medical"></i> Site: Right Proximal Femur</span>
-                    </div>
+                <div class="calendar-weekdays">
+                    <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
                 </div>
-                <div class="card-actions">
-                    <span class="status-badge">Ready</span>
-                    <a href="patient_v2.html?file=Alice_Brown_SkeletalExtremity.json" class="btn-open">
-                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    </a>
+                <div class="calendar-days">
+                    <div class="prev-month">27</div><div class="prev-month">28</div><div class="prev-month">29</div><div class="prev-month">30</div><div class="prev-month">31</div>
+                    <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div><div>23</div><div>24</div>
+                    <div class="today">25</div> <div>26</div><div>27</div><div>28</div><div>29</div><div>30</div>
+                    <div class="next-month">1</div>
                 </div>
-            </li>
+            </div>
+        </aside>
 
-            <li class="schedule-card">
-                <div class="time-slot">
-                    <span class="time">08:45 AM - 09:45 AM</span>
-                    <span class="duration"><i class="fa-regular fa-clock"></i> 60 min</span>
-                </div>
-                <div class="patient-info">
-                    <h3>Robert Miller</h3>
-                    <div class="patient-details">
-                        <span><i class="fa-solid fa-id-card"></i> ID: RM99112</span>
-                        <span><i class="fa-solid fa-notes-medical"></i> Site: Lung (RUL) SBRT</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <span class="status-badge">Scheduled</span>
-                    <a href="patient_v2.html?file=Robert_Miller_ThoraxSBRT.json" class="btn-open">
-                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    </a>
-                </div>
-            </li>
+        <section class="schedule-content">
+            
+            <h1 class="page-title">Department Schedule</h1>
 
-            <li class="schedule-card">
-                <div class="time-slot">
-                    <span class="time">10:00 AM - 10:45 AM</span>
-                    <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
+            <div class="dept-tabs">
+                <button class="tab-btn active"><i class="fa-solid fa-x-ray"></i> LINAC Treatment</button>
+                <button class="tab-btn"><i class="fa-solid fa-procedures"></i> Simulation (CT/MR)</button>
+                <button class="tab-btn"><i class="fa-solid fa-user-doctor"></i> Consults & Follow-ups</button>
+                <button class="tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> HDR & Special Proc</button>
+            </div>
+
+            <div class="linac-rooms-grid">
+
+                <div class="room-column">
+                    <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 1 (TrueBeam A)</h2>
+                    <ul class="schedule-list">
+                        <li class="schedule-card active">
+                            <div class="time-slot">
+                                <span class="time">08:00 - 08:30</span>
+                            </div>
+                            <div class="patient-info">
+                                <h3>Alice Brown</h3>
+                                <div class="patient-details">
+                                    <span>ID: ABM22334</span>
+                                    <span>Rt Proximal Femur</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="status-badge">Ready</span>
+                                <a href="patient_v2.html?file=Alice_Brown_SkeletalExtremity.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                            </div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">08:30 - 09:00</span></div>
+                            <div class="patient-info">
+                                <h3>Linda Jones</h3>
+                                <div class="patient-details"><span>ID: LJ77889</span><span>Thorax IMRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">09:00 - 09:30</span></div>
+                            <div class="patient-info">
+                                <h3>Michael Chen</h3>
+                                <div class="patient-details"><span>ID: MC55443</span><span>Head & Neck VMAT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">09:30 - 10:00</span></div>
+                            <div class="patient-info">
+                                <h3>Sarah Davis</h3>
+                                <div class="patient-details"><span>ID: SD99887</span><span>Breast 3D-CRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">10:00 - 10:45</span></div>
+                            <div class="patient-info">
+                                <h3>William Thompson</h3>
+                                <div class="patient-details"><span>ID: WT11223</span><span>Rectum VMAT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">10:45 - 11:30</span></div>
+                            <div class="patient-info">
+                                <h3>Emily Wilson</h3>
+                                <div class="patient-details"><span>ID: EW44556</span><span>Cervix VMAT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="patient-info">
-                    <h3>James Wilson</h3>
-                    <div class="patient-details">
-                        <span><i class="fa-solid fa-id-card"></i> ID: JW55667</span>
-                        <span><i class="fa-solid fa-notes-medical"></i> Site: Prostate VMAT</span>
-                    </div>
+
+                <div class="room-column">
+                    <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 2 (TrueBeam B)</h2>
+                    <ul class="schedule-list">
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">08:00 - 09:00</span></div>
+                            <div class="patient-info">
+                                <h3>Robert Miller</h3>
+                                <div class="patient-details"><span>ID: RM99112</span><span>Lung SBRT</span></div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="status-badge">Scheduled</span>
+                                <a href="patient_v2.html?file=Robert_Miller_ThoraxSBRT.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                            </div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">09:00 - 10:00</span></div>
+                            <div class="patient-info">
+                                <h3>Jessica Martinez</h3>
+                                <div class="patient-details"><span>ID: JM22334</span><span>Brain SRS</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">10:00 - 11:00</span></div>
+                            <div class="patient-info">
+                                <h3>Christopher Taylor</h3>
+                                <div class="patient-details"><span>ID: CT55667</span><span>Pancreas SBRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">11:00 - 11:45</span></div>
+                            <div class="patient-info">
+                                <h3>Daniel Hernandez</h3>
+                                <div class="patient-details"><span>ID: DH11223</span><span>Prostate SBRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">11:45 - 12:30</span></div>
+                            <div class="patient-info">
+                                <h3>Melissa White</h3>
+                                <div class="patient-details"><span>ID: MW44556</span><span>Liver SBRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">12:30 - 13:15</span></div>
+                            <div class="patient-info">
+                                <h3>Jennifer Jackson</h3>
+                                <div class="patient-details"><span>ID: JJ22334</span><span>Spine SBRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="card-actions">
-                    <span class="status-badge">Scheduled</span>
-                    <a href="patient_v2.html?file=James_Wilson_PelvisProstate.json" class="btn-open">
-                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    </a>
+
+                <div class="room-column">
+                    <h2 class="room-title"><i class="fa-solid fa-circle-stop text-muted"></i> LINAC 3 (Halcyon)</h2>
+                    <ul class="schedule-list">
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">08:15 - 08:45</span></div>
+                            <div class="patient-info">
+                                <h3>Jane Smith</h3>
+                                <div class="patient-details"><span>ID: JS12345</span><span>SVCS</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">08:45 - 09:30</span></div>
+                            <div class="patient-info">
+                                <h3>David Anderson</h3>
+                                <div class="patient-details"><span>ID: DA77889</span><span>Esophagus IMRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">09:30 - 10:15</span></div>
+                            <div class="patient-info">
+                                <h3>James Wilson</h3>
+                                <div class="patient-details">
+                                    <span>ID: JW55667</span>
+                                    <span>Prostate VMAT</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="status-badge">Scheduled</span>
+                                <a href="patient_v2.html?file=James_Wilson_PelvisProstate.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                            </div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">10:15 - 11:00</span></div>
+                            <div class="patient-info">
+                                <h3>George Harris</h3>
+                                <div class="patient-details">
+                                    <span>ID: GH88991</span>
+                                    <span>L3 Spine</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="status-badge">Scheduled</span>
+                                <a href="patient_v2.html?file=George_Harris_SkeletalSpine.json" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                            </div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">11:00 - 11:45</span></div>
+                            <div class="patient-info">
+                                <h3>Amanda Thomas</h3>
+                                <div class="patient-details"><span>ID: AT88990</span><span>Sarcoma IMRT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">11:45 - 12:30</span></div>
+                            <div class="patient-info">
+                                <h3>Patrick Moore</h3>
+                                <div class="patient-details"><span>ID: PM77889</span><span>Bladder VMAT</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                         <li class="schedule-card">
+                            <div class="time-slot"><span class="time">12:30 - 13:00</span></div>
+                            <div class="patient-info">
+                                <h3>Brian Martin</h3>
+                                <div class="patient-details"><span>ID: BM55667</span><span>Lymphoma IS</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                        <li class="schedule-card">
+                            <div class="time-slot"><span class="time">13:00 - 13:45</span></div>
+                            <div class="patient-info">
+                                <h3>Elizabeth Lee</h3>
+                                <div class="patient-details"><span>ID: EL88990</span><span>Whole Brain</span></div>
+                            </div>
+                            <div class="card-actions"><span class="status-badge">Scheduled</span><a href="#" class="btn-open btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
+                        </li>
+                    </ul>
                 </div>
-            </li>
-             <li class="schedule-card">
-                <div class="time-slot">
-                    <span class="time">11:00 AM - 11:45 AM</span>
-                    <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
-                </div>
-                <div class="patient-info">
-                    <h3>George Harris</h3>
-                    <div class="patient-details">
-                        <span><i class="fa-solid fa-id-card"></i> ID: GH88991</span>
-                        <span><i class="fa-solid fa-notes-medical"></i> Site: L3 Spine</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <span class="status-badge">Scheduled</span>
-                    <a href="patient_v2.html?file=George_Harris_SkeletalSpine.json" class="btn-open">
-                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    </a>
-                </div>
-            </li>
-        </ul>
-    </main>
+
+            </div> </section>
+    </div>
 
     <script>
         // Simple script to set current date
