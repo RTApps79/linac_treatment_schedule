@@ -5,6 +5,7 @@
     --bg-dark: #1a1c23;
     --bg-card: #232730;
     --bg-slot: #2c313a;
+    --bg-hover: #363c48; /* New hover color for drop zones */
     --primary-color: #3498db;
     --success-color: #2ecc71;
     --text-light: #ecf0f1;
@@ -20,24 +21,22 @@ body {
     font-family: var(--font-stack);
     background-color: var(--bg-dark);
     color: var(--text-light);
-    /* FULL SCREEN SETUP */
     height: 100vh;
     width: 100vw;
-    overflow: hidden; /* Prevent body scroll */
+    overflow: hidden;
     display: grid;
-    grid-template-rows: auto 1fr; /* Header takes space it needs, content takes rest */
+    grid-template-rows: auto 1fr;
 }
 
 /* --- Utility Classes --- */
 .text-success { color: var(--success-color) !important; }
 .text-muted { color: var(--text-muted) !important; }
-/* Utility to hide elements dynamically */
 .hidden { display: none !important; }
 
 /* --- Navigation Bar --- */
 .navbar {
     background-color: var(--bg-card);
-    padding: 10px 20px; /* Reduced padding */
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -45,13 +44,7 @@ body {
     flex-shrink: 0;
 }
 
-.brand-logo {
-    font-size: 1.3rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+.brand-logo { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 .logo-icon { color: var(--primary-color); font-size: 1.5rem; }
 .date-display { font-weight: 500; color: var(--text-muted); font-size: 0.9rem; }
 
@@ -61,33 +54,23 @@ body {
    ========================================= */
 .main-content-wrapper {
     display: grid;
-    grid-template-columns: 260px 1fr; /* Sidebar fixed width, content flexible */
+    grid-template-columns: 260px 1fr;
     gap: 20px;
     padding: 20px;
-    height: 100%; /* Fill the grid row */
-    overflow: hidden; /* Contain internal scrolls */
+    height: 100%;
+    overflow: hidden;
 }
 
-/* --- Sidebar & Calendar (Compact) --- */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-}
-
+/* --- Sidebar & Calendar --- */
+.sidebar { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
 .card-container {
     background-color: var(--bg-card);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    padding: 15px;
+    border-radius: 8px; border: 1px solid var(--border-color); padding: 15px;
 }
-
 .calendar-header {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 10px; font-size: 0.9rem; font-weight: 600;
 }
-
 .calendar-weekdays, .calendar-days {
     display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 2px;
 }
@@ -102,19 +85,12 @@ body {
 
 /* --- Main Schedule Content Area --- */
 .schedule-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Fill height */
-    overflow: hidden;
+    display: flex; flex-direction: column; height: 100%; overflow: hidden;
 }
-
 .page-title { margin-bottom: 15px; font-size: 1.4rem; font-weight: 600; }
-
-/* --- Department Tabs (Compact) --- */
 .dept-tabs {
     display: flex; gap: 5px; margin-bottom: 15px;
-    border-bottom: 1px solid var(--border-color); padding-bottom: 5px;
-    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color); padding-bottom: 5px; flex-shrink: 0;
 }
 .tab-btn {
     background: none; border: none; color: var(--text-muted);
@@ -125,88 +101,115 @@ body {
 .tab-btn:hover { background-color: var(--bg-slot); color: var(--text-light); }
 .tab-btn.active { background-color: rgba(52, 152, 219, 0.15); color: var(--primary-color); }
 
-/* --- LINAC Rooms Grid (Full Height) --- */
+/* --- LINAC Rooms Grid --- */
 .linac-rooms-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    flex-grow: 1; /* Take remaining height */
-    overflow: hidden; /* Important: ensure rooms don't spill out */
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+    flex-grow: 1; overflow: hidden;
 }
-
 .room-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    height: 100%;
-    overflow: hidden;
+    display: flex; flex-direction: column; gap: 10px; height: 100%; overflow: hidden;
 }
-
 .room-title {
     font-size: 1.1rem; font-weight: 600; color: var(--text-light);
     display: flex; align-items: center; gap: 8px;
-    padding-bottom: 8px; border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
 }
 .room-title i { font-size: 0.85rem; }
 
-/* The scrollable area within a room column if it overflows standard hours */
 .schedule-list-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 5px; /* Space for scrollbar */
+    flex-grow: 1; overflow-y: auto; padding-right: 5px;
 }
-
 .schedule-list {
     list-style: none; display: flex; flex-direction: column; gap: 8px;
 }
 
 /* =========================================
-   COMPACT SCHEDULE CARD STYLES
+   NEW SCHEDULE ROW STRUCTURE
    ========================================= */
-.schedule-card {
+
+/* The container for the whole row (Time + Drop Zone) */
+.schedule-time-row {
     display: flex;
     background-color: var(--bg-card);
     border-radius: 6px;
     overflow: hidden;
     border: 1px solid var(--border-color);
-    /* Compact height to fit 8-5 without scrolling */
-    min-height: 65px; 
-    transition: all 0.2s ease;
+    min-height: 65px; /* Fixed height for the slot */
 }
 
-/* Gap/Break Slot Style */
-.schedule-card.gap-slot {
-    background-color: transparent;
-    border: 1px dashed var(--border-color);
-    min-height: 40px;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    font-style: italic;
-}
-
-/* --- Left: Time Slot --- */
-.time-slot {
+/* The fixed time label on the left */
+.fixed-time-label {
     flex: 0 0 90px;
     background-color: var(--bg-slot);
     padding: 0 10px;
     display: flex; align-items: center; justify-content: center;
-    border-left: 4px solid var(--primary-color); /* Default Scheduled Color */
+    /* The colored border moves here */
+    border-left: 4px solid var(--primary-color); 
     font-size: 0.85rem; font-weight: 700;
+    user-select: none;
 }
 
-/* Ready State Color */
-.schedule-card.active .time-slot { border-left-color: var(--success-color); }
+/* The area where patient cards are dropped */
+.patient-drop-zone {
+    flex: 1;
+    display: flex;
+    align-items: stretch; /* Ensure dropped card fills height */
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+}
 
-/* --- Center: Patient Info --- */
+/* Visual cue when hovering over a valid drop zone */
+.patient-drop-zone.drag-over {
+    background-color: var(--bg-hover);
+    border: 2px dashed var(--primary-color);
+}
+
+/* =========================================
+   DRAGGABLE PATIENT CARD STYLES
+   ========================================= */
+
+/* The actual draggable patient "chip" */
+.draggable-patient-card {
+    flex: 1;
+    display: flex;
+    background-color: var(--bg-card); /* Matches background so it looks seamless */
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.draggable-patient-card:active { cursor: grabbing; }
+
+/* Style when being dragged */
+.draggable-patient-card.dragging {
+    opacity: 0.4;
+    background-color: var(--bg-slot);
+}
+
+
+/* Style for Ready state (applied to the outer row container now) */
+.schedule-time-row.status-ready .fixed-time-label {
+    border-left-color: var(--success-color);
+}
+
+/* --- Gap Slots (Non-draggable rows) --- */
+.schedule-time-row.gap-row {
+    background-color: transparent;
+    border: 1px dashed var(--border-color);
+    min-height: 40px;
+    align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 0.85rem; font-style: italic;
+    pointer-events: none; /* Prevent dropping onto gaps */
+}
+
+
+/* --- Patient Info & Actions (Inside draggable card) --- */
 .patient-info {
     flex: 1;
     padding: 8px 12px;
     display: flex; flex-direction: column; justify-content: center;
     border-right: 1px solid var(--border-color);
     overflow: hidden;
+    border-left: 1px solid var(--border-color); /* Seperator from time slot */
 }
 .patient-info h3 {
     font-size: 0.95rem; margin-bottom: 3px;
@@ -218,7 +221,6 @@ body {
 }
 .patient-details span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* --- Right: Actions & Status --- */
 .card-actions {
     flex: 0 0 75px;
     background-color: var(--bg-slot);
@@ -233,194 +235,19 @@ body {
     background-color: rgba(52, 152, 219, 0.15); color: var(--primary-color);
 }
 
-.schedule-card.active .status-badge {
+.schedule-time-row.status-ready .status-badge {
     background-color: rgba(46, 204, 113, 0.15); color: var(--success-color);
 }
 
-/* Interactive Action Buttons (Circular) */
 .btn-action {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: none;
+    width: 30px; height: 30px; border-radius: 50%; border: none;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s;
+    cursor: pointer; font-size: 0.9rem; transition: background-color 0.2s;
 }
-
-/* Mark Ready Button (Checkmark) */
 .btn-mark-ready {
     background-color: var(--bg-card); color: var(--text-muted);
     border: 1px solid var(--border-color);
 }
 .btn-mark-ready:hover { background-color: var(--success-color); color: white; border-color: transparent;}
-
-/* Open Chart Button (Arrow) */
-.btn-open-chart {
-    background-color: var(--primary-color); color: white;
-    text-decoration: none;
-}
+.btn-open-chart { background-color: var(--primary-color); color: white; text-decoration: none; }
 .btn-open-chart:hover { background-color: #2980b9; }
-
-
-/* =========================================
-   PATIENT TREATMENT PAGE STYLES (Kept for context)
-   ========================================= */
-/* ... (The rest of your CSS for the patient page remains here unchanged) ... */
-.patient-container {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 25px;
-    max-width: 1400px;
-    margin: 30px auto;
-    padding: 0 20px;
-    height: calc(100vh - 100px);
-}
-/* ... [Keep the rest of the original CSS file below this line] ... */
-
-/* --- Reset and Base Styles --- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background-color: #1e2124; color: #e0e0e0; overflow: hidden; }
-
-/* --- Header --- */
-.header { background-color: #1a3a5e; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 70px; border-bottom: 2px solid #0d1f33; }
-.header-left h1 { font-size: 1.6rem; margin: 0; } .header-left h2 { font-size: 0.9rem; font-weight: normal; opacity: 0.8; margin: 0; }
-.header-middle { display: flex; gap: 30px; font-size: 0.85rem; }
-.user-info, .patient-orientation { display: flex; flex-direction: column; }
-.header-right .logo { height: 40px; filter: brightness(0) invert(1); }
-
-/* --- Main Body Layout --- */
-.main-body { flex: 1; display: flex; overflow: hidden; }
-
-/* (Blue) Sidebar */
-.patient-info-container { width: 260px; background-color: #2c4a6d; border-right: 2px solid #1a3a5e; display: flex; flex-direction: column; }
-.patient-details { padding: 15px; font-size: 0.9rem; } .patient-details p { margin-bottom: 6px; }
-.dose-details-header { background-color: #1a3a5e; padding: 8px 15px; font-weight: bold; font-size: 0.9rem; }
-.treatment-list { flex: 1; overflow-y: auto; }
-.list-header { background-color: #3d5c7f; padding: 8px 15px; display: flex; justify-content: space-between; font-weight: bold; font-size: 0.85rem; }
-#field-list-items { list-style: none; }
-#field-list-items li { padding: 10px 15px; border-bottom: 1px solid #3d5c7f; display: flex; align-items: center; cursor: pointer; user-select: none; font-size: 0.9rem; }
-#field-list-items li:hover { background-color: rgba(255,255,255,0.05); }
-#field-list-items li.active { background-color: #4a90e2; color: white; }
-#field-list-items li .field-name-span { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 10px;}
-.treated-icon { color: #2ecc71; margin-left: 5px; display: none; }
-li.treated .treated-icon { display: inline-block; }
-
-.drag-handle { margin-right: 10px; color: #aaa; cursor: grab; display: none; } .reorder-mode .drag-handle { display: block; }
-.field-checkbox { margin-right: 10px; display: none; } .deactivate-mode .field-checkbox { display: block; }
-li.deactivated { color: #888; font-style: italic; } li.deactivated span { text-decoration: line-through; }
-li.imaging-field { background-color: #3a4a5e; border-left: 3px solid #4a90e2; color: #cee; } li.imaging-field .icon { margin-right: 8px; }
-
-/* --- Right Content --- */
-.content-right { flex: 1; display: flex; flex-direction: column; }
-
-/* (Green) Machine View */
-.machine-view-container { height: 40%; background-color: #2d4a2d; position: relative; border-bottom: 3px solid #1d3a1d; overflow: hidden;}
-.machine-view-container img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
-.privacy-shade-label { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem;}
-.machine-overlay-text { position: absolute; bottom: 15px; width: 100%; text-align: center; font-size: 1.3rem; font-weight: bold; text-shadow: 2px 2px 4px black; color: #fff; }
-
-/* Treatment Flow Bar */
-.treatment-flow-bar { height: 45px; background-color: #222; display: flex; border-bottom: 2px solid #111; }
-.flow-step { flex: 1; display: flex; justify-content: center; align-items: center; background-color: #3a3d42; margin-right: 2px; font-weight: bold; position: relative; clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%); padding-left: 20px; color: #aaa; transition: all 0.3s ease;}
-.flow-step:first-child { padding-left: 0; clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%); }
-/* Workflow States */
-.workflow-active { background-color: #e2c74a; color: #222; } /* Default Yellow */
-.workflow-ready-green { background-color: #2ecc71 !important; color: #fff !important; }
-.workflow-beam-on-red { background-color: #e74c3c !important; color: #fff !important; animation: pulseBeam 1s infinite alternate; }
-@keyframes pulseBeam { from { box-shadow: inset 0 0 10px #c0392b; } to { box-shadow: inset 0 0 30px #f39c12; } }
-
-
-/* Treatment Data Containers */
-.treatment-data-container { flex: 1; display: flex; overflow: hidden; }
-.container-header, .container-header-split { display: flex; padding: 6px 10px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.3); font-size: 0.9rem; }
-.container-header span, .geo-header span { flex: 1; text-align: center; } .container-header span:first-child, .geo-header span:first-child { flex: 2; text-align: left; }
-.data-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px 10px; padding: 10px; align-items: center; font-size: 0.85rem; overflow-y: auto;}
-.value-box { background-color: rgba(255,255,255,0.1); padding: 5px; text-align: center; border: 1px solid rgba(255,255,255,0.15); min-height: 28px; display: flex; align-items: center; justify-content: center;}
-.value-box.highlighted { background-color: #e6b800; color: black; font-weight: bold; font-size: 1rem;}
-
-/* (Red) Fields Container */
-.treatment-fields-container { flex: 1; background-color: #8c3a3a; border-right: 2px solid #6d2a2a; display: flex; flex-direction: column;}
-.treatment-fields-container .container-header { background-color: #6d2a2a; }
-.mu-split-container { display: flex; flex-direction: column; gap: 2px; }
-.mu-val { background-color: #e6b800; color: black; text-align: center; padding: 4px; font-weight: bold;}
-.mu-progress-bar { height: 8px; background-color: #555; border-radius: 4px; overflow: hidden; }
-.mu-progress-fill { height: 100%; background-color: #2ecc71; width: 0%; transition: width 0.1s linear; }
-
-/* (Yellow) Console Container */
-.treatment-console-container { flex: 1.3; background-color: #8c8c4a; display: flex; flex-direction: column; }
-.container-header-split { background-color: #6d6d3a; }
-.geo-header { flex: 3; display: flex; } .bev-header { flex: 2; text-align: center; border-left: 2px solid rgba(0,0,0,0.3); }
-.console-content { flex: 1; display: flex; overflow: hidden; }
-.geometry-grid { flex: 3; border-right: 2px solid rgba(0,0,0,0.3); }
-
-/* BEV & Canvas */
-.bev-graphic-container { flex: 2; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #000; }
-#bev-canvas { width: 100%; max-width: 280px; height: auto; aspect-ratio: 1 / 1; border: 2px solid #444; background-color: #111; }
-.bev-controls { width: 100%; max-width: 280px; margin-top: 5px; font-size: 0.8rem; color: #aaa; text-align: right;}
-
-/* --- (Purple) Toolbar --- */
-.status-tool-bar { height: 55px; background-color: #4a3a5e; border-top: 2px solid #3a2a4e; display: flex; justify-content: space-between; padding: 8px 15px; }
-.tool-group { display: flex; gap: 8px; }
-.status-tool-bar button { padding: 6px 12px; border: 1px solid #6a5a7e; background: linear-gradient(to bottom, #5a4a6e, #4a3a5e); color: #eee; cursor: pointer; font-size: 0.85rem; border-radius: 3px; }
-.status-tool-bar button:hover:not(:disabled) { background: #6a5a7e; } .status-tool-bar button:disabled { opacity: 0.5; cursor: not-allowed; }
-.status-tool-bar button.active-tool { background: #e2c74a; color: #222; border-color: #c0a000; }
-.primary-tool { font-weight: bold; background: #6a5a7e !important; }
-.action-btn { font-weight: bold; min-width: 70px; } .apply { background: #4a90e2 !important; border-color: #3a70b2 !important; } .cancel { background: #e74c3c !important; border-color: #c0392b !important; }
-
-/* --- Notifications & Warnings --- */
-#notification-area { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: auto; z-index: 100; pointer-events: none; }
-.notification { background-color: rgba(40, 167, 69, 0.95); color: white; padding: 10px 20px; border-radius: 4px; margin-bottom: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); font-weight: bold; animation: fadeOut 4s forwards; }
-@keyframes fadeOut { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
-.value-box.out-of-tolerance { background-color: #c0392b; animation: pulseRed 1s infinite alternate; } @keyframes pulseRed { from { background-color: #c0392b; } to { background-color: #e74c3c; } }
-#tolerance-warning { background-color: #c0392b; color: white; text-align: center; padding: 8px; font-weight: bold; font-size: 0.9rem;}
-.warning-btn { background: #c0392b !important; border-color: #a93226 !important; }
-
-/* --- Modals --- */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(2px); }
-.modal-content { background-color: #2c3e50; margin: 8% auto; padding: 20px; border: 1px solid #4a6b8a; width: 450px; color: #eee; box-shadow: 0 10px 25px rgba(0,0,0,0.7); border-radius: 5px;}
-.big-modal .modal-content { width: 700px; }
-.close-modal { color: #aaa; float: right; font-size: 24px; font-weight: bold; cursor: pointer; } .close-modal:hover { color: white; }
-.modal h2 { margin-top: 0; border-bottom: 1px solid #4a6b8a; padding-bottom: 10px; font-size: 1.2rem; }
-.form-group { margin: 15px 0; } .form-group label { display: block; margin-bottom: 6px; }
-.form-group select, .form-group input { width: 100%; padding: 8px; background-color: #1a2a3a; color: white; border: 1px solid #3a5a7a; border-radius: 3px;}
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-.notes-content, .modal-tab-container { background-color: #1a2a3a; padding: 15px; height: 250px; overflow-y: auto; border: 1px solid #3a5a7a; white-space: pre-wrap; font-size: 0.9rem; }
-.checklist-container { background-color: #1a2a3a; padding: 15px; border: 1px solid #3a5a7a; }
-.checklist-item { display: block; margin-bottom: 10px; cursor: pointer; } .checklist-item input { margin-right: 10px; transform: scale(1.2); }
-
-/* Modal Tabs */
-.modal-tabs { display: flex; border-bottom: 1px solid #4a6b8a; margin-bottom: 0; }
-.modal-tab { padding: 10px 15px; background: none; border: none; color: #aaa; cursor: pointer; font-weight: bold; border-bottom: 3px solid transparent; }
-.modal-tab.active { color: white; border-bottom-color: #4a90e2; background-color: rgba(74, 144, 226, 0.1); }
-.modal-tab-container { border-top: none; }
-.info-group { margin-bottom: 15px; } .info-group h3 { font-size: 1rem; color: #4a90e2; margin-bottom: 5px; border-bottom: 1px solid #3a5a7a; } .info-group p, .info-group li { margin-bottom: 4px; color: #ccc; }
-
-/* ... [Previous CSS ends here] ... */
-
-/* =========================================
-   DRAG AND DROP STYLES
-   ========================================= */
-/* Visual feedback while dragging a card */
-.schedule-card.dragging {
-    opacity: 0.5;
-    border: 2px dashed var(--primary-color);
-    box-shadow: var(--shadow-md);
-    /* Ensure it's above other elements */
-    z-index: 100; 
-}
-
-/* Ensure gap slots look anchored and different from movable cards */
-.schedule-card.gap-slot {
-    cursor: not-allowed;
-    user-select: none;
-}
-
-/* Cursor hint for draggable items */
-.schedule-card:not(.gap-slot) {
-    cursor: grab;
-}
-
-.schedule-card:not(.gap-slot):active {
-    cursor: grabbing;
-}
