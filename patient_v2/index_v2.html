@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule - OncoCare Radiotherapy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style_v2.css">
+    <link rel="stylesheet" href="style_v2 (1).css">
 </head>
 <body>
 
@@ -15,9 +15,7 @@
             <span>OncoCare Radiotherapy Center</span>
         </div>
         <div class="date-display" id="current-date">
-            <i class="fa-regular fa-calendar-days"></i>
-            Monday, November 25, 2024
-        </div>
+            </div>
     </header>
 
     <div class="main-content-wrapper">
@@ -53,179 +51,21 @@
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 1 (TrueBeam A)</h2>
                     <div class="schedule-list-container">
-                        <ul class="schedule-list">
-                            <li class="schedule-card" draggable="true" data-patient-id="ABM22334">
-                                <div class="time-slot">08:00 - 08:30</div>
-                                <div class="patient-info"><h3>Alice Brown</h3><div class="patient-details"><span>Rt Proximal Femur (3D-CRT)</span></div></div>
-                                <div class="card-actions">
-                                    <span class="status-badge">Scheduled</span>
-                                    <button class="btn-action btn-mark-ready" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
-                                    <a href="patient_v2.html?file=Alice_Brown_SkeletalExtremity.json" class="btn-action btn-open-chart hidden" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                                </div>
-                            </li>
-                            <li class="schedule-card" draggable="true">
-                                <div class="time-slot">08:30 - 08:45</div>
-                                <div class="patient-info"><h3>Linda Jones</h3><div class="patient-details"><span>Thorax IMRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">08:45 - 09:15</div>
-                                <div class="patient-info"><h3>Michael Chen</h3><div class="patient-details"><span>Head & Neck VMAT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card gap-slot">09:15 - 09:30 | Morning QA Check</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">09:30 - 10:00</div>
-                                <div class="patient-info"><h3>Sarah Davis</h3><div class="patient-details"><span>Breast 3D-CRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">10:00 - 10:30</div>
-                                <div class="patient-info"><h3>William Thompson</h3><div class="patient-details"><span>Rectum VMAT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card" draggable="true">
-                                <div class="time-slot">10:30 - 11:15</div>
-                                <div class="patient-info"><h3>Emily Wilson</h3><div class="patient-details"><span>Cervix VMAT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card gap-slot">11:15 - 12:30 | Lunch Break / Physics QA</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">12:30 - 13:00</div>
-                                <div class="patient-info"><h3>David Anderson</h3><div class="patient-details"><span>Esophagus IMRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card" draggable="true">
-                                <div class="time-slot">13:00 - 13:30</div>
-                                <div class="patient-info"><h3>Amanda Thomas</h3><div class="patient-details"><span>Sarcoma IMRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">13:30 - 14:00</div>
-                                <div class="patient-info"><h3>Patrick Moore</h3><div class="patient-details"><span>Bladder VMAT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">14:00 - 14:45</div>
-                                <div class="patient-info"><h3>Jennifer Jackson</h3><div class="patient-details"><span>Spine SBRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card gap-slot">14:45 - 15:15 | Machine Break</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">15:15 - 15:45</div>
-                                <div class="patient-info"><h3>Brian Martin</h3><div class="patient-details"><span>Lymphoma IS</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">15:45 - 16:30</div>
-                                <div class="patient-info"><h3>Elizabeth Lee</h3><div class="patient-details"><span>Whole Brain (Hippocampal Avoidance)</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                        </ul>
+                        <ul class="schedule-list" id="linac1-list"></ul>
                     </div>
                 </div>
 
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-play text-success"></i> LINAC 2 (TrueBeam B)</h2>
                     <div class="schedule-list-container">
-                        <ul class="schedule-list">
-                            <li class="schedule-card" draggable="true">
-                                <div class="time-slot">08:00 - 09:00</div>
-                                <div class="patient-info"><h3>Robert Miller</h3><div class="patient-details"><span>Lung SBRT (RUL)</span></div></div>
-                                <div class="card-actions">
-                                    <span class="status-badge">Scheduled</span>
-                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
-                                    <a href="patient_v2.html?file=Robert_Miller_ThoraxSBRT.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                                </div>
-                            </li>
-                            <li class="schedule-card gap-slot">09:00 - 09:30 | Room Cleaning / Setup</li>
-                            <li class="schedule-card" draggable="true">
-                                <div class="time-slot">09:30 - 10:30</div>
-                                <div class="patient-info"><h3>Jessica Martinez</h3><div class="patient-details"><span>Brain SRS (Multiple Mets)</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">10:30 - 11:30</div>
-                                <div class="patient-info"><h3>Christopher Taylor</h3><div class="patient-details"><span>Pancreas SBRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card gap-slot">11:30 - 13:00 | Lunch Break / Physics Support</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">13:00 - 14:00</div>
-                                <div class="patient-info"><h3>Daniel Hernandez</h3><div class="patient-details"><span>Prostate SBRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">14:00 - 15:15</div>
-                                <div class="patient-info"><h3>Melissa White</h3><div class="patient-details"><span>Liver SBRT (Breath Hold)</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card gap-slot">15:15 - 17:00 | Physics QA / Service</li>
-                        </ul>
+                         <ul class="schedule-list" id="linac2-list"></ul>
                     </div>
                 </div>
 
                 <div class="room-column">
                     <h2 class="room-title"><i class="fa-solid fa-circle-stop text-muted"></i> LINAC 3 (Halcyon)</h2>
                     <div class="schedule-list-container">
-                         <ul class="schedule-list">
-                             <li class="schedule-card gap-slot">08:00 - 08:30 | Morning Warmup</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">08:30 - 09:00</div>
-                                <div class="patient-info"><h3>Jane Smith</h3><div class="patient-details"><span>Urgent SVCS (AP/PA)</span></div></div>
-                                <div class="card-actions">
-                                    <span class="status-badge">Scheduled</span>
-                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
-                                    <a href="patient_v2.html?file=Jane_Smith_SVCS.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                                </div>
-                            </li>
-                            <li class="schedule-card" draggable="true">
-                                <div class="time-slot">09:00 - 09:30</div>
-                                <div class="patient-info"><h3>James Wilson</h3><div class="patient-details"><span>Prostate VMAT</span></div></div>
-                                <div class="card-actions">
-                                    <span class="status-badge">Scheduled</span>
-                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
-                                    <a href="patient_v2.html?file=James_Wilson_PelvisProstate.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                                </div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">09:30 - 10:00</div>
-                                <div class="patient-info"><h3>George Harris</h3><div class="patient-details"><span>L3 Spine (Palliative)</span></div></div>
-                                <div class="card-actions">
-                                    <span class="status-badge">Scheduled</span>
-                                    <button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button>
-                                    <a href="patient_v2.html?file=George_Harris_SkeletalSpine.json" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
-                                </div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">10:00 - 10:30</div>
-                                <div class="patient-info"><h3>Barbara Garcia</h3><div class="patient-details"><span>Whole Breast (Tangents)</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card gap-slot">10:30 - 12:00 | Mid-day Break / Therapist Meeting</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">12:00 - 12:30</div>
-                                <div class="patient-info"><h3>Richard Davis</h3><div class="patient-details"><span>Prostate Bed VMAT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">12:30 - 13:00</div>
-                                <div class="patient-info"><h3>Susan Clark</h3><div class="patient-details"><span>Chest Wall + Nodes</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">13:00 - 13:30</div>
-                                <div class="patient-info"><h3>Joseph Hall</h3><div class="patient-details"><span>Lung IMRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                             <li class="schedule-card gap-slot">13:30 - 14:30 | Machine Break</li>
-                             <li class="schedule-card" draggable="true">
-                                <div class="time-slot">14:30 - 15:00</div>
-                                <div class="patient-info"><h3>Margaret Allen</h3><div class="patient-details"><span>Rectum 3D-CRT</span></div></div>
-                                <div class="card-actions"><span class="status-badge">Scheduled</span><button class="btn-action btn-mark-ready"><i class="fa-solid fa-check"></i></button><a href="#" class="btn-action btn-open-chart hidden"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></div>
-                            </li>
-                            <li class="schedule-card gap-slot">15:00 - 17:00 | End of Day QA</li>
-                        </ul>
+                         <ul class="schedule-list" id="linac3-list"></ul>
                     </div>
                 </div>
 
@@ -233,78 +73,166 @@
     </div>
 
     <script>
-        // 1. Set current date
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
+        // ============================================
+        // 1. MASTER DATA STRUCTURE (The "Brain")
+        // ============================================
+        // This array holds the state of the schedule. In the future, 
+        // clicking a calendar date will load different data into here.
+        let scheduleData = [
+            // --- LINAC 1 Data ---
+            { id: 'l1-1', roomId: 'linac1', type: 'appt', time: '08:00 - 08:30', ptName: 'Alice Brown', ptDetails: 'Rt Proximal Femur (3D-CRT)', status: 'Scheduled', chartLink: 'Alice_Brown_SkeletalExtremity.json' },
+            { id: 'l1-2', roomId: 'linac1', type: 'appt', time: '08:30 - 08:45', ptName: 'Linda Jones', ptDetails: 'Thorax IMRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-3', roomId: 'linac1', type: 'appt', time: '08:45 - 09:15', ptName: 'Michael Chen', ptDetails: 'Head & Neck VMAT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-g1', roomId: 'linac1', type: 'gap', text: '09:15 - 09:30 | Morning QA Check' },
+            { id: 'l1-4', roomId: 'linac1', type: 'appt', time: '09:30 - 10:00', ptName: 'Sarah Davis', ptDetails: 'Breast 3D-CRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-5', roomId: 'linac1', type: 'appt', time: '10:00 - 10:30', ptName: 'William Thompson', ptDetails: 'Rectum VMAT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-6', roomId: 'linac1', type: 'appt', time: '10:30 - 11:15', ptName: 'Emily Wilson', ptDetails: 'Cervix VMAT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-g2', roomId: 'linac1', type: 'gap', text: '11:15 - 12:30 | Lunch Break / Physics QA' },
+            { id: 'l1-7', roomId: 'linac1', type: 'appt', time: '12:30 - 13:00', ptName: 'David Anderson', ptDetails: 'Esophagus IMRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-8', roomId: 'linac1', type: 'appt', time: '13:00 - 13:30', ptName: 'Amanda Thomas', ptDetails: 'Sarcoma IMRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-9', roomId: 'linac1', type: 'appt', time: '13:30 - 14:00', ptName: 'Patrick Moore', ptDetails: 'Bladder VMAT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-10', roomId: 'linac1', type: 'appt', time: '14:00 - 14:45', ptName: 'Jennifer Jackson', ptDetails: 'Spine SBRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-g3', roomId: 'linac1', type: 'gap', text: '14:45 - 15:15 | Machine Break' },
+            { id: 'l1-11', roomId: 'linac1', type: 'appt', time: '15:15 - 15:45', ptName: 'Brian Martin', ptDetails: 'Lymphoma IS', status: 'Scheduled', chartLink: '#' },
+            { id: 'l1-12', roomId: 'linac1', type: 'appt', time: '15:45 - 16:30', ptName: 'Elizabeth Lee', ptDetails: 'Whole Brain (Hippocampal Avoidance)', status: 'Scheduled', chartLink: '#' },
 
+            // --- LINAC 2 Data ---
+            { id: 'l2-1', roomId: 'linac2', type: 'appt', time: '08:00 - 09:00', ptName: 'Robert Miller', ptDetails: 'Lung SBRT (RUL)', status: 'Scheduled', chartLink: 'Robert_Miller_ThoraxSBRT.json' },
+            { id: 'l2-g1', roomId: 'linac2', type: 'gap', text: '09:00 - 09:30 | Room Cleaning / Setup' },
+            { id: 'l2-2', roomId: 'linac2', type: 'appt', time: '09:30 - 10:30', ptName: 'Jessica Martinez', ptDetails: 'Brain SRS (Multiple Mets)', status: 'Scheduled', chartLink: '#' },
+            { id: 'l2-3', roomId: 'linac2', type: 'appt', time: '10:30 - 11:30', ptName: 'Christopher Taylor', ptDetails: 'Pancreas SBRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l2-g2', roomId: 'linac2', type: 'gap', text: '11:30 - 13:00 | Lunch Break / Physics Support' },
+            { id: 'l2-4', roomId: 'linac2', type: 'appt', time: '13:00 - 14:00', ptName: 'Daniel Hernandez', ptDetails: 'Prostate SBRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l2-5', roomId: 'linac2', type: 'appt', time: '14:00 - 15:15', ptName: 'Melissa White', ptDetails: 'Liver SBRT (Breath Hold)', status: 'Scheduled', chartLink: '#' },
+            { id: 'l2-g3', roomId: 'linac2', type: 'gap', text: '15:15 - 17:00 | Physics QA / Service' },
+
+            // --- LINAC 3 Data ---
+            { id: 'l3-g1', roomId: 'linac3', type: 'gap', text: '08:00 - 08:30 | Morning Warmup' },
+            { id: 'l3-1', roomId: 'linac3', type: 'appt', time: '08:30 - 09:00', ptName: 'Jane Smith', ptDetails: 'Urgent SVCS (AP/PA)', status: 'Scheduled', chartLink: 'Jane_Smith_SVCS.json' },
+            { id: 'l3-2', roomId: 'linac3', type: 'appt', time: '09:00 - 09:30', ptName: 'James Wilson', ptDetails: 'Prostate VMAT', status: 'Scheduled', chartLink: 'James_Wilson_PelvisProstate.json' },
+            { id: 'l3-3', roomId: 'linac3', type: 'appt', time: '09:30 - 10:00', ptName: 'George Harris', ptDetails: 'L3 Spine (Palliative)', status: 'Scheduled', chartLink: 'George_Harris_SkeletalSpine.json' },
+            { id: 'l3-4', roomId: 'linac3', type: 'appt', time: '10:00 - 10:30', ptName: 'Barbara Garcia', ptDetails: 'Whole Breast (Tangents)', status: 'Scheduled', chartLink: '#' },
+            { id: 'l3-g2', roomId: 'linac3', type: 'gap', text: '10:30 - 12:00 | Mid-day Break / Therapist Meeting' },
+            { id: 'l3-5', roomId: 'linac3', type: 'appt', time: '12:00 - 12:30', ptName: 'Richard Davis', ptDetails: 'Prostate Bed VMAT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l3-6', roomId: 'linac3', type: 'appt', time: '12:30 - 13:00', ptName: 'Susan Clark', ptDetails: 'Chest Wall + Nodes', status: 'Scheduled', chartLink: '#' },
+            { id: 'l3-7', roomId: 'linac3', type: 'appt', time: '13:00 - 13:30', ptName: 'Joseph Hall', ptDetails: 'Lung IMRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l3-g3', roomId: 'linac3', type: 'gap', text: '13:30 - 14:30 | Machine Break' },
+            { id: 'l3-8', roomId: 'linac3', type: 'appt', time: '14:30 - 15:00', ptName: 'Margaret Allen', ptDetails: 'Rectum 3D-CRT', status: 'Scheduled', chartLink: '#' },
+            { id: 'l3-g4', roomId: 'linac3', type: 'gap', text: '15:00 - 17:00 | End of Day QA' },
+        ];
+
+
+        // ============================================
+        // 2. RENDERING ENGINE (The "View Builder")
+        // ============================================
+        function renderSchedule() {
+            // Clear current lists
+            document.getElementById('linac1-list').innerHTML = '';
+            document.getElementById('linac2-list').innerHTML = '';
+            document.getElementById('linac3-list').innerHTML = '';
+
+            // Loop through data and generate HTML
+            scheduleData.forEach(item => {
+                const listContainer = document.getElementById(`${item.roomId}-list`);
+                let html = '';
+
+                if (item.type === 'gap') {
+                    html = `<li class="schedule-card gap-slot" data-id="${item.id}">${item.text}</li>`;
+                } 
+                else if (item.type === 'appt') {
+                    const isReady = item.status === 'Ready';
+                    const activeClass = isReady ? 'active' : '';
+                    // Determine which buttons to show based on status
+                    const readyBtnClass = isReady ? 'hidden' : '';
+                    const openBtnClass = isReady ? '' : 'hidden';
+                    // Build the actual link if available, else #
+                    const linkHref = item.chartLink && item.chartLink !== '#' ? `patient_v2.html?file=${item.chartLink}` : '#';
+
+                    html = `
+                        <li class="schedule-card ${activeClass}" draggable="true" data-id="${item.id}" data-status="${item.status}">
+                            <div class="time-slot">${item.time}</div>
+                            <div class="patient-info">
+                                <h3>${item.ptName}</h3>
+                                <div class="patient-details"><span>${item.ptDetails}</span></div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="status-badge">${item.status}</span>
+                                <button class="btn-action btn-mark-ready ${readyBtnClass}" title="Mark Ready"><i class="fa-solid fa-check"></i></button>
+                                <a href="${linkHref}" class="btn-action btn-open-chart ${openBtnClass}" title="Open Chart"><i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                            </div>
+                        </li>
+                    `;
+                }
+                // Insert the generated HTML into the correct list
+                listContainer.insertAdjacentHTML('beforeend', html);
+            });
+
+            // Re-initialize Drag and Drop listeners after rendering new HTML
+            initializeDragAndDrop();
+        }
+
+
+        // ============================================
+        // 3. INITIALIZATION & EVENT HANDLERS
+        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
-            // 2. Handle "Mark Ready" functionality
-            // Use event delegation for better performance and handling moved elements
+            // Set date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
+
+            // Initial Render
+            renderSchedule();
+
+            // Handle "Mark Ready" clicks (Event Delegation)
             document.querySelectorAll('.schedule-list').forEach(list => {
                 list.addEventListener('click', function(e) {
-                    // Check if the clicked element or its parent is a .btn-mark-ready
                     const markReadyBtn = e.target.closest('.btn-mark-ready');
                     if (markReadyBtn) {
                         const card = markReadyBtn.closest('.schedule-card');
-                        // Update status badge
-                        const badge = card.querySelector('.status-badge');
-                        badge.textContent = 'Ready';
-                        // Add active styling
-                        card.classList.add('active');
-                        // Toggle buttons
-                        markReadyBtn.classList.add('hidden');
-                        const openBtn = card.querySelector('.btn-open-chart');
-                        openBtn.classList.remove('hidden');
+                        const cardId = card.getAttribute('data-id');
+
+                        // Update the master data structure
+                        const dataItem = scheduleData.find(item => item.id === cardId);
+                        if (dataItem) {
+                            dataItem.status = 'Ready';
+                            // Re-render to reflect changes based on data
+                            renderSchedule();
+                        }
                     }
                 });
             });
+        });
 
-
-            // 3. Drag and Drop Functionality
+        // --- Helper: Drag and Drop Initialization ---
+        function initializeDragAndDrop() {
             const draggables = document.querySelectorAll('.schedule-card[draggable="true"]');
             const containers = document.querySelectorAll('.schedule-list');
 
-            // Drag Source Events
             draggables.forEach(draggable => {
-                draggable.addEventListener('dragstart', () => {
-                    draggable.classList.add('dragging');
-                });
-                draggable.addEventListener('dragend', () => {
-                    draggable.classList.remove('dragging');
-                });
+                draggable.addEventListener('dragstart', () => { draggable.classList.add('dragging'); });
+                draggable.addEventListener('dragend', () => { draggable.classList.remove('dragging'); });
             });
 
-            // Drop Target Events
             containers.forEach(container => {
                 container.addEventListener('dragover', e => {
-                    e.preventDefault(); // Allow dropping
+                    e.preventDefault();
                     const afterElement = getDragAfterElement(container, e.clientY);
                     const draggable = document.querySelector('.dragging');
-                    if (afterElement == null) {
-                        container.appendChild(draggable);
-                    } else {
-                        container.insertBefore(draggable, afterElement);
-                    }
+                    if (afterElement == null) { container.appendChild(draggable); } 
+                    else { container.insertBefore(draggable, afterElement); }
                 });
             });
+        }
 
-            // Helper: Find insertion point based on mouse Y position
-            function getDragAfterElement(container, y) {
-                // Consider all cards (including gap slots) as potential anchor points
-                const draggableElements = [...container.querySelectorAll('.schedule-card:not(.dragging)')];
-
-                return draggableElements.reduce((closest, child) => {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2; // Distance from center center
-                    // We want the element whose center is just below the mouse cursor (negative offset closes to 0)
-                    if (offset < 0 && offset > closest.offset) {
-                        return { offset: offset, element: child };
-                    } else {
-                        return closest;
-                    }
-                }, { offset: Number.NEGATIVE_INFINITY }).element;
-            }
-        });
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.schedule-card:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } 
+                else { return closest; }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
     </script>
 </body>
 </html>
