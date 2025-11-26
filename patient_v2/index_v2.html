@@ -3,33 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINAC Daily Treatment Schedule</title>
-    <link rel="stylesheet" href="style_v2.css">
+    <title>Schedule - OncoCare Radiotherapy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style_v2 (1).css">
 </head>
 <body>
-    <div class="header-container">
-        <header>
-            <h1>Linear Accelerator Daily Treatment Schedule</h1>
-        </header>
-    </div>
-    <div class="schedule-container">
-        <div class="schedule-table">
-            <div class="table-header">
-                <div class="header-item">Appointment Time</div>
-                <div class="header-item">Patient Name</div>
-                <div class="header-item">Diagnosis</div>
-                <div class="header-item">Radiation Oncologist</div>
-                <div class="header-item">Treatment Site</div>
-                <div class="header-item">Status</div>
-            </div>
-            <div class="table-body" id="schedule-body">
-                <div class="table-row">
-                    <div class="row-item" colspan="6" style="text-align: center;">Loading patient data...</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <script src="script_v2.js"></script>
+    <header class="navbar">
+        <div class="brand-logo">
+            <i class="fa-solid fa-radiation logo-icon"></i>
+            <span>OncoCare Radiotherapy Center</span>
+        </div>
+        <div class="date-display" id="current-date">
+            <i class="fa-regular fa-calendar-days"></i>
+            Monday, November 25, 2024
+        </div>
+    </header>
+
+    <main class="schedule-container">
+        <h1 class="page-title">Today's Treatment Schedule</h1>
+
+        <ul class="schedule-list" id="schedule-list">
+            <li class="schedule-card active">
+                <div class="time-slot">
+                    <span class="time">08:00 AM - 08:30 AM</span>
+                    <span class="duration"><i class="fa-regular fa-clock"></i> 30 min</span>
+                </div>
+                <div class="patient-info">
+                    <h3>Alice Brown</h3>
+                    <div class="patient-details">
+                        <span><i class="fa-solid fa-id-card"></i> ID: ABM22334</span>
+                        <span><i class="fa-solid fa-notes-medical"></i> Site: Right Proximal Femur</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <span class="status-badge">Ready</span>
+                    <a href="patient_v2.html?file=Alice_Brown_SkeletalExtremity.json" class="btn-open">
+                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </a>
+                </div>
+            </li>
+
+            <li class="schedule-card">
+                <div class="time-slot">
+                    <span class="time">08:45 AM - 09:45 AM</span>
+                    <span class="duration"><i class="fa-regular fa-clock"></i> 60 min</span>
+                </div>
+                <div class="patient-info">
+                    <h3>Robert Miller</h3>
+                    <div class="patient-details">
+                        <span><i class="fa-solid fa-id-card"></i> ID: RM99112</span>
+                        <span><i class="fa-solid fa-notes-medical"></i> Site: Lung (RUL) SBRT</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <span class="status-badge">Scheduled</span>
+                    <a href="patient_v2.html?file=Robert_Miller_ThoraxSBRT.json" class="btn-open">
+                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </a>
+                </div>
+            </li>
+
+            <li class="schedule-card">
+                <div class="time-slot">
+                    <span class="time">10:00 AM - 10:45 AM</span>
+                    <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
+                </div>
+                <div class="patient-info">
+                    <h3>James Wilson</h3>
+                    <div class="patient-details">
+                        <span><i class="fa-solid fa-id-card"></i> ID: JW55667</span>
+                        <span><i class="fa-solid fa-notes-medical"></i> Site: Prostate VMAT</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <span class="status-badge">Scheduled</span>
+                    <a href="patient_v2.html?file=James_Wilson_PelvisProstate.json" class="btn-open">
+                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </a>
+                </div>
+            </li>
+             <li class="schedule-card">
+                <div class="time-slot">
+                    <span class="time">11:00 AM - 11:45 AM</span>
+                    <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
+                </div>
+                <div class="patient-info">
+                    <h3>George Harris</h3>
+                    <div class="patient-details">
+                        <span><i class="fa-solid fa-id-card"></i> ID: GH88991</span>
+                        <span><i class="fa-solid fa-notes-medical"></i> Site: L3 Spine</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <span class="status-badge">Scheduled</span>
+                    <a href="patient_v2.html?file=George_Harris_SkeletalSpine.json" class="btn-open">
+                        Open Chart <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </main>
+
+    <script>
+        // Simple script to set current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerHTML = '<i class="fa-regular fa-calendar-days"></i> ' + new Date().toLocaleDateString('en-US', options);
+    </script>
 </body>
 </html>
