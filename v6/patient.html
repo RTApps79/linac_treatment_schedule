@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="console.css">
+    <link rel="stylesheet" href="study_embed.css">
+</head>
+<body class="patient-page">
+    <div class="header-container">
+        <header>
+            <a href="index.html" class="back-link">&larr; Back to Schedule</a>
+            <h1 id="patient-name-header">Loading Patient...</h1>
+        </header>
+    </div>
+    
+    <div class="tabs-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="summary">Summary</button>
+            <button class="tab-button" data-tab="delivery">Treatment Delivery</button>
+            <button class="tab-button" data-tab="billing">Billing (CPT)</button>
+            <button class="tab-button" data-tab="plan">Treatment Plan</button>
+            <button class="tab-button" data-tab="imaging">Imaging</button>
+            <button class="tab-button" data-tab="records">Treatment Records</button>
+            <button class="tab-button" data-tab="demographics">Demographics</button>
+        </div>
+
+        <div class="tab-content">
+            <div id="summary" class="tab-pane active">
+                </div>
+
+            <div id="delivery" class="tab-pane">
+                </div>
+
+            <div id="billing" class="tab-pane">
+                </div>
+
+            <div id="imaging" class="tab-pane">
+    <div class="imaging-container">
+        <div class="imaging-views">
+            <div class="image-viewer">
+                <img alt="DRR Image" class="base-image" id="drr-image">
+                <img alt="Overlay Image" class="overlay-image" id="kv-image-overlay">
+            </div>
+        </div>
+        <div class="imaging-controls">
+            <h3>Alignment Tools</h3>
+            <div class="control-group">
+                <label>Opacity/Fusion</label>
+                <input type="range" min="0" max="100" value="50" class="control-slider" id="opacity-slider">
+            </div>
+            <div class="control-group">
+                <label>Couch Translation (cm)</label>
+                <div class="couch-controls">
+                    <span>VRT</span>
+                    <button class="control-btn" data-axis="y" data-dir="-1">&uarr;</button>
+                    <input type="text" class="axis-input" id="y-axis" value="0.0" readonly>
+                    <button class="control-btn" data-axis="y" data-dir="1">&darr;</button>
+                </div>
+                <div class="couch-controls">
+                    <span>LAT</span>
+                    <button class="control-btn" data-axis="x" data-dir="-1">&larr;</button>
+                    <input type="text" class="axis-input" id="x-axis" value="0.0" readonly>
+                    <button class="control-btn" data-axis="x" data-dir="1">&rarr;</button>
+                </div>
+                <div class="couch-controls">
+                    <span>LNG</span>
+                    <button class="control-btn" data-axis="z" data-dir="-1">&uarr;</button>
+                    <input type="text" class="axis-input" id="z-axis" value="0.0" readonly>
+                    <button class="control-btn" data-axis="z" data-dir="1">&darr;</button>
+                </div>
+            </div>
+             <div class="control-group">
+                <label>Couch Rotation (°)</label>
+                 <div class="couch-controls">
+                    <span>PITCH</span>
+                    <button class="control-btn" data-axis="pitch" data-dir="-1">&#8635;</button>
+                    <input type="text" class="axis-input" id="pitch-axis" value="0.0" readonly>
+                    <button class="control-btn" data-axis="pitch" data-dir="1">&#8634;</button>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="control-btn-action" id="reset-shifts">Reset</button>
+                <button class="control-btn-action" id="apply-shifts">Apply Shifts</button>
+            </div>
+            <div id="shift-confirmation" class="confirmation-message"></div>
+        </div>
+    </div>
+</div>
+
+            <div id="plan" class="tab-pane"></div>
+            <div id="records" class="tab-pane"></div>
+            <div id="demographics" class="tab-pane"></div>
+        </div>
+    </div>
+
+    <script src="study_capture.js"></script>
+    <script src="study_embed.js"></script>
+    <script src="patient.js"></script>
+</body>
+</html>
