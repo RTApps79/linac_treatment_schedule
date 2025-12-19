@@ -27,9 +27,9 @@
         "gantryAngle": 0,
         "collimatorAngle": 0,
         "jawPositions_cm": {
-          "X1": -8.0,
+          "X1": 8.0,
           "X2": 8.0,
-          "Y1": -6.0,
+          "Y1": 6.0,
           "Y2": 6.0
         }
       },
