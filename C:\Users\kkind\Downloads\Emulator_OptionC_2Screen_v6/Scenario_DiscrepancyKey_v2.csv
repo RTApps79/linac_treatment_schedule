@@ -1,7 +1,0 @@
-Set,ScenarioID,ErrorType,Parameter,PaperValue,ComputerValue,WhereVisible
-A,A1,Laterality/Site label mismatch,treatmentPlan.treatmentSite,Left Breast,Right Breast,Left sidebar patient/treatment site label (Plan & Treatment Site Confirmed)
-A,A2,Field ID/Name mismatch,treatmentFields[0].fieldName,VMAT Arc 1 (CW),VMAT Arc 1 (CW) - ALT,Dose Details field list / Beam panel header for selected field
-A,A2,Imaging type mismatch,prescription.imagingType / imaging fieldName,CBCT Setup (CBCT),kV-kV Setup Pair (kV-kV),Dose Details imaging step label and Image Guided Alignment modality screen
-B,B1,Bolus mismatch,prescription.bolus / therapistAlerts,Bolus: 5 mm daily,Bolus: None,Beam panel Bolus row and/or Therapist Alerts panel
-B,B2,Course/Fractionation mismatch,prescription.numberOfFractions (and totalDose),44 fractions (total 7920 cGy),39 fractions (total 7020 cGy),Dose Details 'Fx: x of y' line and prescription on paper chart
-B,B2,MU mismatch,treatmentFields[2].monitorUnits,348 MU,384 MU,Beam panel MU row for Arc 2
