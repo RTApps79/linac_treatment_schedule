@@ -1,0 +1,7 @@
+Set,ScenarioID,ErrorCount,TreatmentSite,Techniques,ImagingType (Paper Correct),Bolus (Paper Correct),PaperChartPDF,PaperJSON,ComputerJSON,EmbeddedErrorTypes
+A,A0,0,Femur (Palliation),"Imaging, STATIC",kV-kV,None,A0_PaperChart.pdf,A0_paper_correct.json,A0_computer_withErrors.json,None
+A,A1,1,Left Breast,"3DCRT, Imaging",kV-kV,None,A1_PaperChart.pdf,A1_paper_correct.json,A1_computer_withErrors.json,Laterality/Site label mismatch
+A,A2,2,Pelvis/Prostate,"Imaging, VMAT",CBCT,None,A2_PaperChart.pdf,A2_paper_correct.json,A2_computer_withErrors.json,Field ID/Name mismatch; Imaging type mismatch
+B,B0,0,Skeletal Spine,"Imaging, STATIC",kV-kV,None,B0_PaperChart.pdf,B0_paper_correct.json,B0_computer_withErrors.json,None
+B,B1,1,Left Breast,"3DCRT, Imaging",kV-kV,5 mm,B1_PaperChart.pdf,B1_paper_correct.json,B1_computer_withErrors.json,Bolus mismatch
+B,B2,2,Pelvis/Prostate,"Imaging, VMAT",CBCT,None,B2_PaperChart.pdf,B2_paper_correct.json,B2_computer_withErrors.json,Course/Fractionation mismatch; MU mismatch
