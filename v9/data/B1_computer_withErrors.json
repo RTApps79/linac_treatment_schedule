@@ -1,0 +1,75 @@
+{
+  "patientId": "BRST1002",
+  "demographics": {
+    "name": "Linda Carter",
+    "dob": "1968-02-19"
+  },
+  "treatmentPlan": {
+    "radOnc": "Dr. Anita Patel",
+    "treatmentSite": "Left Breast",
+    "prescription": {
+      "dosePerFraction_cGy": 200,
+      "numberOfFractions": 25,
+      "totalDose_cGy": 5000,
+      "planId": "BRST_L_Bolus_01",
+      "bolus": "None",
+      "imagingType": "kV-kV"
+    },
+    "therapistAlerts": [
+      "Bolus: None."
+    ],
+    "treatmentFields": [
+      {
+        "fieldName": "Tangent Medial",
+        "technique": "3DCRT",
+        "energy_MV": 6,
+        "monitorUnits": 210,
+        "gantryAngle": 300,
+        "collimatorAngle": 0,
+        "jawPositions_cm": {
+          "X1": -6.0,
+          "X2": 6.0,
+          "Y1": -7.0,
+          "Y2": 7.0
+        }
+      },
+      {
+        "fieldName": "kV-kV Setup Pair",
+        "technique": "Imaging",
+        "energy_MV": 0,
+        "monitorUnits": 0,
+        "gantryAngle": 0,
+        "collimatorAngle": 0,
+        "jawPositions_cm": {
+          "X1": 0.0,
+          "X2": 0.0,
+          "Y1": 0.0,
+          "Y2": 0.0
+        },
+        "imagingModality": "kV-kV"
+      },
+      {
+        "fieldName": "Tangent Lateral",
+        "technique": "3DCRT",
+        "energy_MV": 6,
+        "monitorUnits": 205,
+        "gantryAngle": 120,
+        "collimatorAngle": 0,
+        "jawPositions_cm": {
+          "X1": -6.0,
+          "X2": 6.0,
+          "Y1": -7.0,
+          "Y2": 7.0
+        }
+      }
+    ]
+  },
+  "treatmentDelivery": {
+    "totalFractionsDelivered": 0,
+    "lastTreatmentDate": "2025-12-17"
+  },
+  "imagingData": {
+    "drrImage": "drr_breast.png",
+    "kvImage": "kv_breast.png"
+  }
+}
