@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LINAC Treatment Console</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="console.css" />
+  <link rel="stylesheet" href="study_embed.css" />
+</head>
+<body class="console-body">
+
+  <header class="console-topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">Treatment</div>
+      <div class="topbar-subtitle">Record and Verify mode</div>
+    </div>
+
+    <div class="topbar-middle">
+      <div class="topbar-row"><span class="topbar-label">Primary User:</span> <span id="primary-user">—</span></div>
+      <div class="topbar-row" id="console-datetime">—</div>
+    </div>
+
+    <div class="topbar-orientation">
+      <div class="topbar-label">PATIENT ORIENTATION</div>
+      <div id="patient-orientation">Head First, Supine</div>
+    </div>
+
+    <div class="topbar-actions">
+      <a id="btn-back-schedule" class="topbar-btn secondary" href="index.html" title="Return to schedule">Back to Schedule</a>
+      <button id="btn-open-imaging" class="topbar-btn">Open Imaging Screen</button>
+    </div>
+  </header>
+
+  <main class="console-layout">
+    <!-- Left sidebar: patient details + dose/field list -->
+    <aside class="sidebar">
+      <section class="patient-card">
+        <div class="patient-line"><span class="lbl">Name:</span> <span id="pt-name">—</span></div>
+        <div class="patient-line"><span class="lbl">ID:</span> <span id="pt-id">—</span></div>
+        <div class="patient-line"><span class="lbl">DOB:</span> <span id="pt-dob">—</span></div>
+        <div class="patient-line"><span class="lbl">Rad. Onc.:</span> <span id="pt-radonc">—</span></div>
+      </section>
+
+      <section class="dose-card">
+        <div class="dose-header">
+          <div class="dose-plan" id="plan-id">—</div>
+          <div class="dose-fraction" id="fraction-info">—</div>
+        </div>
+        <div class="dose-list-title">Treatment Port</div>
+        <ul id="field-list" class="field-list"></ul>
+      </section>
+    </aside>
+
+    <!-- Center console -->
+    <section class="console-main">
+      <div class="center-stage">
+        <div class="center-panel">
+          <div class="mlc-container">
+            <canvas id="mlc-canvas" width="760" height="360" aria-label="MLC View"></canvas>
+            <div id="center-message" class="center-message">To begin, click Prepare.</div>
+          </div>
+        </div>
+
+        <div class="workflow-bar" role="toolbar" aria-label="Workflow">
+          <button id="btn-preview" class="wf-btn active" data-stage="preview">Preview</button>
+          <button id="btn-prepare" class="wf-btn" data-stage="prepare">Prepare</button>
+          <button id="btn-ready" class="wf-btn" data-stage="ready" disabled>Ready</button>
+          <button id="btn-beam-on" class="wf-btn beam" data-stage="beamOn" disabled>Beam On</button>
+          <button id="btn-record" class="wf-btn record" data-stage="record" disabled>Record</button>
+        </div>
+
+        <div class="bottom-panels">
+          <div class="panel">
+            <div class="panel-header">Beam</div>
+            <table class="kv-table" id="beam-table">
+              <thead>
+                <tr><th></th><th>Plan</th><th>Actual</th></tr>
+              </thead>
+              <tbody id="beam-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">Geometry</div>
+            <table class="kv-table" id="geom-table">
+              <thead>
+                <tr><th></th><th>Plan</th><th>Actual</th></tr>
+              </thead>
+              <tbody id="geom-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="panel bev">
+            <div class="panel-header">Beam's Eye View</div>
+            <div class="bev-wrap">
+              <canvas id="bev-canvas" width="240" height="240" aria-label="Beam's eye view"></canvas>
+              <div class="bev-caption" id="bev-caption">MLC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button id="btn-study-log" class="footer-pill">Study Log</button>
+        <button id="btn-export" class="footer-pill">Export CSV</button>
+        <button id="btn-clear" class="footer-pill danger">Clear Participant</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-root"></div>
+
+  <script src="study_config.js"></script>
+<script src="study_capture.js"></script>
+  <script src="study_embed.js"></script>
+  <script src="patient.js"></script>
+</body>
+</html>

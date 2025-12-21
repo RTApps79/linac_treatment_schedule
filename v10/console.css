@@ -1,0 +1,403 @@
+/* Console UI (ARIA-like) - generic styling */
+
+.console-body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0b2c4d;
+  color: #e9f0f7;
+}
+
+.console-topbar {
+  display: grid;
+  grid-template-columns: 260px 1fr 240px 220px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(#103b66, #0b2c4d);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.topbar-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.topbar-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+.topbar-row {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.topbar-label {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.topbar-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.topbar-btn {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.topbar-btn:hover {
+  background: rgba(255,255,255,0.16);
+}
+
+.console-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  height: calc(100vh - 70px);
+}
+
+.sidebar {
+  background: #0a2743;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 14px 12px;
+  overflow: auto;
+}
+
+.patient-card {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.patient-line {
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+.patient-line .lbl {
+  display: inline-block;
+  width: 90px;
+  opacity: 0.9;
+}
+
+.dose-card {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.dose-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.dose-plan {
+  font-weight: 800;
+}
+
+.dose-fraction {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.dose-list-title {
+  padding: 8px 12px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.field-list {
+  list-style: none;
+  padding: 0 8px 10px;
+  margin: 0;
+}
+
+.field-item {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  margin: 6px 4px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+}
+
+.field-item.active {
+  outline: 2px solid rgba(255, 230, 0, 0.75);
+  background: rgba(255, 230, 0, 0.10);
+}
+
+.field-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.22);
+}
+
+.field-icon.done {
+  background: #21c55d;
+}
+
+.field-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.field-progress {
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+.console-main {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  overflow: hidden;
+}
+
+.center-stage {
+  padding: 14px 14px 10px;
+  overflow: auto;
+}
+
+.mlc-container {
+  position: relative;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 10px;
+  height: 390px;
+}
+
+#mlc-canvas {
+  width: 100%;
+  height: 360px;
+  display: block;
+  background: #101418;
+  border-radius: 8px;
+}
+
+.center-message {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.65);
+  pointer-events: none;
+}
+
+.workflow-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin: 10px 0;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.wf-btn {
+  background: transparent;
+  border: 0;
+  color: rgba(255,255,255,0.80);
+  padding: 12px 10px;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.wf-btn:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.wf-btn.active {
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+}
+
+.wf-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.wf-btn.beam {
+  color: #ffe600;
+}
+
+.wf-btn.record {
+  color: #7cf0ff;
+}
+
+.bottom-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 320px;
+  gap: 12px;
+}
+
+.panel {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.panel-header {
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.kv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.kv-table th,
+.kv-table td {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 6px 6px;
+}
+
+.kv-table thead th {
+  border-top: 0;
+  opacity: 0.85;
+  text-align: left;
+  font-size: 12px;
+}
+
+.bev-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+#bev-canvas {
+  background: #0b0f14;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.bev-caption {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.footer-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: #0a2743;
+}
+
+.footer-pill {
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.footer-pill:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+.footer-pill.danger {
+  background: rgba(255, 64, 64, 0.12);
+  border-color: rgba(255, 64, 64, 0.35);
+}
+
+/* Checklist modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+}
+
+.modal {
+  width: min(620px, 92vw);
+  background: #112c47;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+  padding: 16px;
+}
+
+.modal h2 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.modal .checklist {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.modal label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal button {
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modal button.primary {
+  background: rgba(0, 170, 120, 0.22);
+  border-color: rgba(0, 170, 120, 0.50);
+}
+
+.modal button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
