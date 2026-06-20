@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RT-Sim · Oncology Information System (Training Emulator)</title>
+<style>
+  :root{
+    /* clinical chrome */
+    --chrome:#16202e; --chrome-2:#1d2b3d; --chrome-line:#2b3c52;
+    /* work surfaces */
+    --surface:#eef1f5; --panel:#ffffff; --panel-2:#f6f8fb; --line:#d3dae3;
+    /* dark console (imaging/delivery) */
+    --console:#0b1119; --console-2:#121c28; --console-line:#22303f;
+    /* ink */
+    --ink:#16202e; --ink-2:#52617a; --ink-on-dark:#dbe5f1; --ink-on-dark-2:#8194ad;
+    /* clinical status */
+    --ok:#2e9e5b; --ok-bg:#e6f5ec;
+    --warn:#cf8a1a; --warn-bg:#fbf1dd;
+    --stop:#d6453f; --stop-bg:#fbe7e6;
+    --info:#2f6fb0; --info-bg:#e6eef8;
+    --accent:#10a3a3; --accent-deep:#0c7d7d;
+    --mono:ui-monospace,"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+    --ui:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:var(--ui);color:var(--ink);background:var(--surface);
+    font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  }
+  button{font-family:inherit;cursor:pointer}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* ===== Top application bar ===== */
+  .appbar{
+    background:var(--chrome);color:#fff;display:flex;align-items:center;
+    height:46px;padding:0 12px;gap:14px;flex:none;border-bottom:1px solid #000;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;letter-spacing:.2px}
+  .brand .logo{
+    width:24px;height:24px;border-radius:5px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+    display:grid;place-items:center;font-size:13px;font-weight:800;color:#04201f;
+  }
+  .brand small{font-weight:400;color:#8fa4bd;font-size:11px;margin-left:2px}
+  .appbar .sim-tag{
+    font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:#ffd479;
+    border:1px solid #5b4a23;background:#2a2310;padding:2px 7px;border-radius:3px;font-weight:600;
+  }
+  .appbar .spacer{flex:1}
+  .appbar .who{display:flex;align-items:center;gap:8px;color:#b9c7da;font-size:12px}
+  .appbar .who .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,158,91,.18)}
+
+  /* ===== Patient safety banner ===== */
+  .patientband{
+    background:var(--chrome-2);color:#fff;flex:none;border-bottom:1px solid var(--chrome-line);
+    display:flex;align-items:stretch;min-height:54px;
+  }
+  .pb-id{display:flex;align-items:center;gap:12px;padding:8px 16px;border-right:1px solid var(--chrome-line)}
+  .pb-photo{width:38px;height:38px;border-radius:5px;background:#33465f;display:grid;place-items:center;font-weight:700;color:#bcd;font-size:15px}
+  .pb-name{font-size:15px;font-weight:700;line-height:1.15}
+  .pb-sub{font-size:11.5px;color:#9fb2cb}
+  .pb-fields{display:flex;flex:1;align-items:center;gap:0;overflow-x:auto}
+  .pb-f{padding:8px 16px;border-right:1px solid var(--chrome-line);min-width:0}
+  .pb-f .k{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7e93ae}
+  .pb-f .v{font-size:13px;font-weight:600;color:#eaf0f7;white-space:nowrap}
+  .pb-alert{display:flex;align-items:center;padding:0 14px;gap:8px}
+  .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:11px;white-space:nowrap}
+  .chip.allergy{background:#4a201f;color:#ffb3ae;border:1px solid #7a3331}
+  .chip.flag{background:#4a3b16;color:#ffd479;border:1px solid #7a6224}
+  .nopatient{display:flex;align-items:center;padding:8px 16px;color:#8194ad;font-style:italic}
+
+  /* ===== Body layout ===== */
+  .body{display:flex;flex:1;min-height:0}
+  .nav{
+    width:78px;background:var(--chrome);flex:none;display:flex;flex-direction:column;
+    padding-top:6px;border-right:1px solid #000;
+  }
+  .nav button{
+    background:none;border:none;color:#8194ad;padding:11px 4px 9px;display:flex;flex-direction:column;
+    align-items:center;gap:5px;font-size:10.5px;border-left:3px solid transparent;transition:.12s;
+  }
+  .nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .nav button:hover{color:#cdd9e8;background:#1a2738}
+  .nav button.active{color:#fff;border-left-color:var(--accent);background:#1a2738}
+  .nav button.active svg{stroke:var(--accent)}
+  .nav .nav-sep{height:1px;background:#243245;margin:6px 12px}
+
+  .main{flex:1;min-width:0;overflow:auto;position:relative}
+
+  /* ===== generic UI bits ===== */
+  .toolbar{
+    background:var(--panel);border-bottom:1px solid var(--line);padding:9px 16px;
+    display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5;flex-wrap:wrap;
+  }
+  .toolbar h2{margin:0;font-size:15px;font-weight:700}
+  .toolbar .sub{color:var(--ink-2);font-size:12px}
+  .btn{
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:5px;
+    font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:.12s;
+  }
+  .btn:hover{background:var(--panel-2);border-color:#b9c4d2}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.primary{background:var(--accent);border-color:var(--accent-deep);color:#04201f}
+  .btn.primary:hover{background:var(--accent-deep);color:#fff}
+  .btn.go{background:var(--ok);border-color:#247d49;color:#fff}
+  .btn.go:hover{background:#247d49}
+  .btn.stop{background:var(--stop);border-color:#b03430;color:#fff}
+  .btn.stop:hover{background:#b03430}
+  .btn.ghost{background:none;border-color:transparent;color:var(--ink-2)}
+  .spacer{flex:1}
+
+  .pad{padding:16px}
+  .grid2{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .card>h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2);
+    padding:9px 13px;border-bottom:1px solid var(--line);background:var(--panel-2);font-weight:700}
+  .card .body-pad{padding:13px}
+
+  table{border-collapse:collapse;width:100%;font-size:12.5px}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-2);
+    padding:7px 10px;border-bottom:2px solid var(--line);background:var(--panel-2);position:sticky;top:0;font-weight:700}
+  td{padding:7px 10px;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .pill.ok{color:var(--ok);background:var(--ok-bg)}
+  .pill.warn{color:var(--warn);background:var(--warn-bg)}
+  .pill.stop{color:var(--stop);background:var(--stop-bg)}
+  .pill.info{color:var(--info);background:var(--info-bg)}
+  .pill.idle{color:var(--ink-2);background:#e9edf2}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px}
+  .kv dt{color:var(--ink-2)}
+  .kv dd{margin:0;font-weight:600;text-align:right;font-family:var(--mono)}
+
+  /* ===== SCHEDULE ===== */
+  .sched-wrap{padding:14px 16px}
+  .sched-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .datepick{font-weight:700;font-size:14px}
+  .sched{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .sched-col-head{background:var(--chrome-2);color:#fff;padding:9px 10px;text-align:center}
+  .sched-col-head .m{font-weight:700;font-size:13px}
+  .sched-col-head .s{font-size:10.5px;color:#9fb2cb}
+  .sched-time{background:var(--panel-2);color:var(--ink-2);font-family:var(--mono);font-size:11px;
+    padding:6px 8px;text-align:right;border-right:1px solid var(--line)}
+  .slot{background:var(--panel);min-height:44px;padding:3px;position:relative}
+  .appt{
+    border-radius:5px;padding:5px 7px;font-size:11.5px;height:100%;cursor:pointer;border-left:3px solid;
+    transition:.1s;display:flex;flex-direction:column;justify-content:center;
+  }
+  .appt:hover{filter:brightness(.97);transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .appt .an{font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appt .ad{font-size:10.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appt.tx{background:#e6f0fa;border-color:#2f6fb0;color:#1c456f}
+  .appt.sim{background:#efe7fb;border-color:#7a52c0;color:#4a2d80}
+  .appt.consult{background:#e6f5ec;border-color:#2e9e5b;color:#1d5e38}
+  .appt.done{opacity:.55;text-decoration:line-through #00000040}
+  .appt.cur{outline:2px solid var(--accent);outline-offset:1px}
+  .legend{display:flex;gap:16px;margin-top:12px;font-size:11.5px;color:var(--ink-2);flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* ===== TREATMENT ===== */
+  .rx-banner{display:flex;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px}
+  .rx-banner .seg{padding:11px 16px;border-right:1px solid var(--line);flex:1}
+  .rx-banner .seg:last-child{border-right:none}
+  .rx-banner .k{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2)}
+  .rx-banner .v{font-size:17px;font-weight:700;font-family:var(--mono);margin-top:2px}
+  .rx-banner .v small{font-size:12px;color:var(--ink-2);font-weight:600}
+  .fx-track{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+  .fx-dot{width:13px;height:13px;border-radius:3px;background:#dce3eb;border:1px solid #c5cedb}
+  .fx-dot.done{background:var(--ok);border-color:#247d49}
+  .fx-dot.today{background:var(--warn);border-color:#a86f14;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(207,138,26,.5)}50%{box-shadow:0 0 0 4px rgba(207,138,26,0)}}
+
+  .field-row td{font-family:var(--mono);font-size:12px}
+  .field-row .fname{font-family:var(--ui);font-weight:600}
+  .field-row.delivering{background:#fff8e8}
+  .field-row.delivered{background:#f1f9f3}
+  .deliver-bar{height:5px;background:#e3e9f0;border-radius:3px;overflow:hidden;margin-top:4px}
+  .deliver-bar>i{display:block;height:100%;background:var(--warn);width:0;transition:width .15s linear}
+
+  .console-strip{
+    background:var(--console);color:var(--ink-on-dark);border-radius:8px;padding:14px 16px;margin-top:14px;
+    display:flex;align-items:center;gap:18px;border:1px solid var(--console-line);
+  }
+  .beam-ind{display:flex;align-items:center;gap:11px}
+  .beam-lamp{width:18px;height:18px;border-radius:50%;background:#33465f;border:2px solid #475a72}
+  .beam-lamp.on{background:var(--ok);border-color:#5fd391;box-shadow:0 0 14px 2px rgba(46,158,91,.7)}
+  .beam-lamp.ready{background:var(--warn);border-color:#f0c069;box-shadow:0 0 12px 1px rgba(207,138,26,.55)}
+  .beam-txt{font-weight:700;font-size:14px;letter-spacing:.3px}
+  .beam-sub{font-size:11px;color:var(--ink-on-dark-2)}
+  .mu-meter{font-family:var(--mono);font-size:22px;font-weight:700;color:#fff}
+  .mu-meter small{font-size:12px;color:var(--ink-on-dark-2)}
+
+  .interlock-banner{
+    display:none;align-items:center;gap:10px;background:var(--stop-bg);border:1px solid #e8b4b1;
+    color:#92211d;border-radius:7px;padding:9px 13px;margin-bottom:12px;font-weight:600;font-size:12.5px;
+  }
+  .interlock-banner.show{display:flex}
+
+  .gate{
+    display:flex;align-items:center;gap:10px;background:var(--warn-bg);border:1px solid #e9cf95;
+    color:#7a5410;border-radius:7px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;font-weight:600;
+  }
+  .gate.ok{background:var(--ok-bg);border-color:#aedcbf;color:#1d5e38}
+
+  /* ===== IMAGING / IGRT ===== */
+  .igrt{display:grid;grid-template-columns:1fr 300px;gap:0;height:100%;background:var(--console)}
+  .imgstage{position:relative;background:#06090e;overflow:hidden;display:flex;flex-direction:column}
+  .imgbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--console-2);border-bottom:1px solid var(--console-line);color:var(--ink-on-dark);flex-wrap:wrap}
+  .seg-ctrl{display:inline-flex;border:1px solid var(--console-line);border-radius:6px;overflow:hidden}
+  .seg-ctrl button{background:#16202e;color:var(--ink-on-dark-2);border:none;padding:5px 11px;font-size:11.5px;font-weight:600;border-right:1px solid var(--console-line)}
+  .seg-ctrl button:last-child{border-right:none}
+  .seg-ctrl button.on{background:var(--accent);color:#04201f}
+  .imgbar .lbl{font-size:11px;color:var(--ink-on-dark-2);text-transform:uppercase;letter-spacing:.5px}
+  .pane-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+    gap:2px;background:var(--console-line);min-height:0;padding:2px}
+  .pane{position:relative;background:#05080c;overflow:hidden;display:grid;place-items:center}
+  .pane-label{position:absolute;top:6px;left:8px;z-index:2;font-size:10.5px;font-weight:700;
+    letter-spacing:.5px;text-transform:uppercase;color:#7fd4d4;text-shadow:0 0 5px #000;pointer-events:none}
+  .pane-label small{display:block;font-weight:500;color:#5f93a3;font-size:9px;letter-spacing:.3px;margin-top:1px}
+  .pane canvas{max-width:100%;max-height:100%;background:#000;cursor:grab;display:block}
+  .pane canvas.dragging{cursor:grabbing}
+  .pane-corner{position:absolute;bottom:6px;right:8px;font-family:var(--mono);font-size:10.5px;
+    color:#9fe0e0;text-shadow:0 0 5px #000;pointer-events:none;text-align:right;line-height:1.4}
+  .pane-3d{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    color:var(--ink-on-dark-2);background:#0a131d}
+  .pane-3d .cap{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px}
+  .pane-3d .big{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1}
+  .pane-hint{position:absolute;bottom:6px;left:8px;font-size:10px;color:#5f93a3;pointer-events:none}
+
+  .igrt-panel{background:var(--console-2);border-left:1px solid var(--console-line);color:var(--ink-on-dark);display:flex;flex-direction:column;overflow:auto}
+  .igrt-panel h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-on-dark-2);
+    padding:11px 14px 7px;font-weight:700}
+  .shift-grid{padding:4px 14px 10px}
+  .shift-row{display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:8px;padding:5px 0}
+  .shift-row label{font-size:12px;color:var(--ink-on-dark)}
+  .shift-row .axis{font-size:10px;color:var(--ink-on-dark-2)}
+  .nudge{display:inline-flex;border:1px solid var(--console-line);border-radius:5px;overflow:hidden}
+  .nudge button{background:#1d2b3d;color:#cfe;border:none;width:24px;height:24px;font-size:14px;font-weight:700}
+  .nudge button:hover{background:var(--accent);color:#04201f}
+  .shift-val{font-family:var(--mono);font-size:14px;font-weight:700;min-width:62px;text-align:right}
+  .shift-val.big{color:var(--stop)}
+  .shift-val.ok{color:#5fd391}
+
+  .residual{margin:6px 14px;padding:10px 12px;background:#0d1722;border:1px solid var(--console-line);border-radius:7px}
+  .residual .rrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;padding:2px 0}
+  .residual .mag{font-weight:700}
+  .tol-ok{color:#5fd391}.tol-warn{color:#f0c069}.tol-bad{color:#ff7a73}
+
+  .igrt-actions{padding:12px 14px;margin-top:auto;border-top:1px solid var(--console-line);display:flex;flex-direction:column;gap:8px}
+  .igrt-actions .btn{justify-content:center}
+  .igrt-actions .btn.primary{background:var(--accent);border-color:var(--accent-deep)}
+
+  .blink{animation:blink 1s steps(2,start) infinite}
+  @keyframes blink{50%{opacity:.35}}
+
+  /* ===== DUAL SCREEN / CONSOLE ===== */
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px;height:100%;min-height:0}
+  .monitor{display:flex;flex-direction:column;background:#0a0e14;border:1px solid #000;border-radius:10px;
+    overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.25),inset 0 0 0 4px #05080c;min-height:0}
+  .mon-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:linear-gradient(#1a2433,#121a26);
+    color:#cdd9e8;font-size:11.5px;font-weight:700;letter-spacing:.4px;border-bottom:1px solid #000}
+  .mon-led{width:9px;height:9px;border-radius:50%;background:#2e9e5b;box-shadow:0 0 7px #2e9e5b}
+  .mon-led.red{background:#d6453f;box-shadow:0 0 7px #d6453f}
+  .mon-led.amber{background:#cf8a1a;box-shadow:0 0 7px #cf8a1a}
+  .mon-tag{margin-left:auto;color:#6f86a3;font-weight:600}
+  .mon-screen{flex:1;overflow:auto;padding:12px;min-height:0}
+  .ois-screen{background:#11161d;color:#dbe5f1}
+  .con-screen{background:radial-gradient(120% 80% at 50% 0,#0e1925,#070b11);color:#dbe5f1;display:flex;flex-direction:column;gap:10px}
+  .qh{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#7e93ae;font-weight:700;margin-bottom:6px}
+
+  .ois-rv-queue{margin-bottom:10px}
+  #oisHead{background:#0c1119;border:1px solid #22303f;border-radius:7px;padding:10px 12px;margin-bottom:10px}
+  #oisHead .nm{font-size:14px;font-weight:700}
+  #oisHead .meta{font-size:11.5px;color:#9fb2cb;margin-top:2px}
+  .qrow{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #1d2a39;border-radius:6px;
+    margin-bottom:5px;font-size:12px;background:#0c1119}
+  .qrow.cur{border-color:var(--accent);background:#0c1f22}
+  .qrow.done{opacity:.6}
+  .qrow .qid{font-family:var(--mono);font-weight:700;min-width:46px}
+  .qrow .qmu{margin-left:auto;font-family:var(--mono);color:#9fb2cb;font-size:11px}
+
+  .con-state{text-align:center;font-weight:800;letter-spacing:1px;font-size:18px;padding:10px;border-radius:8px;
+    border:1px solid #22303f;background:#0c1119;transition:.15s}
+  .con-state.s-parked{color:#8194ad}
+  .con-state.s-moving{color:#0c0a04;background:#cf8a1a;border-color:#a86f14;animation:pulse 1.2s infinite}
+  .con-state.s-ready{color:#04201f;background:#2e9e5b;border-color:#247d49}
+  .con-state.s-beamon{color:#fff;background:#1d8a4f;border-color:#5fd391;box-shadow:0 0 22px rgba(46,158,91,.6);animation:pulse 1s infinite}
+  .con-state.s-interrupt{color:#0c0a04;background:#e0a93a;border-color:#a86f14}
+  .con-state.s-interlock{color:#fff;background:#c23b36;border-color:#92211d}
+  .con-state.s-complete{color:#fff;background:#2f6fb0;border-color:#1c456f}
+  .con-meters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .meter{background:#0a0f16;border:1px solid #22303f;border-radius:7px;padding:8px 6px;text-align:center}
+  .meter .ml{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:#7e93ae}
+  .meter .mv{font-family:var(--mono);font-size:19px;font-weight:700;color:#eaf6ff;margin-top:2px;line-height:1.1}
+  .meter .mv small{font-size:8.5px;color:#7e93ae;display:block;font-weight:600}
+  .con-cols{display:grid;grid-template-columns:1fr 152px;gap:10px;min-height:0}
+  .con-params table{font-size:11.5px}
+  .con-params th{background:#0a0f16;color:#7e93ae;border-bottom:1px solid #22303f;padding:5px 7px;text-transform:none;letter-spacing:0;position:static}
+  .con-params td{padding:5px 7px;border-bottom:1px solid #161f2a;font-family:var(--mono)}
+  .con-params td.pname{font-family:var(--ui);color:#b9c7da}
+  .mtick{color:#5fd391;font-weight:700}.mcross{color:#ff7a73;font-weight:700}
+  #ilList{display:flex;flex-direction:column;gap:5px}
+  .ilrow{display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;
+    border-radius:5px;background:#0a0f16;border:1px solid #1d2a39}
+  .ilrow .ip{font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:9px}
+  .ilrow .ip.ok{background:#0f2a1c;color:#5fd391}.ilrow .ip.set{background:#3a1513;color:#ff8a83}
+  .con-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cbtn{padding:11px;border-radius:8px;border:1px solid #2b3c52;background:#1a2433;color:#dbe5f1;font-weight:700;font-size:13px}
+  .cbtn:hover:not(:disabled){background:#22304a}
+  .cbtn:disabled{opacity:.4;cursor:not-allowed}
+  .cbtn.beam{background:#1d8a4f;border-color:#247d49;color:#fff;user-select:none}
+  .cbtn.beam:active{background:#166e3f}
+  .cbtn.beam.armed{box-shadow:0 0 0 3px rgba(46,158,91,.3)}
+  .cbtn.term{background:#7a2420;border-color:#92211d;color:#ffd9d6}
+  .con-hint{font-size:10.5px;color:#6f86a3;text-align:center}
+  @media (max-width:900px){ .dual{grid-template-columns:1fr;height:auto} .con-cols{grid-template-columns:1fr} }
+
+
+    background:var(--chrome);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;font-weight:600;
+    box-shadow:0 8px 28px rgba(0,0,0,.35);opacity:0;transition:.25s;z-index:50;display:flex;gap:9px;align-items:center;border:1px solid #2b3c52}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .ic{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#fff}
+  .toast.ok .ic{background:var(--ok)}.toast.warn .ic{background:var(--warn)}.toast.stop .ic{background:var(--stop)}
+
+  .empty{display:grid;place-items:center;height:100%;color:var(--ink-2);text-align:center;padding:40px}
+  .empty svg{width:46px;height:46px;stroke:#b6c1cf;fill:none;stroke-width:1.4;margin-bottom:12px}
+
+  .help{font-size:11.5px;color:var(--ink-2);background:var(--panel-2);border:1px dashed var(--line);
+    border-radius:7px;padding:9px 12px;margin:0 16px 14px}
+  .help b{color:var(--ink)}
+
+  @media (max-width:880px){
+    .grid2{grid-template-columns:1fr}
+    .igrt{grid-template-columns:1fr;height:auto}
+    .igrt-panel{border-left:none;border-top:1px solid var(--console-line)}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== APP BAR ===== -->
+<div class="appbar">
+  <div class="brand">
+    <span class="logo">R</span>
+    RT-Sim <small>Oncology Information System</small>
+  </div>
+  <span class="sim-tag">Training Emulator · Simulated Data</span>
+  <div class="spacer"></div>
+  <div class="who"><span class="dot"></span> RT&nbsp;Student · LINAC-A Console · <span class="mono" id="clock">--:--</span></div>
+</div>
+
+<!-- ===== PATIENT SAFETY BANNER ===== -->
+<div class="patientband" id="patientband">
+  <div class="nopatient">No patient in context — open a treatment appointment from the Schedule.</div>
+</div>
+
+<!-- ===== BODY ===== -->
+<div class="body">
+  <nav class="nav" id="nav">
+    <button data-mod="schedule" class="active" title="Schedule">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+      Schedule
+    </button>
+    <button data-mod="treatment" title="Treatment Delivery">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M7 21h10M12 3v2M9.5 5.5 8 4M14.5 5.5 16 4"/></svg>
+      Treat
+    </button>
+    <button data-mod="imaging" title="Image Alignment (IGRT)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14M3 12h18" stroke-dasharray="2 2"/><circle cx="12" cy="12" r="3"/></svg>
+      Imaging
+    </button>
+    <button data-mod="console" title="Treatment Console (dual screen)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="4" width="9" height="13" rx="1"/><rect x="13" y="4" width="9" height="13" rx="1"/><path d="M9 20h6M12 17v3"/></svg>
+      Console
+    </button>
+    <div class="nav-sep"></div>
+    <button data-mod="chart" title="Patient Chart">
+      <svg viewBox="0 0 24 24"><path d="M9 2h6a2 2 0 0 1 2 2v0H7v0a2 2 0 0 1 2-2Z"/><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 11h6M9 15h6"/></svg>
+      Chart
+    </button>
+  </nav>
+
+  <div class="main" id="main"><!-- module renders here --></div>
+</div>
+
+<div class="toast" id="toast"><span class="ic">✓</span><span id="toastMsg"></span></div>
+
+<script>
+/* ============================================================
+   RT-Sim — OIS Training Emulator
+   Original training interface. Reproduces RT workflow patterns
+   (machine-column scheduling, record & verify, IGRT couch-shift
+   registration) without copying any vendor's proprietary UI.
+   All patients and data are fictional.
+   ============================================================ */
+
+const TOL = 2.0; // mm/deg action level for IGRT (teaching default)
+
+const state = {
+  module: 'schedule',
+  patientId: null,
+  date: 'Fri 20 Jun 2026',
+};
+
+/* ---------- fictional patient / treatment data ---------- */
+const PATIENTS = {
+  'P100247': {
+    mrn:'100247', name:'Chen, Margaret', dob:'1958-03-12', sex:'F', age:68,
+    site:'Prostate', laterality:'—', technique:'VMAT', machine:'LINAC-A', energy:'6 MV',
+    rxDose:6000, fxDose:300, fxTotal:20, fxDone:7, oncologist:'Dr. A. Pereira',
+    allergies:['Penicillin'], flags:['Full bladder / empty rectum protocol'],
+    position:'Supine, knee-fix, kneefix+', imaging:'Daily CBCT',
+    setupNote:'Match to prostate + fiducials. 3 gold seeds.',
+    fields:[
+      {id:'CBCT', type:'Setup', energy:'kV',  gantry:'0→360', coll:'0.0', mu:0,   note:'Volumetric setup'},
+      {id:'ARC1', type:'Treat', energy:'6 MV', gantry:'181→179', coll:'30.0', mu:312, note:'CW VMAT'},
+      {id:'ARC2', type:'Treat', energy:'6 MV', gantry:'179→181', coll:'330.0', mu:298, note:'CCW VMAT'},
+    ],
+    couch:{vrt:-3.2,lng:12.6,lat:-0.4,rtn:0},
+    anatomy:'pelvis'
+  },
+  'P100892': {
+    mrn:'100892', name:'Okafor, Robert', dob:'1965-11-02', sex:'M', age:60,
+    site:'Oropharynx (H&N)', laterality:'—', technique:'IMRT', machine:'LINAC-A', energy:'6 MV',
+    rxDose:7000, fxDose:200, fxTotal:35, fxDone:18, oncologist:'Dr. S. Lindqvist',
+    allergies:[], flags:['5-point thermoplastic mask','Daily kV + weekly CBCT'],
+    position:'Supine, S-frame mask, neutral neck', imaging:'Daily kV pair',
+    setupNote:'Match to C2 vertebra / mandible. Watch mask fit.',
+    fields:[
+      {id:'kV-AP', type:'Setup', energy:'kV', gantry:'0',  coll:'0.0', mu:0, note:'AP setup'},
+      {id:'kV-LAT',type:'Setup', energy:'kV', gantry:'270',coll:'0.0', mu:0, note:'Lateral setup'},
+      {id:'F1', type:'Treat', energy:'6 MV', gantry:'180', coll:'0.0', mu:142, note:'Step & shoot'},
+      {id:'F2', type:'Treat', energy:'6 MV', gantry:'230', coll:'0.0', mu:131, note:'Step & shoot'},
+      {id:'F3', type:'Treat', energy:'6 MV', gantry:'280', coll:'0.0', mu:118, note:'Step & shoot'},
+      {id:'F4', type:'Treat', energy:'6 MV', gantry:'80',  coll:'0.0', mu:127, note:'Step & shoot'},
+      {id:'F5', type:'Treat', energy:'6 MV', gantry:'130', coll:'0.0', mu:139, note:'Step & shoot'},
+    ],
+    couch:{vrt:-1.8,lng:24.1,lat:0.6,rtn:0},
+    anatomy:'head'
+  },
+  'P101455': {
+    mrn:'101455', name:'Vance, Eleanor', dob:'1971-07-19', sex:'F', age:54,
+    site:'Breast (Left)', laterality:'Left', technique:'Tangents (FiF)', machine:'LINAC-B', energy:'6 MV',
+    rxDose:4005, fxDose:267, fxTotal:15, fxDone:11, oncologist:'Dr. A. Pereira',
+    allergies:['Contrast dye'], flags:['DIBH — breath hold','Breast board 12.5°'],
+    position:'Supine, breast board, both arms up', imaging:'Daily kV (DIBH)',
+    setupNote:'Match to chest wall / carina. Confirm breath-hold baseline.',
+    fields:[
+      {id:'kV-AP', type:'Setup', energy:'kV', gantry:'0',  coll:'0.0', mu:0, note:'AP DIBH'},
+      {id:'MED',  type:'Treat', energy:'6 MV', gantry:'305', coll:'0.0', mu:178, note:'Medial tangent'},
+      {id:'LAT',  type:'Treat', energy:'6 MV', gantry:'125', coll:'0.0', mu:184, note:'Lateral tangent'},
+    ],
+    couch:{vrt:-2.5,lng:9.3,lat:1.2,rtn:0},
+    anatomy:'chest'
+  },
+};
+
+/* schedule grid */
+const MACHINES = [
+  {id:'LINAC-A', model:'TrueLINAC 21 · 6/10 MV'},
+  {id:'LINAC-B', model:'TrueLINAC 14 · 6 MV'},
+  {id:'CT-SIM',  model:'BigBore CT-Simulator'},
+];
+const TIMES = ['08:00','08:20','08:40','09:00','09:20','09:40','10:00','10:20','10:40'];
+const SCHEDULE = [
+  {t:'08:00', m:'LINAC-A', type:'tx', pid:'P100247', label:'Chen, Margaret', sub:'Prostate · Fx 8/20', done:false},
+  {t:'08:20', m:'LINAC-A', type:'tx', pid:'P100892', label:'Okafor, Robert', sub:'H&N · Fx 19/35', done:false},
+  {t:'08:40', m:'LINAC-A', type:'tx', label:'Nguyen, T.', sub:'Prostate · Fx 22/39', done:true},
+  {t:'09:00', m:'LINAC-A', type:'consult', label:'OTV — Dr. Pereira', sub:'On-treatment review', done:false},
+  {t:'09:40', m:'LINAC-A', type:'tx', label:'Rossi, M.', sub:'Pelvis · Fx 5/25', done:false},
+  {t:'08:00', m:'LINAC-B', type:'tx', pid:'P101455', label:'Vance, Eleanor', sub:'Breast L · Fx 12/15', done:false},
+  {t:'08:40', m:'LINAC-B', type:'tx', label:'Adeyemi, K.', sub:'Lung SBRT · Fx 3/5', done:false},
+  {t:'09:20', m:'LINAC-B', type:'tx', label:'Brown, J.', sub:'Breast R · Fx 8/15', done:true},
+  {t:'08:20', m:'CT-SIM', type:'sim', label:'Patel, R.', sub:'New · Prostate sim', done:false},
+  {t:'09:00', m:'CT-SIM', type:'sim', label:'García, L.', sub:'New · Breast sim', done:false},
+  {t:'10:00', m:'CT-SIM', type:'sim', label:'Wallace, D.', sub:'New · Lung 4DCT', done:false},
+];
+
+/* per-patient runtime session state (imaging + delivery) */
+const sessions = {}; // pid -> {igrtApproved, appliedShift, delivered:Set, ...}
+function sess(pid){
+  if(!sessions[pid]){
+    sessions[pid] = {
+      igrtApproved:false,
+      truthError:randomErr(),     // the "real" setup error student must correct
+      applied:{vrt:0,lng:0,lat:0,pitch:0,roll:0,yaw:0},
+      delivered:new Set(),
+      view:'overlay',
+    };
+  }
+  return sessions[pid];
+}
+function randomErr(){
+  const r=(a)=>Math.round((Math.random()*2-1)*a*10)/10;
+  return {vrt:r(6),lng:r(8),lat:r(6),pitch:r(1.5),roll:r(1.5),yaw:r(2)};
+}
+
+/* =================== RENDER ROOT =================== */
+const main = document.getElementById('main');
+function render(){
+  renderBanner();
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active', b.dataset.mod===state.module));
+  if(state.module==='schedule') renderSchedule();
+  else if(state.module==='treatment') renderTreatment();
+  else if(state.module==='imaging') renderImaging();
+  else if(state.module==='console') renderConsole();
+  else if(state.module==='chart') renderChart();
+}
+
+/* ---------- patient banner ---------- */
+function renderBanner(){
+  const band=document.getElementById('patientband');
+  const p = state.patientId ? PATIENTS[state.patientId] : null;
+  if(!p){
+    band.innerHTML=`<div class="nopatient">No patient in context — open a treatment appointment from the Schedule.</div>`;
+    return;
+  }
+  const s=sess(state.patientId);
+  const initials=p.name.split(',')[0].slice(0,2).toUpperCase();
+  band.innerHTML=`
+    <div class="pb-id">
+      <div class="pb-photo">${initials}</div>
+      <div>
+        <div class="pb-name">${p.name}</div>
+        <div class="pb-sub">MRN ${p.mrn} · ${p.sex} · ${p.age}y · DOB ${p.dob}</div>
+      </div>
+    </div>
+    <div class="pb-fields">
+      <div class="pb-f"><div class="k">Site / Technique</div><div class="v">${p.site} · ${p.technique}</div></div>
+      <div class="pb-f"><div class="k">Prescription</div><div class="v">${(p.rxDose/100).toFixed(2)} Gy / ${p.fxTotal} fx</div></div>
+      <div class="pb-f"><div class="k">Fraction</div><div class="v">${p.fxDone+1} <small>of ${p.fxTotal}</small></div></div>
+      <div class="pb-f"><div class="k">Machine</div><div class="v">${p.machine}</div></div>
+      <div class="pb-f"><div class="k">Oncologist</div><div class="v">${p.oncologist}</div></div>
+    </div>
+    <div class="pb-alert">
+      ${p.allergies.length?`<span class="chip allergy">⚠ ${p.allergies.join(', ')}</span>`:''}
+      ${p.flags.map(f=>`<span class="chip flag">${f}</span>`).join('')}
+    </div>`;
+}
+
+/* =================== SCHEDULE =================== */
+function renderSchedule(){
+  const cols = MACHINES.length;
+  let grid = `<div class="sched" style="grid-template-columns:64px repeat(${cols},1fr)">`;
+  grid += `<div class="sched-col-head" style="background:#0e1622"></div>`;
+  MACHINES.forEach(m=>grid+=`<div class="sched-col-head"><div class="m">${m.id}</div><div class="s">${m.model}</div></div>`);
+  TIMES.forEach(t=>{
+    grid += `<div class="sched-time">${t}</div>`;
+    MACHINES.forEach(m=>{
+      const a = SCHEDULE.find(x=>x.t===t && x.m===m.id);
+      if(a){
+        const cur = a.pid && a.pid===state.patientId ? ' cur':'';
+        const done = a.done ? ' done':'';
+        const click = a.pid ? `onclick="openAppt('${a.pid}')"` : `onclick="toast('warn','This is a placeholder appointment — only flagged patients are loadable in this build.')"`;
+        grid+=`<div class="slot"><div class="appt ${a.type}${done}${cur}" ${click}>
+          <div class="an">${a.label}</div><div class="ad">${a.sub}</div></div></div>`;
+      } else {
+        grid+=`<div class="slot"></div>`;
+      }
+    });
+  });
+  grid += `</div>`;
+
+  main.innerHTML = `
+    <div class="toolbar">
+      <h2>Daily Schedule</h2>
+      <span class="sub">${state.date}</span>
+      <div class="spacer"></div>
+      <button class="btn ghost">◀ Prev</button>
+      <button class="btn">Today</button>
+      <button class="btn ghost">Next ▶</button>
+      <button class="btn primary">+ Book</button>
+    </div>
+    <div class="help">Click a <b>treatment appointment</b> (Chen, Okafor, or Vance) to load the patient into context, then move to <b>Imaging</b> and <b>Treat</b>.</div>
+    <div class="sched-wrap">
+      ${grid}
+      <div class="legend">
+        <span><i style="background:#2f6fb0"></i> Treatment</span>
+        <span><i style="background:#7a52c0"></i> CT-Sim</span>
+        <span><i style="background:#2e9e5b"></i> Consult / OTV</span>
+        <span><i style="background:#dce3eb;border:1px solid #c5cedb"></i> Completed</span>
+      </div>
+    </div>`;
+}
+window.openAppt=function(pid){
+  state.patientId=pid;
+  const p=PATIENTS[pid];
+  state.module='imaging';
+  toast('ok',`${p.name} loaded · ${p.machine} · begin image setup`);
+  render();
+};
+
+/* =================== TREATMENT DELIVERY =================== */
+function renderTreatment(){
+  const p = state.patientId?PATIENTS[state.patientId]:null;
+  if(!p){ main.innerHTML=emptyState('No patient loaded','Open a treatment appointment from the Schedule to begin.'); return; }
+  const s=sess(state.patientId);
+  const txFields = p.fields.filter(f=>f.type==='Treat');
+  const allDone = txFields.every(f=>s.delivered.has(f.id));
+  const totalMU = txFields.reduce((a,f)=>a+f.mu,0);
+  const doneMU = txFields.filter(f=>s.delivered.has(f.id)).reduce((a,f)=>a+f.mu,0);
+
+  // fraction dots
+  let dots='';
+  for(let i=0;i<p.fxTotal;i++){
+    const cls = i<p.fxDone?'done': (i===p.fxDone?'today':'');
+    dots+=`<span class="fx-dot ${cls}"></span>`;
+  }
+
+  // field table
+  let rows='';
+  p.fields.forEach(f=>{
+    const isTx=f.type==='Treat';
+    const dl=s.delivered.has(f.id);
+    const st = !isTx ? `<span class="pill info">Setup</span>`
+      : dl ? `<span class="pill ok">Delivered</span>`
+      : `<span class="pill idle">Planned</span>`;
+    rows+=`<tr class="field-row ${dl?'delivered':''}" id="row-${f.id}">
+      <td class="fname">${f.id}</td>
+      <td>${f.type}</td>
+      <td>${f.energy}</td>
+      <td>${f.gantry}°</td>
+      <td>${f.coll}</td>
+      <td>${f.mu?f.mu:'—'}</td>
+      <td>${st}</td>
+    </tr>`;
+  });
+
+  const gate = s.igrtApproved
+    ? `<div class="gate ok">✓ Image guidance approved — couch shift applied. Cleared for treatment delivery.</div>`
+    : `<div class="gate">⏳ Image guidance not yet approved. Complete <b>Imaging (IGRT)</b> and apply the couch correction before beam-on.</div>`;
+
+  main.innerHTML=`
+    <div class="toolbar">
+      <h2>Treatment Delivery</h2><span class="sub">Record &amp; Verify · ${p.machine} · Fraction ${p.fxDone+1}/${p.fxTotal}</span>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="state.module='imaging';render()">◀ Back to Imaging</button>
+    </div>
+    <div class="pad">
+      <div class="interlock-banner" id="interlock">⛔ INTERLOCK — beam inhibited. Clear the condition and re-arm.</div>
+      ${gate}
+
+      <div class="rx-banner">
+        <div class="seg"><div class="k">Diagnosis / Site</div><div class="v" style="font-size:14px">${p.site}</div></div>
+        <div class="seg"><div class="k">Dose / Fraction</div><div class="v">${(p.fxDose/100).toFixed(2)}<small> Gy</small></div></div>
+        <div class="seg"><div class="k">Total Prescription</div><div class="v">${(p.rxDose/100).toFixed(2)}<small> Gy</small></div></div>
+        <div class="seg">
+          <div class="k">Fractions Delivered</div>
+          <div class="v">${p.fxDone}<small> / ${p.fxTotal}</small></div>
+          <div class="fx-track">${dots}</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h3>Treatment Fields — Planned vs Delivered</h3>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Energy</th><th>Gantry</th><th>Coll</th><th>MU</th><th>Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+
+      <div class="console-strip">
+        <div class="beam-ind">
+          <div class="beam-lamp" id="beamLamp"></div>
+          <div>
+            <div class="beam-txt" id="beamTxt">Beam Hold</div>
+            <div class="beam-sub" id="beamSub">${s.igrtApproved?'Ready to mode up next field':'Awaiting image approval'}</div>
+          </div>
+        </div>
+        <div style="border-left:1px solid var(--console-line);height:34px"></div>
+        <div>
+          <div class="beam-sub">Monitor Units (session)</div>
+          <div class="mu-meter"><span id="muDone">${doneMU}</span> <small>/ ${totalMU} MU</small></div>
+        </div>
+        <div class="spacer" style="flex:1"></div>
+        ${allDone
+          ? `<button class="btn go" onclick="completeFraction()">✓ Complete Fraction ${p.fxDone+1}</button>`
+          : `<button class="btn go" id="deliverBtn" onclick="deliverNext()" ${s.igrtApproved?'':'disabled'}>▶ Deliver Next Field</button>`}
+        <button class="btn stop" onclick="simInterlock()">⛔ Interlock (demo)</button>
+      </div>
+      <div class="help" style="margin:14px 0 0">Delivery is gated on image approval, mirroring real workflow sequencing: <b>image → match → approve shift → treat</b>. The “Interlock (demo)” button shows how a beam-hold condition presents.</div>
+    </div>`;
+}
+
+let delivering=false;
+window.deliverNext=function(){
+  if(delivering) return;
+  const p=PATIENTS[state.patientId]; const s=sess(state.patientId);
+  if(!s.igrtApproved){ toast('warn','Image guidance not approved — cannot deliver.'); return; }
+  const next=p.fields.find(f=>f.type==='Treat' && !s.delivered.has(f.id));
+  if(!next){ return; }
+  delivering=true;
+  const row=document.getElementById('row-'+next.id);
+  row.classList.add('delivering');
+  row.querySelector('td:last-child').innerHTML=`<span class="pill warn">Delivering…</span>`;
+  // add progress bar in MU cell
+  const lamp=document.getElementById('beamLamp'), btxt=document.getElementById('beamTxt'), bsub=document.getElementById('beamSub');
+  lamp.className='beam-lamp ready'; btxt.textContent='Mode Up'; bsub.textContent=next.id+' · verifying parameters';
+  document.getElementById('deliverBtn').disabled=true;
+  setTimeout(()=>{
+    lamp.className='beam-lamp on'; btxt.textContent='BEAM ON'; btxt.classList.add('blink');
+    bsub.textContent=next.id+' · '+next.gantry+'° · '+next.mu+' MU';
+    let mu=0; const start=parseInt(document.getElementById('muDone').textContent);
+    const tick=setInterval(()=>{
+      mu+=Math.ceil(next.mu/22);
+      if(mu>=next.mu){ mu=next.mu; clearInterval(tick); finishField(next,start); }
+      document.getElementById('muDone').textContent=start+mu;
+    },70);
+  },650);
+};
+function finishField(next,start){
+  const s=sess(state.patientId);
+  s.delivered.add(next.id);
+  const lamp=document.getElementById('beamLamp'), btxt=document.getElementById('beamTxt'), bsub=document.getElementById('beamSub');
+  lamp.className='beam-lamp'; btxt.textContent='Beam Hold'; btxt.classList.remove('blink');
+  bsub.textContent='Field '+next.id+' delivered';
+  delivering=false;
+  toast('ok',`${next.id} delivered · ${next.mu} MU recorded`);
+  renderTreatment();
+}
+window.completeFraction=function(){
+  const p=PATIENTS[state.patientId];
+  p.fxDone=Math.min(p.fxDone+1,p.fxTotal);
+  const s=sess(state.patientId);
+  s.delivered.clear(); s.igrtApproved=false; s.truthError=randomErr();
+  s.applied={vrt:0,lng:0,lat:0,pitch:0,roll:0,yaw:0};
+  s.con=null;
+  toast('ok',`Fraction recorded. ${p.name} now ${p.fxDone}/${p.fxTotal}.`);
+  render();
+};
+window.simInterlock=function(){
+  const il=document.getElementById('interlock'); il.classList.add('show');
+  const lamp=document.getElementById('beamLamp');
+  if(lamp){lamp.className='beam-lamp';}
+  toast('stop','Interlock asserted — beam inhibited.');
+  setTimeout(()=>il.classList.remove('show'),3200);
+};
+
+/* =================== IMAGING / IGRT =================== */
+function renderImaging(){
+  const p=state.patientId?PATIENTS[state.patientId]:null;
+  if(!p){ main.innerHTML=emptyState('No patient loaded','Open a treatment appointment from the Schedule to begin image setup.'); return; }
+  const s=sess(state.patientId);
+  const acq = p.imaging.includes('CBCT')?'CBCT':'kV';
+
+  main.innerHTML=`
+    <div class="igrt">
+      <div class="imgstage">
+        <div class="imgbar">
+          <span class="lbl">${p.imaging} · ${p.site} · Ref DRR vs ${acq}</span>
+          <div class="seg-ctrl" id="viewCtrl">
+            <button data-v="overlay" class="${s.view==='overlay'?'on':''}">Overlay</button>
+            <button data-v="split" class="${s.view==='split'?'on':''}">Split</button>
+            <button data-v="checker" class="${s.view==='checker'?'on':''}">Checker</button>
+          </div>
+          <div class="spacer" style="flex:1"></div>
+          <span class="lbl" style="color:#7fd4d4">Match: ${p.setupNote}</span>
+        </div>
+        <div class="pane-grid">
+          <div class="pane">
+            <div class="pane-label">Transverse / Axial<small>LAT ↔ &nbsp; VRT ↕ &nbsp; Roll ⟳</small></div>
+            <canvas id="cv-axial" width="320" height="320"></canvas>
+            <div class="pane-corner" id="corner-axial"></div>
+            <div class="pane-hint">drag to shift</div>
+          </div>
+          <div class="pane">
+            <div class="pane-label">Coronal<small>LAT ↔ &nbsp; LNG ↕ &nbsp; Yaw ⟳</small></div>
+            <canvas id="cv-coronal" width="320" height="320"></canvas>
+            <div class="pane-corner" id="corner-coronal"></div>
+            <div class="pane-hint">drag to shift</div>
+          </div>
+          <div class="pane">
+            <div class="pane-label">Sagittal<small>LNG ↔ &nbsp; VRT ↕ &nbsp; Pitch ⟳</small></div>
+            <canvas id="cv-sagittal" width="320" height="320"></canvas>
+            <div class="pane-corner" id="corner-sagittal"></div>
+            <div class="pane-hint">drag to shift</div>
+          </div>
+          <div class="pane pane-3d">
+            <div class="pane-label">Summary</div>
+            <div class="cap">3D offset</div>
+            <div class="big" id="offset3d">0.0</div>
+            <div class="cap">mm vector</div>
+            <div id="paneStatus" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="igrt-panel">
+        <h4>Couch Correction</h4>
+        <div class="shift-grid" id="shiftGrid"></div>
+
+        <h4>Tolerance</h4>
+        <div style="padding:0 14px 6px;font-size:11.5px;color:var(--ink-on-dark-2)">
+          Action level ±${TOL.toFixed(1)} mm / deg. Bring every axis within tolerance, then apply the shift.
+        </div>
+        <div class="residual"><div id="tolBody"></div></div>
+
+        <div class="igrt-actions">
+          <button class="btn" style="background:#1d2b3d;color:#cfe;border-color:var(--console-line)" onclick="autoMatch()">⊹ Auto-Match</button>
+          <button class="btn" style="background:#1d2b3d;color:#cfe;border-color:var(--console-line)" onclick="resetShift()">↺ Reset</button>
+          <button class="btn primary" id="applyBtn" onclick="applyShift()">Apply Shift &amp; Approve</button>
+          <div id="approveState" style="font-size:11.5px;color:var(--ink-on-dark-2);text-align:center"></div>
+        </div>
+      </div>
+    </div>`;
+
+  buildShiftControls();
+  attachCanvasDrag();
+  drawIGRT(); updateResidual();
+  document.querySelectorAll('#viewCtrl button').forEach(b=>b.onclick=()=>{ s.view=b.dataset.v; render(); });
+}
+
+const AXES=[
+  {k:'vrt',  label:'VRT', axis:'Vertical (Ant–Post)'},
+  {k:'lng',  label:'LNG', axis:'Longitudinal (Sup–Inf)'},
+  {k:'lat',  label:'LAT', axis:'Lateral (L–R)'},
+  {k:'pitch',label:'PITCH',axis:'rotation °'},
+  {k:'roll', label:'ROLL', axis:'rotation °'},
+  {k:'yaw',  label:'YAW',  axis:'rotation °'},
+];
+function buildShiftControls(){
+  const s=sess(state.patientId);
+  const host=document.getElementById('shiftGrid');
+  host.innerHTML=AXES.map(a=>{
+    const unit=(a.k==='pitch'||a.k==='roll'||a.k==='yaw')?'°':'mm';
+    return `<div class="shift-row">
+      <div><label>${a.label}</label><div class="axis">${unit}</div></div>
+      <div class="nudge">
+        <button onclick="nudge('${a.k}',-${unit==='°'?0.5:1})">−</button>
+        <button onclick="nudge('${a.k}',${unit==='°'?0.5:1})">+</button>
+      </div>
+      <div class="shift-val" id="sv-${a.k}">0.0</div>
+    </div>`;
+  }).join('');
+  refreshShiftVals();
+}
+window.nudge=function(k,d){
+  const s=sess(state.patientId);
+  s.applied[k]=Math.round((s.applied[k]+d)*10)/10;
+  refreshShiftVals(); drawIGRT(); updateResidual();
+};
+function refreshShiftVals(){
+  const s=sess(state.patientId);
+  AXES.forEach(a=>{
+    const el=document.getElementById('sv-'+a.k); if(!el)return;
+    const v=s.applied[a.k];
+    el.textContent=(v>0?'+':'')+v.toFixed(1);
+  });
+}
+window.resetShift=function(){
+  const s=sess(state.patientId);
+  s.applied={vrt:0,lng:0,lat:0,pitch:0,roll:0,yaw:0};
+  refreshShiftVals(); drawIGRT(); updateResidual();
+};
+window.autoMatch=function(){
+  const s=sess(state.patientId);
+  // animate applied toward truth (auto registration)
+  const target={...s.truthError};
+  const steps=18; let i=0;
+  const startV={...s.applied};
+  const anim=setInterval(()=>{
+    i++; const f=i/steps;
+    AXES.forEach(a=>{ s.applied[a.k]=Math.round((startV[a.k]+(target[a.k]-startV[a.k])*f)*10)/10; });
+    refreshShiftVals(); drawIGRT(); updateResidual();
+    if(i>=steps){clearInterval(anim); toast('ok','Auto-match complete — verify before applying.');}
+  },28);
+};
+
+/* residual = truthError - applied  (what's left after correction) */
+function residual(){
+  const s=sess(state.patientId);
+  const r={}; AXES.forEach(a=>r[a.k]=Math.round((s.truthError[a.k]-s.applied[a.k])*10)/10);
+  return r;
+}
+function updateResidual(){
+  const r=residual(); const s=sess(state.patientId);
+  // side tolerance box (all 6 axes)
+  const body=document.getElementById('tolBody');
+  if(body){
+    body.innerHTML=AXES.map(a=>{
+      const v=r[a.k], u=unitOf(a.k), cls=tcls(Math.abs(v));
+      return `<div class="rrow"><span>${a.label}</span><span class="mag ${cls}">${(v>0?'+':'')+v.toFixed(1)} ${u}</span></div>`;
+    }).join('');
+  }
+  // per-plane corner readouts (in-plane axes + that plane's rotation)
+  PLANES.forEach(pl=>{
+    const el=document.getElementById('corner-'+pl.key); if(!el)return;
+    el.innerHTML = `${pl.h.toUpperCase()} ${fmtv(r[pl.h],unitOf(pl.h))}`
+      +`<br>${pl.v.toUpperCase()} ${fmtv(r[pl.v],unitOf(pl.v))}`
+      +`<br>${pl.rot.toUpperCase()} ${fmtv(r[pl.rot],'°')}`;
+  });
+  // 3D summary + status
+  const o3=document.getElementById('offset3d');
+  if(o3){ const m=vecMag(r); o3.textContent=m.toFixed(1); o3.className='big '+tcls(m); }
+  const inTol=AXES.every(a=>Math.abs(r[a.k])<=TOL);
+  const ps=document.getElementById('paneStatus');
+  if(ps) ps.innerHTML = inTol
+    ? `<span class="pill ok" style="background:#0f2a1c;color:#5fd391">Within tolerance</span>`
+    : `<span class="pill warn" style="background:#2a2410;color:#f0c069">Out of tolerance</span>`;
+  // apply button gate
+  const btn=document.getElementById('applyBtn'); const st=document.getElementById('approveState');
+  if(btn){
+    if(s.igrtApproved){
+      btn.textContent='✓ Approved'; btn.disabled=true; btn.style.background='var(--ok)'; btn.style.color='#fff';
+      st.textContent='Shift applied & approved — return to Treat.';
+    } else {
+      btn.disabled=!inTol; btn.style.background=inTol?'var(--accent)':'#1d2b3d';
+      btn.style.color=inTol?'#04201f':'var(--ink-on-dark-2)';
+      btn.textContent=inTol?'Apply Shift & Approve':'Out of tolerance — keep matching';
+      st.textContent=inTol?'All axes within ±'+TOL.toFixed(1)+'.':'';
+    }
+  }
+}
+function tcls(mag){return mag<=TOL?'tol-ok':mag<=TOL*2?'tol-warn':'tol-bad';}
+function fmtv(v,u){return `<span class="${tcls(Math.abs(v))}">${(v>0?'+':'')+v.toFixed(1)}${u}</span>`;}
+function unitOf(k){return (k==='pitch'||k==='roll'||k==='yaw')?'°':'mm';}
+function vecMag(r){return Math.sqrt(r.vrt*r.vrt+r.lng*r.lng+r.lat*r.lat);}
+
+window.applyShift=function(){
+  const s=sess(state.patientId); const r=residual();
+  const inTol=AXES.every(a=>Math.abs(r[a.k])<=TOL);
+  if(!inTol){ toast('warn','Residual exceeds tolerance — keep matching.'); return; }
+  s.igrtApproved=true;
+  toast('ok','Couch shift applied & image approved. Cleared to treat.');
+  updateResidual();
+  setTimeout(()=>{ state.module='treatment'; render(); },700);
+};
+
+/* ---------- synthetic radiographic rendering (multi-plane) ---------- */
+/* axis convention: VRT=ant-post, LNG=sup-inf, LAT=L-R
+   each plane shows its two in-plane translations + the rotation about its normal axis */
+const PLANES=[
+  {key:'axial',    h:'lat', v:'vrt', rot:'roll',  hSign:1,  vSign:1 },
+  {key:'coronal',  h:'lat', v:'lng', rot:'yaw',   hSign:1,  vSign:-1},
+  {key:'sagittal', h:'lng', v:'vrt', rot:'pitch', hSign:-1, vSign:1 },
+];
+const IGRT_S=4; // px per mm
+
+function attachCanvasDrag(){
+  PLANES.forEach(pl=>{
+    const cvs=document.getElementById('cv-'+pl.key); if(!cvs)return;
+    cvs._pl=pl;
+    cvs.addEventListener('mousedown',e=>{
+      const s=sess(state.patientId);
+      cvs._drag={x:e.clientX,y:e.clientY,h:s.applied[pl.h],v:s.applied[pl.v]};
+      cvs.classList.add('dragging');
+    });
+  });
+  if(!window._igrtBound){
+    window.addEventListener('mousemove',onPaneMove);
+    window.addEventListener('mouseup',()=>document.querySelectorAll('.pane canvas').forEach(c=>{c.classList.remove('dragging');c._drag=null;}));
+    window._igrtBound=true;
+  }
+}
+function onPaneMove(e){
+  document.querySelectorAll('.pane canvas').forEach(cvs=>{
+    if(!cvs._drag)return;
+    const pl=cvs._pl, s=sess(state.patientId);
+    const rect=cvs.getBoundingClientRect(), scale=cvs.width/rect.width;
+    const dx=(e.clientX-cvs._drag.x)*scale, dy=(e.clientY-cvs._drag.y)*scale;
+    s.applied[pl.h]=Math.round((cvs._drag.h + dx/(IGRT_S*pl.hSign))*10)/10;
+    s.applied[pl.v]=Math.round((cvs._drag.v + dy/(IGRT_S*pl.vSign))*10)/10;
+    refreshShiftVals(); drawIGRT(); updateResidual();
+  });
+}
+
+function drawIGRT(){
+  const s=sess(state.patientId), p=PATIENTS[state.patientId];
+  PLANES.forEach(pl=>{
+    const cvs=document.getElementById('cv-'+pl.key); if(!cvs)return;
+    drawPlane(cvs.getContext('2d'),cvs,pl,p,s);
+  });
+}
+function drawPlane(c,cvs,pl,p,s){
+  const W=cvs.width,H=cvs.height, r=residual();
+  const ox=-(r[pl.h])*IGRT_S*pl.hSign, oy=-(r[pl.v])*IGRT_S*pl.vSign;
+  const rot=(r[pl.rot]||0)*Math.PI/180;
+  c.clearRect(0,0,W,H); c.fillStyle='#05080c'; c.fillRect(0,0,W,H);
+  if(s.view==='split'){
+    c.save(); c.beginPath(); c.rect(0,0,W/2,H); c.clip(); paintAnatomy(c,W,H,p.anatomy,pl.key,0,0,0,'#cfe8ff'); c.restore();
+    c.save(); c.beginPath(); c.rect(W/2,0,W/2,H); c.clip(); paintAnatomy(c,W,H,p.anatomy,pl.key,ox,oy,rot,'#ffd9a8'); c.restore();
+    c.strokeStyle='#10a3a3'; c.lineWidth=2; c.beginPath(); c.moveTo(W/2,0); c.lineTo(W/2,H); c.stroke();
+  } else if(s.view==='checker'){
+    const n=6, sz=W/n;
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+      c.save(); c.beginPath(); c.rect(i*sz,j*sz,sz,sz); c.clip();
+      if((i+j)%2===0) paintAnatomy(c,W,H,p.anatomy,pl.key,0,0,0,'#cfe8ff');
+      else paintAnatomy(c,W,H,p.anatomy,pl.key,ox,oy,rot,'#ffd9a8');
+      c.restore();
+    }
+  } else {
+    c.globalCompositeOperation='lighter';
+    paintAnatomy(c,W,H,p.anatomy,pl.key,0,0,0,'#1f6f7f');
+    paintAnatomy(c,W,H,p.anatomy,pl.key,ox,oy,rot,'#7f5a1f');
+    c.globalCompositeOperation='source-over';
+  }
+  drawGraticule(c,W,H);
+}
+function drawGraticule(c,W,H){
+  c.strokeStyle='rgba(120,220,220,.42)'; c.lineWidth=1; c.setLineDash([6,5]);
+  c.beginPath(); c.moveTo(W/2,0); c.lineTo(W/2,H); c.moveTo(0,H/2); c.lineTo(W,H/2); c.stroke();
+  c.setLineDash([]);
+  c.strokeStyle='rgba(120,220,220,.85)'; c.beginPath();
+  c.moveTo(W/2-10,H/2); c.lineTo(W/2+10,H/2); c.moveTo(W/2,H/2-10); c.lineTo(W/2,H/2+10); c.stroke();
+}
+
+function paintAnatomy(c,W,H,site,plane,ox,oy,rot,tint){
+  c.save();
+  c.translate(W/2+ox,H/2+oy); c.rotate(rot); c.translate(-W/2,-H/2);
+  c.strokeStyle=tint; c.fillStyle=tint; c.lineWidth=2.2; c.globalAlpha=.9;
+  const cx=W/2, cy=H/2;
+  const ring=(x,y,r)=>{c.beginPath();c.arc(x,y,r,0,7);c.stroke();};
+  const ell=(x,y,rx,ry,a=0)=>{c.beginPath();c.ellipse(x,y,rx,ry,a,0,7);c.stroke();};
+  const rect=(x,y,w,h)=>c.strokeRect(x,y,w,h);
+  const line=(a,b,d,e)=>{c.beginPath();c.moveTo(a,b);c.lineTo(d,e);c.stroke();};
+  const arc=(x,y,r,a,b)=>{c.beginPath();c.arc(x,y,r,a,b);c.stroke();};
+  const dash=on=>c.setLineDash(on?[4,3]:[]);
+  const fid=(x,y)=>{const sv=c.globalAlpha;c.globalAlpha=1;c.beginPath();c.arc(x,y,3.4,0,7);c.fill();c.globalAlpha=sv;};
+  const tri=(x,y,s)=>{c.beginPath();c.moveTo(x,y);c.lineTo(x-s,y+s*1.6);c.lineTo(x+s,y+s*1.6);c.closePath();c.stroke();};
+  const tgt=(x,y,r)=>{dash(true);const sv=c.globalAlpha;c.globalAlpha=.85;ring(x,y,r);c.globalAlpha=sv;dash(false);};
+
+  switch(site+'_'+plane){
+    /* ---------- PROSTATE / PELVIS ---------- */
+    case 'pelvis_axial':
+      c.globalAlpha=.45; c.lineWidth=3; ell(cx,cy,W*0.34,H*0.24);
+      c.lineWidth=2.4; c.globalAlpha=.9; ring(cx-74,cy+44,24); ring(cx+74,cy+44,24);
+      c.globalAlpha=.6; c.lineWidth=7; arc(cx,cy+28,52,-2.5,-0.64);
+      c.lineWidth=2.2; c.globalAlpha=.85; ring(cx,cy+60,14);
+      tgt(cx,cy+4,26); fid(cx-9,cy-4); fid(cx+11,cy+2); fid(cx-1,cy+18);
+      break;
+    case 'pelvis_coronal':
+      c.lineWidth=10; c.globalAlpha=.5; arc(cx-104,cy-44,80,-0.5,2.3); arc(cx+104,cy-44,80,0.85,3.6);
+      c.lineWidth=2.4; c.globalAlpha=.9; ring(cx-82,cy+82,30); ring(cx+82,cy+82,30);
+      c.globalAlpha=.55; c.lineWidth=12; line(cx-26,cy+104,cx+26,cy+104);
+      tgt(cx,cy+24,34); fid(cx-10,cy+14); fid(cx+12,cy+20); fid(cx-2,cy+40);
+      break;
+    case 'pelvis_sagittal':
+      c.lineWidth=8; c.globalAlpha=.5; arc(cx+66,cy-30,92,1.0,2.7);
+      c.lineWidth=2; c.globalAlpha=.55; rect(cx-88,cy+34,24,40);
+      c.lineWidth=2.2; c.globalAlpha=.85; ring(cx-34,cy-4,30);
+      tgt(cx-28,cy+42,24); fid(cx-36,cy+36); fid(cx-20,cy+46); fid(cx-30,cy+54);
+      c.globalAlpha=.6; c.lineWidth=6; arc(cx+28,cy+42,40,1.4,2.9);
+      break;
+
+    /* ---------- HEAD & NECK ---------- */
+    case 'head_axial':
+      c.lineWidth=4; c.globalAlpha=.5; ell(cx,cy-6,W*0.30,H*0.27);
+      c.globalAlpha=.55; c.lineWidth=3; arc(cx,cy-58,40,0.3,2.84);
+      c.lineWidth=2.4; c.globalAlpha=.9; ring(cx,cy+38,16); tri(cx,cy+54,7);
+      tgt(cx+44,cy+6,26);
+      break;
+    case 'head_coronal':
+      c.lineWidth=4; c.globalAlpha=.55; ring(cx,cy-26,108);
+      c.lineWidth=5; c.globalAlpha=.5; arc(cx,cy+40,82,0.2,Math.PI-0.2);
+      c.lineWidth=2.4; c.globalAlpha=.9; for(let i=0;i<4;i++) rect(cx-20,cy+82+i*30,40,24);
+      tgt(cx+20,cy+4,42);
+      break;
+    case 'head_sagittal':
+      c.lineWidth=4; c.globalAlpha=.55; arc(cx-4,cy-30,98,-2.45,1.0);
+      c.globalAlpha=.5; c.lineWidth=4; arc(cx-66,cy+28,44,-0.6,1.25);
+      c.lineWidth=2.4; c.globalAlpha=.9; for(let i=0;i<4;i++) rect(cx+16+i*5,cy+48+i*30,30,24);
+      tgt(cx-6,cy+8,40);
+      break;
+
+    /* ---------- BREAST / CHEST ---------- */
+    case 'chest_axial':
+      c.lineWidth=3; c.globalAlpha=.42; ell(cx,cy,W*0.36,H*0.26);
+      c.lineWidth=2.4; c.globalAlpha=.9; ring(cx,cy+52,18); tri(cx,cy+70,7);
+      c.lineWidth=5; c.globalAlpha=.5; rect(cx-9,cy-68,18,15);
+      c.globalAlpha=.38; c.lineWidth=3; arc(cx-148,cy+4,150,-0.5,0.5); arc(cx+148,cy+4,150,Math.PI-0.5,Math.PI+0.5);
+      tgt(cx-62,cy-20,30); fid(cx-62,cy-20);
+      break;
+    case 'chest_coronal':
+      c.lineWidth=3; c.globalAlpha=.38; for(let i=0;i<5;i++) arc(cx-150,cy-50+i*36,200,-0.5,0.5);
+      c.lineWidth=2.4; c.globalAlpha=.85; for(let i=0;i<6;i++) rect(cx-16,cy-100+i*36,32,26);
+      c.globalAlpha=.9; fid(cx+4,cy-8);
+      tgt(cx-100,cy+34,52);
+      break;
+    case 'chest_sagittal':
+      c.lineWidth=2.4; c.globalAlpha=.85; for(let i=0;i<6;i++) rect(cx+44,cy-100+i*36,28,26);
+      c.globalAlpha=.5; c.lineWidth=5; line(cx-58,cy-78,cx-58,cy+8);
+      c.lineWidth=4; c.globalAlpha=.42; arc(cx-8,cy+72,120,-1.0,-0.1);
+      tgt(cx-58,cy-28,40);
+      break;
+
+    default: ring(cx,cy,60);
+  }
+  c.restore();
+}
+
+/* =================== TREATMENT CONSOLE (dual screen) =================== */
+const near=(a,b,t=0.3)=>Math.abs(a-b)<=t;
+function parseGantry(g){
+  if(g.includes('→')){const [a,b]=g.split('→').map(x=>parseFloat(x));return [a,b];}
+  const v=parseFloat(g); return [v,v];
+}
+function plannedFor(p,f){
+  const [gs,ge]=parseGantry(f.gantry);
+  return {energy:f.energy,mu:f.mu,doseRate:600,gantryStart:gs,gantryStop:ge,arc:gs!==ge,
+    coll:parseFloat(f.coll),vrt:p.couch.vrt,lng:p.couch.lng,lat:p.couch.lat,rtn:p.couch.rtn};
+}
+function nextTreatField(p,s){return p.fields.find(f=>f.type==='Treat' && !s.delivered.has(f.id));}
+function initCon(p,s){
+  if(s.con) return s.con;
+  s.con={field:null,st:'parked',door:'open',mu:0,gantryNow:0,hold:false,
+    actual:{coll:0,vrt:0,lng:0,lat:0,rtn:0,energy:'—'}};
+  return s.con;
+}
+function conMatched(con,plan){
+  if(!plan)return false;
+  return con.actual.energy===plan.energy && near(con.actual.coll,plan.coll) &&
+    near(con.actual.vrt,plan.vrt) && near(con.actual.lng,plan.lng) &&
+    near(con.actual.lat,plan.lat) && near(con.gantryNow,plan.gantryStart,0.8);
+}
+function conRecheck(){
+  const p=PATIENTS[state.patientId],s=sess(state.patientId),con=s.con;
+  if(['moving','beamon','complete','interrupt'].includes(con.st))return;
+  if(con.field===null){con.st='parked';return;}
+  const plan=plannedFor(p,p.fields.find(f=>f.id===con.field));
+  const gated = con.door!=='closed' || !s.igrtApproved || !conMatched(con,plan);
+  con.st = gated?'interlock':'ready';
+}
+
+function renderConsole(){
+  const p=state.patientId?PATIENTS[state.patientId]:null;
+  if(!p){ main.innerHTML=emptyState('No patient loaded','Open a treatment appointment from the Schedule to begin.'); return; }
+  const s=sess(state.patientId); initCon(p,s);
+  main.innerHTML=`
+    <div class="toolbar"><h2>Treatment Console</h2><span class="sub">Dual screen · OIS ⇄ LINAC · ${p.machine}</span>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="state.module='imaging';render()">◀ Imaging</button>
+      <button class="btn ghost" onclick="state.module='treatment';render()">R&amp;V Chart ▶</button>
+    </div>
+    <div class="dual">
+      <div class="monitor">
+        <div class="mon-bar"><span class="mon-led" id="oisLed"></span> OIS · Record &amp; Verify <span class="mon-tag">${p.machine}</span></div>
+        <div class="mon-screen ois-screen">
+          <div id="oisHead"></div>
+          <div class="ois-rv-queue"><div class="qh">Field Queue</div><div id="oisQueue"></div></div>
+          <div id="oisFooter"></div>
+        </div>
+      </div>
+      <div class="monitor">
+        <div class="mon-bar"><span class="mon-led red" id="conLed"></span> LINAC Console <span class="mon-tag">TrueLINAC 21</span></div>
+        <div class="mon-screen con-screen">
+          <div class="con-state s-parked" id="conState">PARKED</div>
+          <div class="con-meters">
+            <div class="meter"><div class="ml">MU 1</div><div class="mv" id="conMU1">0</div></div>
+            <div class="meter"><div class="ml">MU 2</div><div class="mv" id="conMU2">0</div></div>
+            <div class="meter"><div class="ml">Dose rate</div><div class="mv" id="conRate">0<small>MU/min</small></div></div>
+            <div class="meter"><div class="ml">Gantry</div><div class="mv" id="conGantry">0.0°</div></div>
+          </div>
+          <div class="con-cols">
+            <div class="con-params"><div class="qh">Planned vs Actual</div>
+              <table><thead><tr><th>Parameter</th><th>Plan</th><th>Actual</th><th></th></tr></thead><tbody id="paramRows"></tbody></table>
+            </div>
+            <div class="con-il"><div class="qh">Interlocks</div><div id="ilList"></div></div>
+          </div>
+          <div class="con-controls">
+            <button class="cbtn" id="btnDoor" onclick="conDoor()">Close Door</button>
+            <button class="cbtn" id="btnMode" onclick="conModeUp()">Mode Up / Set</button>
+            <button class="cbtn beam" id="btnBeam">⏻ Beam On (hold)</button>
+            <button class="cbtn term" id="btnTerm" onclick="conTerminate()">Terminate</button>
+          </div>
+          <div class="con-hint">Beam On is a dead-man control — press and hold to deliver, release to interrupt.</div>
+        </div>
+      </div>
+    </div>`;
+  const bb=document.getElementById('btnBeam');
+  bb.addEventListener('mousedown',conBeamDown);
+  bb.addEventListener('mouseup',conBeamUp);
+  bb.addEventListener('mouseleave',conBeamUp);
+  bb.addEventListener('touchstart',e=>{e.preventDefault();conBeamDown();},{passive:false});
+  bb.addEventListener('touchend',e=>{e.preventDefault();conBeamUp();},{passive:false});
+  updateConsole();
+}
+
+function updateConsole(){
+  const p=PATIENTS[state.patientId], s=sess(state.patientId), con=s.con; if(!con)return;
+  const sel = con.field ? p.fields.find(f=>f.id===con.field) : nextTreatField(p,s);
+  const plan = sel ? plannedFor(p,sel) : null;
+  const matched = plan ? conMatched(con,plan) : false;
+
+  // resting-state recompute (animations/beam/interrupt manage their own state)
+  if(!['moving','beamon','complete','interrupt'].includes(con.st)){
+    con.st = con.field===null ? 'parked'
+      : (con.door==='closed' && s.igrtApproved && matched) ? 'ready' : 'interlock';
+  }
+
+  const banner=document.getElementById('conState');
+  const map={parked:['PARKED','s-parked'],moving:['MOVING — CLEAR THE ROOM','s-moving'],
+    ready:['BEAM READY','s-ready'],beamon:['◉ BEAM ON','s-beamon'],
+    interrupt:['BEAM INTERRUPTED','s-interrupt'],interlock:['INTERLOCK','s-interlock'],
+    complete:['FIELD COMPLETE','s-complete']};
+  const [txt,cls]=map[con.st]||['—','s-parked'];
+  banner.textContent=txt; banner.className='con-state '+cls;
+  document.getElementById('conLed').className='mon-led '+
+    ((con.st==='ready'||con.st==='beamon')?'':(con.st==='moving'||con.st==='interrupt')?'amber':'red');
+
+  document.getElementById('conMU1').textContent=con.mu;
+  document.getElementById('conMU2').textContent=con.mu;
+  document.getElementById('conRate').innerHTML=(con.st==='beamon'&&plan?plan.doseRate:0)+'<small>MU/min</small>';
+  document.getElementById('conGantry').textContent=con.gantryNow.toFixed(1)+'°';
+
+  const tb=document.getElementById('paramRows');
+  if(plan){
+    const tick=ok=>ok?'<span class="mtick">✓</span>':'<span class="mcross">✗</span>';
+    const rows=[
+      ['Energy',plan.energy,con.actual.energy,con.actual.energy===plan.energy],
+      ['Gantry',plan.arc?`${plan.gantryStart}→${plan.gantryStop}°`:`${plan.gantryStart}°`,con.gantryNow.toFixed(1)+'°',matched||con.st==='beamon'],
+      ['Collimator',plan.coll.toFixed(1)+'°',con.actual.coll.toFixed(1)+'°',near(con.actual.coll,plan.coll)],
+      ['Couch Vrt',plan.vrt.toFixed(1)+' cm',con.actual.vrt.toFixed(1)+' cm',near(con.actual.vrt,plan.vrt)],
+      ['Couch Lng',plan.lng.toFixed(1)+' cm',con.actual.lng.toFixed(1)+' cm',near(con.actual.lng,plan.lng)],
+      ['Couch Lat',plan.lat.toFixed(1)+' cm',con.actual.lat.toFixed(1)+' cm',near(con.actual.lat,plan.lat)],
+      ['MU',plan.mu,con.mu,con.mu>=plan.mu],
+    ];
+    tb.innerHTML=rows.map(r=>`<tr><td class="pname">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${tick(r[3])}</td></tr>`).join('');
+  } else {
+    tb.innerHTML=`<tr><td class="pname" colspan="4" style="text-align:center;color:#7e93ae">All treatment fields delivered</td></tr>`;
+  }
+
+  const il=[
+    {id:'Maze door', set: con.door!=='closed'},
+    {id:'Image approval', set: !s.igrtApproved},
+    {id:'Axis position', set: con.field!==null && !matched && !['beamon','moving'].includes(con.st)},
+    {id:'Beam-on key', set:false},
+    {id:'Dosimetry', set:false},
+  ];
+  document.getElementById('ilList').innerHTML=il.map(x=>
+    `<div class="ilrow"><span>${x.id}</span><span class="ip ${x.set?'set':'ok'}">${x.set?'SET':'OK'}</span></div>`).join('');
+
+  const bMode=document.getElementById('btnMode'), bBeam=document.getElementById('btnBeam'),
+        bDoor=document.getElementById('btnDoor'), bTerm=document.getElementById('btnTerm');
+  bMode.disabled = con.st==='moving'||con.st==='beamon'||!plan;
+  bMode.textContent = con.field? 'Re-Set Axes':'Mode Up / Set';
+  bDoor.disabled = con.st==='beamon'||con.st==='moving';
+  bDoor.textContent = con.door==='closed'?'Open Door':'Close Door';
+  bBeam.disabled = !(con.st==='ready'||con.st==='interrupt'||con.st==='beamon');
+  bBeam.classList.toggle('armed',con.st==='ready');
+  bBeam.textContent = con.st==='beamon'?'◉ Delivering…':con.st==='interrupt'?'Resume (hold)':'⏻ Beam On (hold)';
+  bTerm.disabled = !(con.st==='beamon'||con.st==='interrupt'||con.st==='interlock'||con.st==='moving');
+
+  renderOisMonitor(p,s,con,sel);
+}
+
+function renderOisMonitor(p,s,con,sel){
+  document.getElementById('oisHead').innerHTML=
+    `<div class="nm">${p.name}</div>
+     <div class="meta">MRN ${p.mrn} · ${p.site} · ${p.technique} · Fx ${p.fxDone+1}/${p.fxTotal}</div>
+     <div style="margin-top:7px">${ s.igrtApproved
+        ? '<span class="pill" style="background:#0f2a1c;color:#5fd391">Image approved</span>'
+        : '<span class="pill" style="background:#3a1513;color:#ff8a83">Image not approved</span>'}</div>`;
+  document.getElementById('oisQueue').innerHTML=p.fields.map(f=>{
+    const treat=f.type==='Treat', done=s.delivered.has(f.id), cur=con.field===f.id;
+    const status= !treat?'<span class="pill" style="background:#13283f;color:#7fb2e6">Setup</span>'
+      : done?'<span class="pill" style="background:#0f2a1c;color:#5fd391">Delivered</span>'
+      : cur?'<span class="pill" style="background:#2a2410;color:#f0c069">At console</span>'
+      : '<span class="pill" style="background:#1a2330;color:#8194ad">Queued</span>';
+    return `<div class="qrow ${cur?'cur':''} ${done?'done':''}">
+       <span class="qid">${f.id}</span><span style="color:#9fb2cb">${f.type} · ${f.energy}</span>
+       ${status}<span class="qmu">${f.mu?f.mu+' MU':''}</span></div>`;
+  }).join('');
+  const allDone=p.fields.filter(f=>f.type==='Treat').every(f=>s.delivered.has(f.id));
+  const foot=document.getElementById('oisFooter');
+  if(allDone){
+    foot.innerHTML=`<button class="btn go" style="width:100%;justify-content:center" onclick="completeFraction()">✓ Record &amp; Complete Fraction ${p.fxDone+1}</button>`;
+  } else if(!s.igrtApproved){
+    foot.innerHTML=`<button class="btn" style="width:100%;justify-content:center;background:#13283f;color:#9fd0ff;border-color:#1c456f" onclick="state.module='imaging';render()">◀ Approve image in Imaging first</button>`;
+  } else {
+    foot.innerHTML=`<div style="font-size:11.5px;color:#9fb2cb">Next field: <b style="font-family:var(--mono);color:#dbe5f1">${sel?sel.id:'—'}</b> — mode it up on the console →</div>`;
+  }
+}
+
+/* ---- console actions ---- */
+window.conDoor=function(){
+  const s=sess(state.patientId),con=s.con;
+  if(con.st==='beamon'||con.st==='moving')return;
+  con.door = con.door==='closed'?'open':'closed';
+  conRecheck(); updateConsole();
+};
+window.conModeUp=function(){
+  const p=PATIENTS[state.patientId],s=sess(state.patientId),con=s.con;
+  const sel = con.field ? p.fields.find(f=>f.id===con.field) : nextTreatField(p,s);
+  if(!sel) return;
+  con.field=sel.id; con.mu=0; con.st='moving';
+  const plan=plannedFor(p,sel);
+  const from={g:con.gantryNow,c:con.actual.coll,v:con.actual.vrt,l:con.actual.lng,a:con.actual.lat};
+  const to={g:plan.gantryStart,c:plan.coll,v:plan.vrt,l:plan.lng,a:plan.lat};
+  let i=0,steps=26; clearInterval(con._move);
+  con._move=setInterval(()=>{
+    i++; const f=i/steps;
+    con.gantryNow=Math.round((from.g+(to.g-from.g)*f)*10)/10;
+    con.actual.coll=Math.round((from.c+(to.c-from.c)*f)*10)/10;
+    con.actual.vrt=Math.round((from.v+(to.v-from.v)*f)*100)/100;
+    con.actual.lng=Math.round((from.l+(to.l-from.l)*f)*100)/100;
+    con.actual.lat=Math.round((from.a+(to.a-from.a)*f)*100)/100;
+    con.actual.energy=plan.energy;
+    if(i>=steps){
+      clearInterval(con._move);
+      con.gantryNow=plan.gantryStart; con.actual.coll=plan.coll;
+      con.actual.vrt=plan.vrt; con.actual.lng=plan.lng; con.actual.lat=plan.lat;
+      con.st='interlock'; conRecheck();
+      toast(con.st==='ready'?'ok':'warn', con.st==='ready'?'Moded up — beam ready':'Moded up — clear remaining interlocks');
+    }
+    updateConsole();
+  },45);
+};
+window.conBeamDown=function(){
+  const s=sess(state.patientId),con=s.con; if(!con)return;
+  if(con.st!=='ready'&&con.st!=='interrupt')return;
+  con.hold=true; con.st='beamon'; startBeamLoop(); updateConsole();
+};
+window.conBeamUp=function(){
+  const s=sess(state.patientId),con=s.con; if(!con)return;
+  con.hold=false;
+};
+function startBeamLoop(){
+  const p=PATIENTS[state.patientId],s=sess(state.patientId),con=s.con;
+  const sel=p.fields.find(f=>f.id===con.field); const plan=plannedFor(p,sel);
+  clearInterval(con._beam);
+  con._beam=setInterval(()=>{
+    if(con.st!=='beamon'){clearInterval(con._beam);return;}
+    if(!con.hold){
+      clearInterval(con._beam);
+      if(con.mu<plan.mu){ con.st='interrupt'; toast('warn','Beam interrupted — hold to resume.'); }
+      updateConsole(); return;
+    }
+    con.mu=Math.min(plan.mu,con.mu+Math.max(2,Math.round(plan.mu/40)));
+    if(plan.arc) con.gantryNow=Math.round((plan.gantryStart+(plan.gantryStop-plan.gantryStart)*(con.mu/plan.mu))*10)/10;
+    if(con.mu>=plan.mu){
+      clearInterval(con._beam); con.st='complete'; s.delivered.add(sel.id);
+      toast('ok',`${sel.id} delivered · ${plan.mu} MU recorded`);
+      updateConsole();
+      setTimeout(advanceField,750);
+      return;
+    }
+    updateConsole();
+  },60);
+}
+function advanceField(){
+  const s=sess(state.patientId),con=s.con;
+  con.field=null; con.mu=0; con.st='parked'; con.gantryNow=0;
+  con.actual={coll:0,vrt:0,lng:0,lat:0,rtn:0,energy:'—'};
+  renderConsole();
+}
+window.conTerminate=function(){
+  const s=sess(state.patientId),con=s.con;
+  clearInterval(con._beam); clearInterval(con._move); con.hold=false;
+  con.mu=0; con.st='interlock'; conRecheck();
+  toast('stop','Beam terminated — field reset.'); updateConsole();
+};
+
+
+/* =================== CHART =================== */
+function renderChart(){
+  const p=state.patientId?PATIENTS[state.patientId]:null;
+  if(!p){ main.innerHTML=emptyState('No patient loaded','Open a treatment appointment from the Schedule.'); return; }
+  main.innerHTML=`
+    <div class="toolbar"><h2>Patient Chart</h2><span class="sub">${p.name} · MRN ${p.mrn}</span></div>
+    <div class="pad grid2">
+      <div class="card"><h3>Demographics</h3><div class="body-pad">
+        <dl class="kv">
+          <dt>Name</dt><dd>${p.name}</dd>
+          <dt>MRN</dt><dd>${p.mrn}</dd>
+          <dt>DOB</dt><dd>${p.dob}</dd>
+          <dt>Sex</dt><dd>${p.sex}</dd>
+          <dt>Oncologist</dt><dd>${p.oncologist}</dd>
+        </dl></div></div>
+      <div class="card"><h3>Prescription &amp; Setup</h3><div class="body-pad">
+        <dl class="kv">
+          <dt>Site</dt><dd>${p.site}</dd>
+          <dt>Technique</dt><dd>${p.technique}</dd>
+          <dt>Machine</dt><dd>${p.machine}</dd>
+          <dt>Energy</dt><dd>${p.energy}</dd>
+          <dt>Dose / fx</dt><dd>${(p.fxDose/100).toFixed(2)} Gy</dd>
+          <dt>Total</dt><dd>${(p.rxDose/100).toFixed(2)} Gy / ${p.fxTotal} fx</dd>
+          <dt>Delivered</dt><dd>${p.fxDone} fx</dd>
+          <dt>Position</dt><dd style="font-family:var(--ui);text-align:right">${p.position}</dd>
+          <dt>Imaging</dt><dd style="font-family:var(--ui);text-align:right">${p.imaging}</dd>
+        </dl>
+        <div style="margin-top:12px;padding:10px;background:var(--panel-2);border-radius:6px;font-size:12px">
+          <b>Setup note:</b> ${p.setupNote}<br><b>Site protocol:</b> ${p.flags.join(' · ')||'—'}
+        </div>
+      </div></div>
+    </div>`;
+}
+
+/* =================== shared =================== */
+function emptyState(t,s){
+  return `<div class="empty"><div>
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+    <h3 style="margin:0 0 4px">${t}</h3><div>${s}</div>
+    <button class="btn primary" style="margin-top:14px" onclick="state.module='schedule';render()">Go to Schedule</button>
+  </div></div>`;
+}
+function toast(kind,msg){
+  const t=document.getElementById('toast'); const m=document.getElementById('toastMsg');
+  t.className='toast '+kind+' show';
+  t.querySelector('.ic').textContent= kind==='ok'?'✓':kind==='warn'?'!':'⛔';
+  m.textContent=msg;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* nav */
+document.getElementById('nav').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  state.module=b.dataset.mod; render();
+});
+
+/* clock */
+function tick(){
+  const d=new Date();
+  document.getElementById('clock').textContent=
+    String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+setInterval(tick,1000); tick();
+
+render();
+</script>
+</body>
+</html>
