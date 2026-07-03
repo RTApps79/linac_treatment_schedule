@@ -1,0 +1,1322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LINAC Treatment Console — Teaching Emulator</title>
+<style>
+  /* =================================================================
+     LINAC TREATMENT CONSOLE — teaching emulator (self-contained).
+     Improvements over the original: real MU delivery dynamics, an
+     interlock chain with beam states, modality/energy separation,
+     mm-based image guidance with couch correction, and all visuals
+     drawn in-app (no external images). Education only — see footer.
+     ================================================================= */
+  :root{
+    --bg:#0a0f16; --bg2:#0d1420; --panel:#121b29; --panel2:#162133; --raised:#1b2940;
+    --line:#243449; --line-soft:#1c2a3c;
+    --ink:#e7eef7; --ink-soft:#9db0c6; --ink-mute:#64788f;
+    --green:#2fd27a; --amber:#f5b53d; --red:#ff5747; --blue:#3d8bf0; --cyan:#34d6c6;
+    --beam:#ff5747;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  h3,h4{margin:0}
+  .mono{font-family:var(--mono)}
+
+  /* ---------- top bar ---------- */
+  header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:linear-gradient(180deg,#0e1726,#0a111c);border-bottom:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo .tre{width:30px;height:30px;flex:0 0 auto}
+  .logo b{font-size:15px;letter-spacing:.08em}
+  .logo .mid{font-family:var(--mono);font-size:10px;color:var(--ink-mute);letter-spacing:.18em;text-transform:uppercase}
+  header .pt{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  header .pt b{color:var(--ink)}
+  header .spacer{flex:1}
+  .state-pill{display:flex;align-items:center;gap:9px;padding:7px 14px;border-radius:24px;border:1px solid var(--line);
+    background:var(--panel);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .state-dot{width:11px;height:11px;border-radius:50%;background:var(--ink-mute);box-shadow:0 0 0 0 rgba(0,0,0,0)}
+  .state-pill[data-s="standby"] .state-dot{background:var(--ink-mute)}
+  .state-pill[data-s="ready"]{border-color:var(--green);color:var(--green)} .state-pill[data-s="ready"] .state-dot{background:var(--green);box-shadow:0 0 12px var(--green)}
+  .state-pill[data-s="beamon"]{border-color:var(--beam);color:var(--beam)} .state-pill[data-s="beamon"] .state-dot{background:var(--beam);box-shadow:0 0 14px var(--beam);animation:blink .7s steps(2) infinite}
+  .state-pill[data-s="interrupt"]{border-color:var(--amber);color:var(--amber)} .state-pill[data-s="interrupt"] .state-dot{background:var(--amber)}
+  .state-pill[data-s="complete"]{border-color:var(--green);color:var(--green)} .state-pill[data-s="complete"] .state-dot{background:var(--green)}
+  .state-pill[data-s="fault"]{border-color:var(--red);color:var(--red)} .state-pill[data-s="fault"] .state-dot{background:var(--red);box-shadow:0 0 12px var(--red)}
+  @keyframes blink{50%{opacity:.25}}
+  .estop{font-family:var(--mono);font-weight:800;font-size:12px;letter-spacing:.1em;color:#fff;background:linear-gradient(180deg,#e03b2e,#b5271d);
+    border:1px solid #ff6a5c;border-radius:50%;width:58px;height:58px;cursor:pointer;text-transform:uppercase;box-shadow:0 4px 14px rgba(224,59,46,.4)}
+  .estop:active{transform:translateY(1px)}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:248px 1fr 322px;gap:12px;padding:12px;align-items:start}
+  @media(max-width:1080px){.grid{grid-template-columns:1fr 1fr}.col-r{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}.col-r{grid-template-columns:1fr}}
+  .col{display:flex;flex-direction:column;gap:12px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+  .card>.lab{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .card>.lab .hint{color:var(--ink-mute);font-size:9.5px;letter-spacing:.05em}
+
+  /* tabs */
+  .tabs{display:flex;gap:5px;margin-bottom:10px}
+  .tabs button{flex:1;font-family:var(--mono);font-size:11px;color:var(--ink-soft);background:var(--bg2);border:1px solid var(--line);
+    padding:6px 4px;border-radius:7px;cursor:pointer}
+  .tabs button.on{background:var(--raised);border-color:var(--cyan);color:var(--ink)}
+  .tab{display:none} .tab.on{display:block}
+  .kv{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line-soft);font-size:13px}
+  .kv:last-child{border-bottom:0}
+  .kv span{color:var(--ink-mute);font-family:var(--mono);font-size:11px;letter-spacing:.03em}
+  .kv b{font-weight:600}
+  .flag{font-family:var(--mono);font-size:10px;padding:1px 7px;border-radius:10px}
+  .flag.low{background:rgba(245,87,71,.16);color:#ff8278}
+
+  /* plan field list */
+  .field-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;background:var(--bg2);cursor:pointer;transition:.12s}
+  .field-row:hover{border-color:var(--cyan)}
+  .field-row.loaded{border-color:var(--green);background:rgba(47,210,122,.06)}
+  .field-row.done{opacity:.55}
+  .field-row .fn{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--cyan);width:30px}
+  .field-row .fd{flex:1;font-family:var(--mono);font-size:11px;color:var(--ink-soft);line-height:1.35}
+  .field-row .fchk{font-size:14px;color:var(--green);width:16px;text-align:center}
+
+  /* canvases */
+  canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .bev-wrap{position:relative;background:#06090e;border-radius:8px;overflow:hidden}
+  .bev-tag{position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute)}
+  .bev-fs{position:absolute;bottom:8px;right:10px;font-family:var(--mono);font-size:11px;color:var(--cyan)}
+
+  /* delivery */
+  .deliv-top{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+  .fld label{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:4px}
+  input[type=number],select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:8px;font-family:var(--mono);font-size:13px}
+  input:focus,select:focus{outline:2px solid var(--cyan);outline-offset:-1px;border-color:transparent}
+  input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
+
+  .mu-readout{display:flex;align-items:flex-end;justify-content:space-between;margin:2px 0 7px}
+  .mu-readout .big{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1}
+  .mu-readout .big small{font-size:13px;color:var(--ink-mute);font-weight:400}
+  .mu-readout .rt{text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-mute)}
+  .mu-readout .rt b{color:var(--ink-soft);font-size:13px}
+  .bar{height:10px;border-radius:6px;background:var(--bg2);border:1px solid var(--line-soft);overflow:hidden}
+  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width .1s linear}
+  .bar.live>i{background:linear-gradient(90deg,var(--beam),#ff8a5c)}
+
+  .beam-btns{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-top:11px}
+  .btn{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);
+    background:var(--raised);color:var(--ink);border-radius:9px;padding:12px 8px;cursor:pointer;transition:.12s}
+  .btn:hover:not(:disabled){border-color:var(--cyan)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.on{background:linear-gradient(180deg,#2bb869,#1f9d59);border-color:#36d97f;color:#04210f}
+  .btn.beam{background:linear-gradient(180deg,#e84436,#bf2a1f);border-color:#ff6a5c;color:#fff}
+  .btn.beam:disabled{background:var(--raised);color:var(--ink)}
+  .btn.warn{border-color:#5a4422}
+  .btn.warn:hover:not(:disabled){border-color:var(--amber)}
+
+  /* motion */
+  .motion{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+  .axis{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:9px;text-align:center}
+  .axis .an{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute)}
+  .axis .av{font-family:var(--mono);font-size:19px;font-weight:700;margin:3px 0}
+  .axis .ab{display:flex;gap:5px}
+  .axis .ab button{flex:1;font-family:var(--mono);font-size:14px;background:var(--raised);border:1px solid var(--line);color:var(--ink-soft);border-radius:6px;padding:4px;cursor:pointer}
+  .axis .ab button:hover:not(:disabled){border-color:var(--cyan);color:var(--ink)}
+  .axis .ab button:disabled{opacity:.35;cursor:not-allowed}
+  .couchpos{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:9px}
+  .couchpos .axis .av{font-size:15px}
+
+  /* interlocks */
+  .ilk{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px dashed var(--line-soft)}
+  .ilk:last-child{border-bottom:0}
+  .ilk .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+  .ilk.clear .dot{background:var(--green);box-shadow:0 0 8px rgba(47,210,122,.6)}
+  .ilk.set .dot{background:var(--red);box-shadow:0 0 8px rgba(255,87,71,.6)}
+  .ilk .nm{flex:1;font-family:var(--mono);font-size:12px}
+  .ilk.set .nm{color:#ffb3ac}
+  .ilk .st{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  .ilk.clear .st{color:var(--green)} .ilk.set .st{color:var(--red)}
+  .ilk .tog{font-family:var(--mono);font-size:10px;border:1px solid var(--line);background:var(--bg2);color:var(--ink-soft);border-radius:6px;padding:3px 8px;cursor:pointer}
+  .ilk .tog:hover{border-color:var(--cyan)}
+
+  /* igrt */
+  .igrt-canvas{background:#05080d}
+  .shiftgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+  .shiftgrid .axis .av{font-size:14px}
+  .shiftgrid .av.ok{color:var(--green)} .shiftgrid .av.bad{color:var(--amber)}
+  .igrt-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .resid{font-family:var(--mono);font-size:11px;color:var(--ink-mute);text-align:center;margin-top:8px}
+  .resid b.ok{color:var(--green)} .resid b.bad{color:var(--amber)}
+
+  /* status log */
+  .statusbar{margin:4px 12px 14px;background:#0a111c;border:1px solid var(--line);border-radius:9px;padding:9px 12px;display:flex;gap:14px;align-items:center}
+  .statusbar .now{font-family:var(--mono);font-size:12px;color:var(--ink);flex:0 0 auto}
+  .statusbar .log{flex:1;height:38px;overflow-y:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);line-height:1.55}
+  .statusbar .log .t{color:var(--ink-soft)}
+
+  .disclaimer{margin:0 12px 26px;font-size:11.5px;color:var(--ink-mute);line-height:1.6;border-top:1px solid var(--line-soft);padding-top:12px}
+  .disclaimer b{color:var(--ink-soft)}
+  .rdg{color:var(--cyan)}
+
+  /* ---------- bench: pendant + setup + cbct ---------- */
+  .bench{padding:0 12px}
+  .bench-grid{display:grid;grid-template-columns:236px 1fr;gap:12px;align-items:start}
+  @media(max-width:820px){.bench-grid{grid-template-columns:1fr}}
+
+  /* handheld pendant */
+  .pendant{background:linear-gradient(180deg,#e9edf2,#cfd6df);border:1px solid #aab4c0;border-radius:26px;padding:12px 12px 16px;
+    box-shadow:inset 0 1px 0 #fff, 0 10px 26px rgba(0,0,0,.45);color:#1a2230}
+  .pendant .lcd{background:#0d2417;border:2px solid #b6bdc6;border-radius:6px;padding:7px 9px;font-family:var(--mono);
+    color:#7dffba;text-shadow:0 0 6px rgba(125,255,186,.5);min-height:48px}
+  .pendant .lcd .l1{font-size:10px;letter-spacing:.08em;color:#9ff5c6;opacity:.85}
+  .pendant .lcd .l2{font-size:17px;font-weight:700;letter-spacing:.04em}
+  .pendant .grp-label{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#5a6577;margin:9px 2px 4px}
+  .pbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .pbtn{position:relative;border:1.5px solid #9aa4b2;background:linear-gradient(180deg,#fafbfc,#dde2e9);border-radius:8px;
+    height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#27303f;font-size:15px;
+    box-shadow:0 1px 0 #fff inset, 0 2px 3px rgba(0,0,0,.12)}
+  .pbtn:hover{filter:brightness(1.03)} .pbtn:active{transform:translateY(1px)}
+  .pbtn .cap{font-family:var(--mono);font-size:8px;position:absolute;bottom:1px;left:0;right:0;text-align:center;color:#5a6577;letter-spacing:.02em}
+  .pbtn.on{box-shadow:0 0 0 2px #2fd27a inset, 0 0 10px rgba(47,210,122,.5)}
+  .pbtn[data-ring=green]{border-color:#3aa657} .pbtn[data-ring=blue]{border-color:#2452a6}
+  .pbtn[data-ring=red]{border-color:#cc3b3b} .pbtn[data-ring=yellow]{border-color:#d8b53a}
+  .pbtn[data-ring=purple]{border-color:#7d4fcf} .pbtn[data-ring=teal]{border-color:#1f9bb5}
+  .pbtn.on[data-ring=red]{box-shadow:0 0 0 2px #ff5747 inset,0 0 10px rgba(255,87,71,.5)}
+  .dpad{display:grid;grid-template-columns:repeat(3,30px);grid-template-rows:repeat(3,30px);gap:4px;justify-content:center;margin:9px 0}
+  .dpad button{border:1.5px solid #9aa4b2;background:linear-gradient(180deg,#fafbfc,#dde2e9);border-radius:7px;cursor:pointer;color:#27303f;font-size:13px}
+  .dpad button:active{transform:translateY(1px)} .dpad .mid{background:#c7cdd6;border-radius:50%}
+  .dpad .none{visibility:hidden}
+  .rockers{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+  .rocker{display:grid;grid-template-columns:46px 1fr 1fr;align-items:center;gap:5px}
+  .rocker .rl{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:#4a5566;text-transform:uppercase}
+  .rocker button{border:1.5px solid #9aa4b2;background:linear-gradient(180deg,#f4f6f9,#d3d9e1);border-radius:6px;height:24px;cursor:pointer;font-family:var(--mono);font-size:12px;color:#27303f}
+  .rocker button:active{transform:translateY(1px);background:#c7cdd6}
+  .pendant .brand{text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:#8a95a4;margin-top:10px}
+
+  /* in-room toggle chips reflecting pendant state */
+  .roomchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .rchip{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--ink-mute)}
+  .rchip.on{border-color:var(--cyan);color:var(--ink)}
+  .rchip.on[data-k=lasers]{border-color:#ff5d7a;color:#ff9db0}
+  .rchip.on[data-k=field]{border-color:#f5b53d;color:#f5d28a}
+  .rchip.on[data-k=room]{border-color:#9fb2c6;color:#cfe} 
+
+  .setup-wrap{position:relative;background:#05080d;border-radius:8px;overflow:hidden}
+  .setup-wrap canvas{display:block;width:100%;height:auto}
+  .setup-tag{position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute)}
+  .setup-grade{position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:11px}
+  .setup-grade.ok{color:var(--green)} .setup-grade.bad{color:var(--amber)}
+  .tri-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+  .tri-stat{font-family:var(--mono);font-size:11px;color:var(--ink-mute)}
+  .tri-stat b{color:var(--ink-soft)}
+
+  /* cbct tools */
+  .cbct-tools{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+  .cbct-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .cbct-row label{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);min-width:42px}
+  .cbct-row input[type=range]{flex:1;min-width:90px}
+  .filebtn{font-family:var(--mono);font-size:11px;color:var(--ink-soft);background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer}
+  .filebtn:hover{border-color:var(--cyan);color:var(--ink)}
+  .seg-mini{display:flex;gap:5px}
+  .seg-mini button{font-family:var(--mono);font-size:10px;color:var(--ink-soft);background:var(--bg2);border:1px solid var(--line);padding:5px 9px;border-radius:7px;cursor:pointer}
+  .seg-mini button.on{border-color:var(--cyan);color:var(--ink);background:var(--raised)}
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important} }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg class="tre" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="4.5" fill="#f5b53d"/>
+      <g fill="#f5b53d">
+        <path d="M20 20 L31 13.6 A13 13 0 0 0 20 7 Z"/>
+        <path d="M20 20 L31 26.4 A13 13 0 0 1 20 33 Z"/>
+        <path d="M20 20 L9 26.4 A13 13 0 0 1 9 13.6 Z"/>
+      </g>
+    </svg>
+    <div><b>HALCYON-T</b> <span class="mid">teaching console</span></div>
+  </div>
+  <div class="pt">PT <b>Chen, Sarah</b> · MRN 4471902 · <span class="rdg" id="fxLabel">Fx 1 / 35</span></div>
+  <div class="spacer"></div>
+  <div class="state-pill" id="statePill" data-s="standby"><span class="state-dot"></span><span id="stateText">Standby</span></div>
+  <button class="estop" id="estop" title="Emergency stop">E-STOP</button>
+</header>
+
+<div class="grid">
+  <!-- ================= LEFT: PATIENT & PLAN ================= -->
+  <div class="col">
+    <div class="card">
+      <div class="lab">Patient record</div>
+      <div class="tabs" id="emrTabs">
+        <button class="on" data-t="demo">Demographics</button>
+        <button data-t="plan">Plan</button>
+        <button data-t="labs">Labs</button>
+      </div>
+      <div class="tab on" id="tab-demo">
+        <div class="kv"><span>Name</span><b>Sarah Chen</b></div>
+        <div class="kv"><span>DOB</span><b>20 Nov 1968 (57)</b></div>
+        <div class="kv"><span>Diagnosis</span><b>SCCa, L tonsil</b></div>
+        <div class="kv"><span>Stage</span><b>cT2 N1 M0</b></div>
+        <div class="kv"><span>Site setup</span><b>Supine, 5-pt mask</b></div>
+      </div>
+      <div class="tab" id="tab-plan">
+        <div class="kv"><span>Technique</span><b>VMAT</b></div>
+        <div class="kv"><span>Prescription</span><b>70 Gy / 35 fx</b></div>
+        <div class="kv"><span>Dose / fx</span><b>2.0 Gy</b></div>
+        <div class="kv"><span>Concurrent</span><b>Cisplatin</b></div>
+        <div class="kv"><span>Image guidance</span><b>Daily CBCT</b></div>
+      </div>
+      <div class="tab" id="tab-labs">
+        <div class="kv"><span>Creatinine</span><b>0.8 mg/dL</b></div>
+        <div class="kv"><span>eGFR</span><b>88 mL/min</b></div>
+        <div class="kv"><span>WBC</span><b>3.5 ×10⁹/L <span class="flag low">LOW</span></b></div>
+        <div class="kv"><span>Hgb</span><b>11.9 g/dL</b></div>
+        <div class="kv"><span>Weight</span><b>61.2 kg (−1.8 kg)</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lab">Treatment fields <span class="hint" id="planMU"></span></div>
+      <div id="fieldList"></div>
+      <div class="resid" style="margin-top:4px">Tap a field to load its parameters into the console.</div>
+    </div>
+  </div>
+
+  <!-- ================= CENTER: BEAM'S EYE + DELIVERY + MOTION ================= -->
+  <div class="col">
+    <div class="card">
+      <div class="lab">Beam's-eye view <span class="hint" id="bevField">FIELD —</span></div>
+      <div class="bev-wrap">
+        <canvas id="bev" width="620" height="620"></canvas>
+        <div class="bev-tag">MLC + jaws · collimator <span id="bevColl">0.0°</span></div>
+        <div class="bev-fs" id="bevFS">10.0 × 10.0 cm</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lab">Beam delivery</div>
+      <div class="deliv-top">
+        <div class="fld"><label for="modality">Modality</label>
+          <select id="modality"><option value="x">Photon (X)</option><option value="e">Electron (E)</option></select></div>
+        <div class="fld"><label for="energy">Energy</label><select id="energy"></select></div>
+        <div class="fld"><label for="muSet">Monitor units (MU)</label>
+          <input type="number" id="muSet" min="1" max="999" step="1" value="0"></div>
+        <div class="fld"><label for="doseRate">Dose rate (MU/min)</label><select id="doseRate"></select></div>
+      </div>
+
+      <div class="mu-readout">
+        <div class="big"><span id="muDelivered">0.0</span> <small>/ <span id="muTarget">0</span> MU</small></div>
+        <div class="rt">beam-on <b id="beamTime">0.0 s</b><br>remaining <b id="muRemain">0</b> MU</div>
+      </div>
+      <div class="bar" id="muBar"><i id="muFill"></i></div>
+
+      <div class="beam-btns">
+        <button class="btn beam" id="beamOn" disabled>● Beam On</button>
+        <button class="btn warn" id="beamHold" disabled>‖ Interrupt</button>
+        <button class="btn" id="beamOff" disabled>■ Terminate</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lab">Mechanical motion <span class="hint">IEC 61217 · locked during beam-on</span></div>
+      <div class="motion">
+        <div class="axis"><div class="an">Gantry</div><div class="av" id="avGantry">0.0°</div>
+          <div class="ab"><button data-ax="gantry" data-d="-1">◀</button><button data-ax="gantry" data-d="1">▶</button></div></div>
+        <div class="axis"><div class="an">Collimator</div><div class="av" id="avColl">0.0°</div>
+          <div class="ab"><button data-ax="coll" data-d="-1">◀</button><button data-ax="coll" data-d="1">▶</button></div></div>
+        <div class="axis"><div class="an">Couch rot</div><div class="av" id="avCouch">0.0°</div>
+          <div class="ab"><button data-ax="couch" data-d="-1">◀</button><button data-ax="couch" data-d="1">▶</button></div></div>
+      </div>
+      <div class="couchpos">
+        <div class="axis"><div class="an">Couch Vrt</div><div class="av" id="avVrt">0.0</div>
+          <div class="ab"><button data-ax="vrt" data-d="-1">−</button><button data-ax="vrt" data-d="1">+</button></div></div>
+        <div class="axis"><div class="an">Couch Lng</div><div class="av" id="avLng">0.0</div>
+          <div class="ab"><button data-ax="lng" data-d="-1">−</button><button data-ax="lng" data-d="1">+</button></div></div>
+        <div class="axis"><div class="an">Couch Lat</div><div class="av" id="avLat">0.0</div>
+          <div class="ab"><button data-ax="lat" data-d="-1">−</button><button data-ax="lat" data-d="1">+</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RIGHT: STATUS, INTERLOCKS, ROOM, IGRT ================= -->
+  <div class="col col-r">
+    <div class="card">
+      <div class="lab">Interlock chain <span class="hint" id="ilkSummary"></span></div>
+      <div id="ilkList"></div>
+      <div class="beam-btns" style="grid-template-columns:1fr 1fr;margin-top:11px">
+        <button class="btn on" id="prepBtn">Prepare beam</button>
+        <button class="btn" id="resetBtn">Reset / Standby</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lab">Treatment room <span class="hint">gantry &amp; couch geometry</span></div>
+      <canvas id="room" width="560" height="440"></canvas>
+      <div class="kv" style="margin-top:8px"><span>Energy</span><b id="mpEnergy">6 MV</b></div>
+      <div class="kv"><span>SAD / SSD</span><b>100 cm / <span id="mpSSD">100</span> cm</b></div>
+    </div>
+
+    <div class="card">
+      <div class="lab">Image-guided alignment <span class="hint" id="igrtHint">deploy kV · acquire CBCT</span></div>
+      <canvas id="igrt" class="igrt-canvas" width="560" height="560"></canvas>
+      <div class="cbct-tools">
+        <div class="cbct-row">
+          <button class="btn" id="acquireBtn" style="flex:1">⊕ Acquire CBCT</button>
+          <label class="filebtn" for="cbctFile" title="Load your own CBCT/DRR screenshot">⤓ Load image…</label>
+          <input id="cbctFile" type="file" accept="image/*" style="display:none">
+        </div>
+        <div class="cbct-row">
+          <label>Blend</label>
+          <input id="blend" type="range" min="0" max="100" value="55">
+          <div class="seg-mini" id="viewSeg">
+            <button data-v="overlay" class="on">Overlay</button>
+            <button data-v="split">Split</button>
+          </div>
+        </div>
+      </div>
+      <div class="shiftgrid">
+        <div class="axis"><div class="an">Vrt (mm)</div><div class="av" id="sVrt">0.0</div>
+          <div class="ab"><button data-sh="vrt" data-d="-1">−</button><button data-sh="vrt" data-d="1">+</button></div></div>
+        <div class="axis"><div class="an">Lng (mm)</div><div class="av" id="sLng">0.0</div>
+          <div class="ab"><button data-sh="lng" data-d="-1">−</button><button data-sh="lng" data-d="1">+</button></div></div>
+        <div class="axis"><div class="an">Lat (mm)</div><div class="av" id="sLat">0.0</div>
+          <div class="ab"><button data-sh="lat" data-d="-1">−</button><button data-sh="lat" data-d="1">+</button></div></div>
+      </div>
+      <div class="igrt-btns">
+        <button class="btn" id="autoMatch">Auto-match</button>
+        <button class="btn on" id="applyShift">Apply couch shift</button>
+      </div>
+      <div class="resid" id="residMsg">Residual offset: <b class="bad">pending match</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PENDANT + ISOCENTRE / TRIANGULATION ================= -->
+<section class="bench">
+  <div class="bench-grid">
+    <!-- handheld pendant -->
+    <div class="pendant" aria-label="Hand pendant">
+      <div class="lcd"><div class="l1" id="penL1">GANTRY</div><div class="l2" id="penL2">0.0°</div></div>
+
+      <div class="grp-label">Room functions</div>
+      <div class="pbtns">
+        <button class="pbtn" data-ring="green"  data-tog="room"  title="Room light">☀<span class="cap">ROOM</span></button>
+        <button class="pbtn" data-ring="blue"   data-tog="field" title="Field light">▦<span class="cap">FIELD</span></button>
+        <button class="pbtn" data-ring="red"    data-tog="odi"   title="Optical distance indicator">⊕<span class="cap">ODI</span></button>
+        <button class="pbtn" data-ring="yellow" data-tog="lasers" title="Lasers">✛<span class="cap">LASERS</span></button>
+        <button class="pbtn" data-ring="purple" data-tog="flash" title="Flashlight">🔦<span class="cap">FLASH</span></button>
+        <button class="pbtn" data-ring="teal"   data-mlc="toggle" title="Open/close MLC">⫴<span class="cap">MLC</span></button>
+      </div>
+
+      <div class="grp-label">Imaging / gantry</div>
+      <div class="pbtns">
+        <button class="pbtn" data-tog="kv" title="Deploy/retract kV panel">kV<span class="cap">PANEL</span></button>
+        <button class="pbtn" data-tog="mv" title="Deploy/retract MV panel">MV<span class="cap">PANEL</span></button>
+        <button class="pbtn" data-act="acq" title="Acquire CBCT">⊞<span class="cap">CBCT</span></button>
+      </div>
+
+      <div class="dpad">
+        <span class="none"></span>
+        <button data-hold="coll" data-d="1" title="Collimator +">▲</button>
+        <span class="none"></span>
+        <button data-hold="gantry" data-d="-1" title="Gantry −">◀</button>
+        <span class="mid"></span>
+        <button data-hold="gantry" data-d="1" title="Gantry +">▶</button>
+        <span class="none"></span>
+        <button data-hold="coll" data-d="-1" title="Collimator −">▼</button>
+        <span class="none"></span>
+      </div>
+
+      <div class="grp-label">Couch motion · hold to move</div>
+      <div class="rockers">
+        <div class="rocker"><span class="rl">Vert</span><button data-hold="vrt" data-d="1">▲ up</button><button data-hold="vrt" data-d="-1">▼ dn</button></div>
+        <div class="rocker"><span class="rl">Long</span><button data-hold="lng" data-d="1">▲ in</button><button data-hold="lng" data-d="-1">▼ out</button></div>
+        <div class="rocker"><span class="rl">Lat</span><button data-hold="lat" data-d="1">▲ L</button><button data-hold="lat" data-d="-1">▼ R</button></div>
+        <div class="rocker"><span class="rl">Rot</span><button data-hold="couch" data-d="1">▲ +</button><button data-hold="couch" data-d="-1">▼ −</button></div>
+      </div>
+      <div class="brand">PENDANT</div>
+    </div>
+
+    <!-- triangulation / isocentre practice -->
+    <div class="card">
+      <div class="lab">Isocentre setup — laser triangulation
+        <span class="hint">align tattoos to room lasers using the couch</span></div>
+      <div class="roomchips" id="roomChips">
+        <span class="rchip" data-k="room">Room light</span>
+        <span class="rchip" data-k="lasers">Lasers</span>
+        <span class="rchip" data-k="field">Field light</span>
+        <span class="rchip" data-k="odi">ODI / SSD</span>
+      </div>
+      <div class="setup-wrap">
+        <canvas id="setup" width="760" height="340"></canvas>
+        <div class="setup-tag">Axial view at reference slice</div>
+        <div class="setup-grade bad" id="setupGrade">offset —</div>
+      </div>
+      <div class="tri-row">
+        <button class="btn on" id="triNew" style="flex:0 0 auto">▶ New setup</button>
+        <button class="btn" id="triReveal" style="flex:0 0 auto">Auto-centre</button>
+        <span class="tri-stat">Tolerance <b>±2 mm</b> · solved <b id="triScore">0</b> · best <b id="triBest">—</b></span>
+      </div>
+      <div class="resid" id="triMsg" style="margin-top:8px">Turn on the lasers, then drive the couch so all three tattoos sit on the laser lines.</div>
+    </div>
+  </div>
+</section>
+
+<div class="statusbar">
+  <div class="now" id="statusNow">System ready</div>
+  <div class="log" id="statusLog"></div>
+</div>
+
+<div class="disclaimer">
+  <b>Teaching emulator — not a medical device.</b> This is a stylised simulation built to teach console workflow, the interlock-to-beam sequence, MU delivery, and image-guidance concepts. Dose-rate options, MU accrual, MLC shapes, and the alignment view are simplified and do not represent any specific manufacturer's machine or any real patient. It cannot control hardware and must never be used for clinical decisions.
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const TAU = Math.PI*2;
+const reduce = matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt = (v,d=1)=>Number(v).toFixed(d);
+
+/* ===================== ENERGY / DOSE-RATE MODEL ===================== */
+const ENERGY_OPTS = {
+  x:[{v:"6 MV",dr:[100,200,300,400,500,600]},
+     {v:"6 MV FFF",dr:[400,800,1200,1400]},
+     {v:"10 MV",dr:[100,200,300,400,500,600]},
+     {v:"10 MV FFF",dr:[600,1200,1800,2400]},
+     {v:"15 MV",dr:[100,200,300,400,500,600]}],
+  e:[{v:"6 MeV",dr:[100,300,600,1000]},
+     {v:"9 MeV",dr:[100,300,600,1000]},
+     {v:"12 MeV",dr:[100,300,600,1000]},
+     {v:"15 MeV",dr:[100,300,600,1000]},
+     {v:"18 MeV",dr:[100,300,600,1000]}],
+};
+
+/* ===================== TREATMENT PLAN (simplified VMAT/IMRT) ===================== */
+// Each field carries machine parameters + an aperture polygon (cm, at isocentre).
+function blob(cx,cy,rx,ry,seed){ const pts=[],n=16; for(let i=0;i<n;i++){ const a=i/n*TAU;
+  const r=1+0.18*Math.sin(a*3+seed)+0.12*Math.cos(a*2+seed*1.7);
+  pts.push([cx+Math.cos(a)*rx*r, cy+Math.sin(a)*ry*r]); } return pts; }
+const PLAN = [
+  {n:"F1", energy:"6 MV", modality:"x", gantry:181, coll:30, mu:148, jaws:[6.5,6.5,8,8], ap:blob(-0.5,-1,5.2,6.4,1)},
+  {n:"F2", energy:"6 MV", modality:"x", gantry:240, coll:330, mu:132, jaws:[6,7,8,8], ap:blob(0.6,-0.6,5,6.2,2)},
+  {n:"F3", energy:"6 MV", modality:"x", gantry:300, coll:30, mu:126, jaws:[7,6,8,8], ap:blob(1,-1.2,4.8,6,3)},
+  {n:"F4", energy:"6 MV", modality:"x", gantry:60,  coll:330, mu:130, jaws:[6,7,8,8], ap:blob(-1,-0.8,4.9,6.1,4)},
+  {n:"F5", energy:"6 MV", modality:"x", gantry:120, coll:30, mu:140, jaws:[6.5,6.5,8,8], ap:blob(-0.6,-1,5.1,6.3,5)},
+];
+let loadedField = -1;
+const delivered = PLAN.map(()=>0);   // MU delivered per field this session
+
+/* ===================== STATE ===================== */
+const M = {
+  state:"standby",                 // standby|ready|beamon|interrupt|complete|fault
+  modality:"x", energyIdx:0, energy:"6 MV", doseRate:600,
+  muTarget:0, muDone:0, beamTime:0,
+  gantry:0, coll:0, couch:0, vrt:0, lng:0, lat:0,
+  jaws:[5,5,5,5],                  // X1,X2,Y1,Y2 (cm)
+  aperture:null,
+  interlocks:{ door:false, key:false, mlc:true, jaws:true, couch:true, imager:true },
+  // false = CLEAR(ok), true = SET(blocking). door/key start SET (open/off).
+};
+/* pendant room indicators + imaging panels */
+const PEN = { room:false, field:false, odi:false, lasers:false, flash:false, kv:false, mv:false };
+/* MLC display override from pendant: null | "open" | "closed" */
+let mlcOverride = null;
+/* isocentre / triangulation practice (errors in cm; tolerance 2 mm) */
+const TRI = { active:false, err:{vrt:0,lng:0,lat:0}, start:{vrt:0,lng:0,lat:0}, solved:0, best:null, t0:0 };
+const TRI_TOL = 0.2; // cm (= 2 mm)
+/* CBCT alignment image state */
+const CBCT = { acquired:false, view:"overlay", blend:0.55, userImg:null, off:null };
+const ILK_META = [
+  {id:"door",  nm:"Treatment door", setTxt:"OPEN",  clrTxt:"CLOSED", toggle:true},
+  {id:"key",   nm:"Console key",    setTxt:"OFF",   clrTxt:"ON",     toggle:true},
+  {id:"jaws",  nm:"Jaw / field",    setTxt:"FAULT", clrTxt:"READY"},
+  {id:"mlc",   nm:"MLC carriage",   setTxt:"MOVING",clrTxt:"READY"},
+  {id:"couch", nm:"Couch / collision",setTxt:"CHECK",clrTxt:"CLEAR"},
+  {id:"imager",nm:"kV imager",      setTxt:"DEPLOYED",clrTxt:"STOWED"},
+];
+
+/* ===================== LOG ===================== */
+function log(msg){
+  const t=new Date().toLocaleTimeString([], {hour12:false});
+  const el=$("statusLog"); const line=document.createElement("div");
+  line.innerHTML=`<span class="t">${t}</span> ${msg}`; el.prepend(line);
+  while(el.children.length>40) el.lastChild.remove();
+  $("statusNow").textContent = msg.replace(/<[^>]+>/g,"");
+}
+
+/* ===================== ENERGY UI ===================== */
+function fillEnergy(){
+  const sel=$("energy"); sel.innerHTML="";
+  ENERGY_OPTS[M.modality].forEach((o,i)=>{ const op=document.createElement("option"); op.value=i; op.textContent=o.v; sel.appendChild(op); });
+  M.energyIdx=clamp(M.energyIdx,0,ENERGY_OPTS[M.modality].length-1); sel.value=M.energyIdx;
+  applyEnergy();
+}
+function applyEnergy(){
+  const o=ENERGY_OPTS[M.modality][M.energyIdx]; M.energy=o.v;
+  const dr=$("doseRate"); dr.innerHTML="";
+  o.dr.forEach(r=>{ const op=document.createElement("option"); op.value=r; op.textContent=r; dr.appendChild(op); });
+  if(!o.dr.includes(M.doseRate)) M.doseRate=o.dr[o.dr.length-1];
+  dr.value=M.doseRate;
+  $("mpEnergy").textContent=M.energy;
+}
+
+/* ===================== INTERLOCKS ===================== */
+function renderInterlocks(){
+  const box=$("ilkList"); box.innerHTML="";
+  let setCount=0;
+  ILK_META.forEach(meta=>{
+    const isSet=M.interlocks[meta.id];
+    if(isSet) setCount++;
+    const row=document.createElement("div");
+    row.className="ilk "+(isSet?"set":"clear");
+    row.innerHTML=`<span class="dot"></span><span class="nm">${meta.nm}</span>
+      <span class="st">${isSet?meta.setTxt:meta.clrTxt}</span>`;
+    if(meta.toggle){
+      const b=document.createElement("button"); b.className="tog";
+      b.textContent=isSet?("set "+meta.clrTxt):("set "+meta.setTxt);
+      b.onclick=()=>{ if(M.state==="beamon"){return;} M.interlocks[meta.id]=!isSet;
+        log(`${meta.nm} → ${!isSet?meta.setTxt:meta.clrTxt}`); evaluateReady(); renderInterlocks(); };
+      row.appendChild(b);
+    }
+    box.appendChild(row);
+  });
+  $("ilkSummary").textContent = setCount? `${setCount} blocking` : "all clear";
+}
+function interlocksClear(){ return Object.values(M.interlocks).every(v=>v===false); }
+
+/* ===================== READY / BEAM SEQUENCE ===================== */
+function paramsValid(){ return M.muTarget>0 && (M.jaws[0]+M.jaws[1])>0 && (M.jaws[2]+M.jaws[3])>0; }
+function setState(s){ M.state=s;
+  const labels={standby:"Standby",ready:"Beam ready",beamon:"Beam on",interrupt:"Interrupted",complete:"Field complete",fault:"Fault"};
+  $("statePill").dataset.s=s; $("stateText").textContent=labels[s];
+  updateControls();
+}
+function evaluateReady(){
+  if(M.state==="beamon"||M.state==="fault") return;
+  if(interlocksClear() && paramsValid() && (M.state==="ready"||M.state==="prep")){
+    setState("ready");
+  } else if(M.state==="ready"){
+    setState("standby");
+  }
+}
+function prepare(){
+  if(M.state==="beamon") return;
+  if(M.state==="fault"){ log("Clear the fault with Reset before preparing."); return; }
+  // auto-clear machine interlocks that are a function of valid params
+  M.interlocks.jaws = !((M.jaws[0]+M.jaws[1])>0 && (M.jaws[2]+M.jaws[3])>0);
+  M.interlocks.mlc = false; M.interlocks.couch = false; M.interlocks.imager = false;
+  renderInterlocks();
+  if(!interlocksClear()){ log("Cannot prepare — interlocks set: "+blockingList()); M.state="prep"; evaluateReady(); return; }
+  if(!paramsValid()){ log("Cannot prepare — set MU and a valid field size."); M.state="prep"; return; }
+  M.state="prep"; setState("ready"); log("Beam prepared — <b>READY</b>.");
+}
+function blockingList(){ return ILK_META.filter(m=>M.interlocks[m.id]).map(m=>m.nm).join(", ")||"none"; }
+
+let raf=null, lastT=0;
+function beamOn(){
+  if(M.state!=="ready") { log("Beam-on denied — not in READY."); return; }
+  if(loadedField<0){ log("Load a treatment field before delivery."); return; }
+  setState("beamon"); log(`<b style="color:#ff8278">BEAM ON</b> — ${M.energy}, ${M.doseRate} MU/min`);
+  lastT=performance.now();
+  cancelAnimationFrame(raf); raf=requestAnimationFrame(deliverTick);
+}
+function deliverTick(now){
+  if(M.state!=="beamon"){ return; }
+  if(!interlocksClear()){ setState("interrupt"); log("Interlock tripped during delivery — beam held at "+fmt(M.muDone)+" MU."); return; }
+  const dt=(now-lastT)/1000; lastT=now;
+  const rate=M.doseRate/60;                 // MU per second
+  M.muDone=Math.min(M.muTarget, M.muDone + rate*dt);
+  M.beamTime += dt;
+  updateMUReadout();
+  if(M.muDone>=M.muTarget-1e-6){ completeField(); return; }
+  raf=requestAnimationFrame(deliverTick);
+}
+function interrupt(){
+  if(M.state!=="beamon") return;
+  setState("interrupt"); log("Beam interrupted (MU held at "+fmt(M.muDone)+").");
+}
+function resumeFromInterrupt(){
+  if(M.state!=="interrupt") return;
+  if(!interlocksClear()){ log("Cannot resume — interlock set."); return; }
+  setState("beamon"); log("Beam resumed."); lastT=performance.now(); raf=requestAnimationFrame(deliverTick);
+}
+function terminate(manual){
+  if(M.state!=="beamon"&&M.state!=="interrupt") return;
+  cancelAnimationFrame(raf);
+  setState("standby");
+  log(`Beam terminated by ${manual?"operator":"system"} at ${fmt(M.muDone)} / ${M.muTarget} MU.`);
+}
+function completeField(){
+  cancelAnimationFrame(raf); M.muDone=M.muTarget; updateMUReadout();
+  if(loadedField>=0) delivered[loadedField]=M.muTarget;
+  setState("complete");
+  log(`Field ${PLAN[loadedField]?.n||""} complete — ${M.muTarget} MU delivered.`);
+  renderFields(); refreshFx();
+}
+function faultAll(reason){
+  cancelAnimationFrame(raf);
+  Object.keys(M.interlocks).forEach(k=>M.interlocks[k]=true);
+  setState("fault"); renderInterlocks();
+  log(`<b style="color:#ff8278">${reason}</b> — all interlocks set.`);
+}
+
+/* ===================== READOUTS ===================== */
+function updateMUReadout(){
+  $("muDelivered").textContent=fmt(M.muDone);
+  $("muTarget").textContent=M.muTarget;
+  $("muRemain").textContent=Math.max(0,Math.ceil(M.muTarget-M.muDone));
+  $("beamTime").textContent=fmt(M.beamTime)+" s";
+  const pct=M.muTarget? (M.muDone/M.muTarget*100):0;
+  $("muFill").style.width=pct+"%";
+  $("muBar").classList.toggle("live",M.state==="beamon");
+}
+function updateControls(){
+  const on=M.state==="beamon", inter=M.state==="interrupt";
+  $("beamOn").disabled = !(M.state==="ready" || inter);
+  $("beamOn").textContent = inter? "● Resume" : "● Beam On";
+  $("beamHold").disabled = !on;
+  $("beamOff").disabled = !(on||inter);
+  // lock parameter edits + motion unless standby/ready/complete
+  const lockEdit = on||inter;
+  ["modality","energy","doseRate","muSet"].forEach(id=>$(id).disabled=lockEdit);
+  document.querySelectorAll('.axis .ab button, .field-row, .ilk .tog').forEach(b=>{ b.disabled = on; });
+  document.querySelectorAll('[data-sh]').forEach(b=> b.disabled = on);
+}
+
+/* ===================== MOTION ===================== */
+function bumpAxis(ax,d){
+  if(M.state==="beamon") return;
+  const angStep=1.0, posStep=0.5;
+  if(ax==="gantry") M.gantry=(M.gantry+d*angStep+360)%360;
+  if(ax==="coll")   M.coll=(M.coll+d*angStep+360)%360;
+  if(ax==="couch")  M.couch=(M.couch+d*angStep+360)%360;
+  if(ax==="vrt")    M.vrt=clamp(M.vrt+d*posStep,-30,30);
+  if(ax==="lng")    M.lng=clamp(M.lng+d*posStep,-60,60);
+  if(ax==="lat")    M.lat=clamp(M.lat+d*posStep,-30,30);
+  refreshMotion();
+  if(M.state==="ready"){ setState("standby"); log("Motion changed after READY — re-prepare beam."); }
+}
+function refreshMotion(){
+  $("avGantry").textContent=fmt(M.gantry)+"°";
+  $("avColl").textContent=fmt(M.coll)+"°";
+  $("avCouch").textContent=fmt(M.couch)+"°";
+  $("avVrt").textContent=fmt(M.vrt); $("avLng").textContent=fmt(M.lng); $("avLat").textContent=fmt(M.lat);
+  $("bevColl").textContent=fmt(M.coll)+"°";
+  // SSD increases as couch lowers (vrt negative = down toward floor → larger SSD), simplified
+  $("mpSSD").textContent=fmt(100 - M.vrt,1);
+  if(typeof penUpdateLCD==="function") penUpdateLCD();
+  if(typeof checkTri==="function") checkTri();
+}
+
+/* ===================== FIELD SIZE ===================== */
+function setMU(v){ M.muTarget=clamp(Math.round(v)||0,0,999); M.muDone=0; M.beamTime=0; updateMUReadout(); evaluateReady(); }
+function refreshFieldSize(){
+  const X=M.jaws[0]+M.jaws[1], Y=M.jaws[2]+M.jaws[3];
+  $("bevFS").textContent=`${fmt(X)} × ${fmt(Y)} cm`;
+}
+
+/* ===================== PLAN / FIELD LOADING ===================== */
+function renderFields(){
+  const box=$("fieldList"); box.innerHTML="";
+  let total=0;
+  PLAN.forEach((f,i)=>{ total+=f.mu;
+    const row=document.createElement("div");
+    row.className="field-row"+(i===loadedField?" loaded":"")+(delivered[i]>=f.mu?" done":"");
+    row.innerHTML=`<div class="fn">${f.n}</div>
+      <div class="fd">G ${fmt(f.gantry)}° · Col ${fmt(f.coll)}° · ${f.energy}<br>${f.mu} MU · ${f.jaws[0]+f.jaws[1]}×${f.jaws[2]+f.jaws[3]} cm</div>
+      <div class="fchk">${delivered[i]>=f.mu?"✓":""}</div>`;
+    row.onclick=()=>loadField(i);
+    box.appendChild(row);
+  });
+  $("planMU").textContent = `${PLAN.length} fields · ${total} MU`;
+}
+function loadField(i){
+  if(M.state==="beamon"||M.state==="interrupt"){ log("Finish current delivery before loading a new field."); return; }
+  const f=PLAN[i]; loadedField=i;
+  M.modality=f.modality; $("modality").value=f.modality; fillEnergy();
+  const ei=ENERGY_OPTS[f.modality].findIndex(o=>o.v===f.energy); M.energyIdx=ei>=0?ei:0; $("energy").value=M.energyIdx; applyEnergy();
+  M.gantry=f.gantry; M.coll=f.coll; M.jaws=f.jaws.slice(); M.aperture=f.ap;
+  M.muTarget=f.mu; M.muDone=delivered[i]||0; M.beamTime=0;
+  $("muSet").value=f.mu;
+  $("bevField").textContent="FIELD "+f.n; $("bevFS")&&refreshFieldSize();
+  refreshMotion(); refreshFieldSize(); updateMUReadout();
+  setState("standby"); evaluateReady();
+  renderFields();
+  log(`Loaded field <b>${f.n}</b> — G ${fmt(f.gantry)}°, ${f.energy}, ${f.mu} MU. Prepare beam when ready.`);
+}
+function refreshFx(){
+  const done=delivered.filter((d,i)=>d>=PLAN[i].mu).length;
+  if(done===PLAN.length) log("All fields delivered — fraction complete. 2.0 Gy recorded.");
+}
+
+/* ===================== IGRT ===================== */
+const truth={vrt:(Math.random()*2-1)*6, lng:(Math.random()*2-1)*6, lat:(Math.random()*2-1)*6}; // hidden setup error (mm)
+const shift={vrt:0,lng:0,lat:0};
+const TOL=2.0;
+function residual(){ return {vrt:truth.vrt-shift.vrt, lng:truth.lng-shift.lng, lat:truth.lat-shift.lat}; }
+function refreshIGRT(){
+  ["vrt","lng","lat"].forEach(a=>{ const el=$("s"+a[0].toUpperCase()+a.slice(1));
+    el.textContent=fmt(shift[a]); });
+  const r=residual(); const mag=Math.max(Math.abs(r.vrt),Math.abs(r.lng),Math.abs(r.lat));
+  const ok=mag<=TOL;
+  $("residMsg").innerHTML=`Residual offset: <b class="${ok?'ok':'bad'}">${fmt(mag)} mm ${ok?'within tol':'> '+TOL+' mm'}</b>`;
+  ["sVrt","sLng","sLat"].forEach((id,k)=>{ const a=["vrt","lng","lat"][k];
+    $(id).className="av "+(Math.abs(residual()[a])<=TOL?"ok":"bad"); });
+}
+function bumpShift(a,d){ if(M.state==="beamon")return; shift[a]=clamp(shift[a]+d*0.5,-15,15); refreshIGRT(); }
+function autoMatch(){ if(M.state==="beamon")return;
+  if(!CBCT.acquired && !CBCT.userImg){ log("Acquire a CBCT first — deploy the kV panel, then Acquire CBCT."); return; }
+  shift.vrt=Math.round(truth.vrt*2)/2; shift.lng=Math.round(truth.lng*2)/2; shift.lat=Math.round(truth.lat*2)/2;
+  refreshIGRT(); log("Auto-match proposed shift Vrt "+fmt(shift.vrt)+" / Lng "+fmt(shift.lng)+" / Lat "+fmt(shift.lat)+" mm."); }
+function applyShift(){ if(M.state==="beamon")return;
+  if(!CBCT.acquired && !CBCT.userImg){ log("Acquire and match a CBCT before applying a couch shift."); return; }
+  M.vrt=clamp(M.vrt+shift.vrt/10,-30,30); M.lng=clamp(M.lng+shift.lng/10,-60,60); M.lat=clamp(M.lat+shift.lat/10,-30,30);
+  truth.vrt-=shift.vrt; truth.lng-=shift.lng; truth.lat-=shift.lat;
+  shift.vrt=shift.lng=shift.lat=0;
+  M.interlocks.imager=false; renderInterlocks();          // imager stows after alignment
+  refreshMotion(); refreshIGRT();
+  const r=residual(); const mag=Math.max(Math.abs(r.vrt),Math.abs(r.lng),Math.abs(r.lat));
+  log("Couch shift applied; kV imager stowed. Residual "+fmt(mag)+" mm "+(mag<=TOL?"— within tolerance.":"— still out, re-match."));
+}
+
+/* ===================== CANVASES ===================== */
+function setupCanvas(cv){ const dpr=Math.min(devicePixelRatio||1,2); const w=cv.clientWidth||cv.width;
+  const ratio=cv.height/cv.width; cv.width=Math.round(w*dpr); cv.height=Math.round(w*ratio*dpr);
+  const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w,h:w*ratio}; }
+
+let bev, room, igrt, setupCv;
+function initCanvases(){ bev=setupCanvas($("bev")); room=setupCanvas($("room")); igrt=setupCanvas($("igrt")); setupCv=setupCanvas($("setup")); }
+
+/* --- Beam's-eye view: jaws + MLC leaves + aperture, rotates with collimator --- */
+const NLEAF=28;
+function drawBEV(now){
+  const {ctx,w,h}=bev; ctx.clearRect(0,0,w,h);
+  const cx=w/2, cy=h/2, FOV=44; const s=(w*0.92)/FOV;  // px per cm (show ~44cm FOV)
+  // light field background
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(M.coll*Math.PI/180);
+  // full radiation field extent (jaws)
+  const X1=M.jaws[0],X2=M.jaws[1],Y1=M.jaws[2],Y2=M.jaws[3];
+  // metal background (closed leaves region)
+  ctx.fillStyle="#0c121b"; ctx.fillRect(-w,-h,2*w,2*h);
+  // jaw-defined open rectangle (dim)
+  ctx.fillStyle="rgba(60,139,240,.06)";
+  ctx.fillRect(-X1*s,-Y2*s,(X1+X2)*s,(Y1+Y2)*s);
+  // MLC leaves: horizontal pairs spanning Y, conforming to aperture polygon
+  const leafH=(Y1+Y2)/NLEAF;
+  const beamon=M.state==="beamon";
+  for(let i=0;i<NLEAF;i++){
+    const yTop=-Y2 + i*leafH, yMid=yTop+leafH/2;
+    let L=-X1, R=X2;                              // default: fully open to jaws
+    if(mlcOverride==="closed"){ L=R=0; }
+    else if(mlcOverride==="open"){ /* leave fully open to jaws */ }
+    else if(M.aperture){
+      const span=polySpanAtY(M.aperture,yMid);
+      if(span){ L=clamp(span[0],-X1,X2); R=clamp(span[1],-X1,X2); if(R<L){L=R=0;} }
+      else { L=R=0; }                            // leaf closed (no aperture at this row)
+    }
+    // sliding-window shimmer during beam-on
+    const jig = beamon && !reduce ? Math.sin(now/120 + i*0.7)*0.12 : 0;
+    const Lp=L+jig, Rp=R+jig;
+    // left leaf bank (from -X1 .. Lp) and right (Rp .. X2)
+    drawLeaf(ctx, -X1*s, yTop*s, (Lp+X1)*s, leafH*s);
+    drawLeaf(ctx, Rp*s,  yTop*s, (X2-Rp)*s, leafH*s);
+  }
+  // aperture glow (open beam)
+  if(beamon && M.aperture){
+    ctx.save(); ctx.globalCompositeOperation="lighter";
+    ctx.fillStyle="rgba(120,200,255,"+(0.10+0.05*Math.sin(now/90))+")";
+    fillPoly(ctx,M.aperture,s); ctx.restore();
+    // radiation sparkle
+    if(!reduce){ ctx.fillStyle="rgba(180,225,255,.7)";
+      for(let k=0;k<10;k++){ const p=randInPoly(M.aperture); if(p){ ctx.beginPath(); ctx.arc(p[0]*s,p[1]*s,1.1,0,TAU); ctx.fill(); } } }
+  } else if(M.aperture){
+    ctx.strokeStyle="rgba(120,200,255,.45)"; ctx.lineWidth=1.2; ctx.setLineDash([3,3]);
+    strokePoly(ctx,M.aperture,s); ctx.setLineDash([]);
+  }
+  // jaw edges
+  ctx.strokeStyle="rgba(160,190,220,.5)"; ctx.lineWidth=1.5;
+  ctx.strokeRect(-X1*s,-Y2*s,(X1+X2)*s,(Y1+Y2)*s);
+  ctx.restore();
+  // crosshair (does NOT rotate)
+  ctx.strokeStyle="rgba(255,255,255,.4)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(cx-12,cy); ctx.lineTo(cx+12,cy); ctx.moveTo(cx,cy-12); ctx.lineTo(cx,cy+12); ctx.stroke();
+}
+function drawLeaf(ctx,x,y,wid,hei){ if(wid<=0) return;
+  const g=ctx.createLinearGradient(x,0,x+wid,0); g.addColorStop(0,"#33425a"); g.addColorStop(.5,"#46587490".slice(0,7)); g.addColorStop(1,"#2a3650");
+  ctx.fillStyle="#3a4a64"; ctx.fillRect(x,y+0.5,wid,hei-1);
+  ctx.strokeStyle="rgba(10,15,22,.7)"; ctx.lineWidth=0.6; ctx.strokeRect(x,y+0.5,wid,hei-1);
+  ctx.fillStyle="rgba(255,255,255,.05)"; ctx.fillRect(x,y+0.5,wid,1);
+}
+function polySpanAtY(poly,y){ let xs=[]; for(let i=0;i<poly.length;i++){ const a=poly[i],b=poly[(i+1)%poly.length];
+  if((a[1]<=y&&b[1]>y)||(b[1]<=y&&a[1]>y)){ const t=(y-a[1])/(b[1]-a[1]); xs.push(a[0]+t*(b[0]-a[0])); } }
+  if(xs.length<2) return null; xs.sort((p,q)=>p-q); return [xs[0],xs[xs.length-1]]; }
+function fillPoly(ctx,poly,s){ ctx.beginPath(); poly.forEach((p,i)=>{ i?ctx.lineTo(p[0]*s,p[1]*s):ctx.moveTo(p[0]*s,p[1]*s); }); ctx.closePath(); ctx.fill(); }
+function strokePoly(ctx,poly,s){ ctx.beginPath(); poly.forEach((p,i)=>{ i?ctx.lineTo(p[0]*s,p[1]*s):ctx.moveTo(p[0]*s,p[1]*s); }); ctx.closePath(); ctx.stroke(); }
+function randInPoly(poly){ for(let t=0;t<8;t++){ const x=(Math.random()*2-1)*8, y=(Math.random()*2-1)*8; if(pointInPoly(poly,x,y)) return [x,y]; } return null; }
+function pointInPoly(poly,x,y){ let inside=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+  const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];
+  if(((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) inside=!inside; } return inside; }
+
+/* --- Treatment room: rotating gantry + couch geometry --- */
+function drawRoom(now){
+  const {ctx,w,h}=room; ctx.clearRect(0,0,w,h);
+  const cx=w/2, cy=h*0.52, R=Math.min(w,h)*0.34;
+  // bore ring
+  ctx.save();
+  ctx.strokeStyle="rgba(120,150,185,.18)"; ctx.lineWidth=14; ctx.beginPath(); ctx.arc(cx,cy,R,0,TAU); ctx.stroke();
+  ctx.strokeStyle="rgba(120,150,185,.30)"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(cx,cy,R+9,0,TAU); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,R-9,0,TAU); ctx.stroke();
+  // angle ticks
+  ctx.fillStyle="rgba(150,180,210,.5)"; ctx.font="9px ui-monospace,monospace"; ctx.textAlign="center";
+  [["0",0],["90",90],["180",180],["270",270]].forEach(([t,a])=>{ const th=(a)*Math.PI/180;
+    const x=cx+Math.sin(th)*(R+22), y=cy-Math.cos(th)*(R+22); ctx.fillText(t+"°",x,y+3); });
+  // couch (rotates about iso by couch angle)
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(M.couch*Math.PI/180);
+  ctx.fillStyle="#1a2740"; ctx.strokeStyle="rgba(140,170,200,.4)"; ctx.lineWidth=1.5;
+  roundRect(ctx,-R*1.15,8,R*2.3,16,4); ctx.fill(); ctx.stroke();
+  // patient
+  ctx.fillStyle="#c9d6e6"; roundRect(ctx,-R*0.5,-2,R*1.0,12,6); ctx.fill();
+  ctx.fillStyle="#aebdd0"; ctx.beginPath(); ctx.arc(R*0.5,4,7,0,TAU); ctx.fill(); // head toward +x
+  ctx.restore();
+  // gantry head at gantry angle (IEC: 0 = top, beam points to iso)
+  const th=M.gantry*Math.PI/180; const dir={x:Math.sin(th),y:-Math.cos(th)};
+  const hx=cx+dir.x*R, hy=cy+dir.y*R;
+  // beam
+  const beamon=M.state==="beamon";
+  ctx.save();
+  const fanX=M.jaws[0]+M.jaws[1]; const halfAng=Math.atan2((fanX/2),100)*1.1;
+  const perp={x:-dir.y,y:dir.x};
+  const tipL={x:cx+ (perp.x*Math.tan(halfAng))*R*0.5, y:cy+(perp.y*Math.tan(halfAng))*R*0.5};
+  ctx.beginPath(); ctx.moveTo(hx,hy);
+  ctx.lineTo(cx+perp.x*18, cy+perp.y*18); ctx.lineTo(cx-perp.x*18, cy-perp.y*18); ctx.closePath();
+  ctx.fillStyle= beamon ? "rgba(255,120,90,"+(0.35+0.15*Math.sin(now/80))+")" : "rgba(120,200,255,.10)";
+  ctx.fill(); ctx.restore();
+  // head block
+  ctx.save(); ctx.translate(hx,hy); ctx.rotate(Math.atan2(dir.y,dir.x)+Math.PI/2);
+  ctx.fillStyle="#26344a"; ctx.strokeStyle="rgba(150,180,210,.55)"; ctx.lineWidth=1.5;
+  roundRect(ctx,-22,-16,44,30,6); ctx.fill(); ctx.stroke();
+  ctx.fillStyle= beamon? "#ff7a5c":"#7af0e0"; ctx.shadowColor=ctx.fillStyle; ctx.shadowBlur=beamon?12:6;
+  roundRect(ctx,-9,12,18,5,2); ctx.fill();
+  ctx.restore();
+  // isocentre
+  ctx.strokeStyle="rgba(255,210,90,.9)"; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(cx-7,cy); ctx.lineTo(cx+7,cy); ctx.moveTo(cx,cy-7); ctx.lineTo(cx,cy+7); ctx.stroke();
+  ctx.fillStyle="rgba(255,210,90,.9)"; ctx.beginPath(); ctx.arc(cx,cy,2,0,TAU); ctx.fill();
+  // gantry readout
+  ctx.fillStyle="#9db0c6"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="left";
+  ctx.fillText("G "+fmt(M.gantry)+"°", 10, 16); ctx.fillText("Couch "+fmt(M.couch)+"°", 10, 30);
+  ctx.restore();
+}
+
+/* --- IGRT: reference (DRR) vs acquired (CBCT), offset by residual --- */
+function drawIGRT(){
+  if(!igrt) return;
+  const {ctx,w,h}=igrt; ctx.clearRect(0,0,w,h);
+  if((!CBCT.acquired && !CBCT.userImg) || !CBCT.off || !CBCT.off.ax){
+    ctx.fillStyle="#05080d"; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle="rgba(150,180,210,.55)"; ctx.font="13px ui-monospace,monospace"; ctx.textAlign="center";
+    ctx.fillText("No CBCT acquired", w/2, h/2-8);
+    ctx.fillStyle="rgba(150,180,210,.35)"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText("deploy kV panel  →  Acquire CBCT", w/2, h/2+14);
+    return;
+  }
+  const r=residual(); const k=2.3;                      // mm → px within a pane
+  const pw=w/2, ph=h/2;
+  // Each pane shows two of the three axes; together they cover all three.
+  const panes=[
+    {x:0,  y:0,  label:"TRANSVERSE", img:CBCT.off.ax,  ref:PLANES.ax,  dx:r.lat*k,  dy:-r.vrt*k},
+    {x:pw, y:0,  label:"CORONAL",    img:CBCT.off.cor, ref:PLANES.cor, dx:r.lat*k,  dy:-r.lng*k},
+    {x:0,  y:ph, label:"SAGITTAL",   img:CBCT.off.sag, ref:PLANES.sag, dx:-r.lng*k, dy:-r.vrt*k},
+  ];
+  panes.forEach(p=>drawPane(ctx,p,pw,ph));
+  drawMatchCell(ctx,pw,ph,pw,ph,r);
+  ctx.strokeStyle="rgba(80,110,140,.55)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pw,0); ctx.lineTo(pw,h); ctx.moveTo(0,ph); ctx.lineTo(w,ph); ctx.stroke();
+}
+function drawPane(ctx,p,pw,ph){
+  ctx.save(); ctx.beginPath(); ctx.rect(p.x,p.y,pw,ph); ctx.clip(); ctx.translate(p.x,p.y);
+  const cx=pw/2, cy=ph/2, R=Math.min(pw,ph)*0.34;
+  ctx.fillStyle="#05080d"; ctx.fillRect(0,0,pw,ph);
+  const scale=Math.min(pw,ph)/220;
+  const iw=p.img.width*scale, ih=p.img.height*scale;
+  const split=CBCT.view==="split";
+  // acquired CBCT (offset by residual); right half only in split mode
+  ctx.save();
+  if(split){ ctx.beginPath(); ctx.rect(cx,0,pw-cx,ph); ctx.clip(); }
+  ctx.imageSmoothingEnabled=true;
+  ctx.drawImage(p.img, cx-iw/2+p.dx, cy-ih/2+p.dy, iw, ih);
+  ctx.restore();
+  // reference contour (centered); blended overlay, or left half in split mode
+  ctx.save();
+  if(split){ ctx.beginPath(); ctx.rect(0,0,cx,ph); ctx.clip(); }
+  else ctx.globalAlpha=CBCT.blend;
+  p.ref(ctx,cx,cy,R,"ref");
+  ctx.restore();
+  if(split){ ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,ph); ctx.stroke(); }
+  // isocentre crosshair (fixed)
+  ctx.strokeStyle="rgba(255,255,255,.45)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(cx,4); ctx.lineTo(cx,ph-4); ctx.moveTo(4,cy); ctx.lineTo(pw-4,cy); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle="rgba(122,240,224,.95)"; ctx.font="9px ui-monospace,monospace"; ctx.textAlign="left"; ctx.fillText(p.label,6,12);
+  ctx.restore();
+}
+function drawMatchCell(ctx,x0,y0,pw,ph,r){
+  ctx.save(); ctx.translate(x0,y0);
+  ctx.fillStyle="#0a121c"; ctx.fillRect(0,0,pw,ph);
+  ctx.fillStyle="rgba(122,240,224,.85)"; ctx.font="9px ui-monospace,monospace"; ctx.textAlign="left"; ctx.fillText("MATCH · residual offset",8,14);
+  [["VRT",r.vrt],["LNG",r.lng],["LAT",r.lat]].forEach((row,i)=>{ const y=36+i*20, ok=Math.abs(row[1])<=TOL;
+    ctx.fillStyle="rgba(150,180,210,.75)"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="left"; ctx.fillText(row[0],12,y);
+    ctx.fillStyle= ok?"#2fd27a":"#f5b53d"; ctx.textAlign="right"; ctx.fillText(fmt(row[1])+" mm",pw-14,y);
+  });
+  const mag=Math.max(Math.abs(r.vrt),Math.abs(r.lng),Math.abs(r.lat)), ok=mag<=TOL;
+  ctx.textAlign="center"; ctx.font="10px ui-monospace,monospace";
+  ctx.fillStyle= ok?"#2fd27a":"#f5b53d"; ctx.fillText(ok?"✓ WITHIN TOLERANCE":"OUT OF TOLERANCE",pw/2,ph-30);
+  ctx.fillStyle="rgba(120,150,180,.6)"; ctx.font="8px ui-monospace,monospace";
+  ctx.fillText("teal = reference plan",pw/2,ph-16); ctx.fillText("grey = "+(CBCT.userImg?"loaded image":"acquired CBCT"),pw/2,ph-6);
+  ctx.restore();
+}
+function drawAnatomy(ctx,cx,cy,sc,bone,edge,dx,dy){
+  ctx.save(); ctx.translate(cx+dx,cy+dy); ctx.globalAlpha=0.85;
+  // skull-ish H&N silhouette
+  ctx.fillStyle=bone; ctx.strokeStyle=edge; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.ellipse(0,-18*sc,34*sc,30*sc,0,0,TAU); ctx.fill(); ctx.stroke(); // cranium
+  ctx.beginPath(); ctx.moveTo(-20*sc,6*sc); ctx.quadraticCurveTo(0,40*sc,20*sc,6*sc); ctx.fill(); ctx.stroke(); // mandible
+  // spine column going down
+  ctx.fillStyle=bone;
+  for(let i=0;i<4;i++){ ctx.beginPath(); ctx.ellipse(0,30*sc+i*14*sc,7*sc,5*sc,0,0,TAU); ctx.fill(); ctx.stroke(); }
+  // air cavity
+  ctx.globalAlpha=0.5; ctx.fillStyle="#05080d"; ctx.beginPath(); ctx.ellipse(0,-12*sc,10*sc,12*sc,0,0,TAU); ctx.fill();
+  ctx.restore();
+}
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+/* ===================== PENDANT ===================== */
+function penUpdateLCD(){
+  let l1="GANTRY", l2=fmt(M.gantry)+"°";
+  if(PEN.odi){ l1="ODI / SSD"; l2=fmt(100 - M.vrt,1)+" cm"; }
+  $("penL1").textContent=l1; $("penL2").textContent=l2;
+}
+function setRoomChips(){
+  document.querySelectorAll('#roomChips .rchip').forEach(c=>{
+    const k=c.dataset.k; c.classList.toggle("on", k==="odi"?PEN.odi:PEN[k]); });
+  document.querySelectorAll('.pbtn[data-tog]').forEach(b=>{
+    const k=b.dataset.tog; b.classList.toggle("on", !!PEN[k]); });
+}
+function penToggle(k){
+  PEN[k]=!PEN[k];
+  if(k==="kv"||k==="mv"){
+    // deploying an imaging panel sets the imager interlock (panel in beam path)
+    M.interlocks.imager = PEN.kv||PEN.mv;
+    renderInterlocks(); evaluateReady();
+    $("acquireBtn").disabled = !PEN.kv;
+    $("igrtHint").textContent = PEN.kv ? "kV deployed · acquire CBCT" : (CBCT.acquired?"matched · apply shift":"deploy kV · acquire CBCT");
+    log((PEN[k]?"Deployed ":"Retracted ")+k.toUpperCase()+" imaging panel.");
+  } else {
+    log(`${{room:"Room light",field:"Field light",odi:"ODI",lasers:"Lasers",flash:"Flashlight"}[k]} ${PEN[k]?"ON":"OFF"}.`);
+  }
+  setRoomChips(); penUpdateLCD();
+}
+function penMLC(){
+  mlcOverride = mlcOverride==null ? "open" : (mlcOverride==="open" ? "closed" : null);
+  document.querySelector('.pbtn[data-mlc]').classList.toggle("on", mlcOverride!=null);
+  log("MLC "+(mlcOverride==null?"conformal (plan)":mlcOverride.toUpperCase())+".");
+}
+function penAcquire(){
+  if(!PEN.kv){ log("Deploy the kV panel before acquiring a CBCT."); return; }
+  genCBCT(); CBCT.acquired=true;
+  $("igrtHint").textContent="CBCT acquired · match to reference";
+  log("CBCT acquired. Match the CBCT to the reference, then apply the couch shift.");
+  refreshIGRT();
+}
+
+/* press-and-hold motion (deadman feel): hold to keep moving */
+let holdTimer=null;
+function startHold(ax,d){
+  stopHold(); bumpAxis(ax,d); penUpdateLCD();
+  holdTimer=setInterval(()=>{ bumpAxis(ax,d); penUpdateLCD(); }, 90);
+}
+function stopHold(){ if(holdTimer){ clearInterval(holdTimer); holdTimer=null; } }
+
+/* ===================== ISOCENTRE / TRIANGULATION ===================== */
+function triNewSetup(){
+  TRI.active=true;
+  TRI.err={ vrt:(Math.random()*2-1)*1.8, lng:(Math.random()*2-1)*1.8, lat:(Math.random()*2-1)*1.8 };
+  TRI.start={ vrt:M.vrt, lng:M.lng, lat:M.lat };
+  TRI.t0=performance.now();
+  if(!PEN.lasers) log("Tip: turn the LASERS on (pendant) to see the alignment lines.");
+  log("New patient setup loaded — drive the couch to bring the tattoos onto the lasers.");
+  $("triMsg").innerHTML="Patient is off isocentre. Use the couch (pendant or motion panel) to align the three tattoos to the laser lines.";
+  checkTri();
+}
+function triResidual(){ // cm, residual mark offset from lasers
+  return { vrt: TRI.err.vrt + (M.vrt-TRI.start.vrt),
+           lng: TRI.err.lng + (M.lng-TRI.start.lng),
+           lat: TRI.err.lat + (M.lat-TRI.start.lat) };
+}
+function checkTri(){
+  if(!TRI.active){ $("setupGrade").textContent="offset —"; $("setupGrade").className="setup-grade bad"; return; }
+  const r=triResidual(); const mag=Math.max(Math.abs(r.vrt),Math.abs(r.lng),Math.abs(r.lat));
+  const mm=mag*10, ok=mag<=TRI_TOL;
+  $("setupGrade").textContent="offset "+fmt(mm)+" mm";
+  $("setupGrade").className="setup-grade "+(ok?"ok":"bad");
+  if(ok){
+    TRI.active=false;
+    const secs=(performance.now()-TRI.t0)/1000; TRI.solved++;
+    if(TRI.best==null||secs<TRI.best) TRI.best=secs;
+    $("triScore").textContent=TRI.solved; $("triBest").textContent=fmt(TRI.best)+" s";
+    $("triMsg").innerHTML=`<b style="color:var(--green)">Aligned to isocentre</b> — all tattoos on the lasers (${fmt(mm)} mm) in ${fmt(secs)} s. Press “New setup” to try another.`;
+    log(`Triangulation solved in ${fmt(secs)} s (residual ${fmt(mm)} mm).`);
+  }
+}
+function triReveal(){ // auto-centre the couch to the solution
+  if(!TRI.active){ log("Start a New setup first."); return; }
+  M.vrt=clamp(TRI.start.vrt-TRI.err.vrt,-30,30);
+  M.lng=clamp(TRI.start.lng-TRI.err.lng,-60,60);
+  M.lat=clamp(TRI.start.lat-TRI.err.lat,-30,30);
+  refreshMotion();
+}
+
+function drawSetup(now){
+  if(!setupCv) return;
+  const {ctx,w,h}=setupCv; ctx.clearRect(0,0,w,h);
+  const cx=w/2, cy=h*0.52, sc=h/150;
+  // background — room light dims/brightens
+  ctx.fillStyle = PEN.room ? "#11161d" : "#05080d"; ctx.fillRect(0,0,w,h);
+  const r = TRI.active ? triResidual() : {vrt:0,lng:0,lat:0};
+  const k = sc*9;                                  // cm → px for body offset
+  const bx = cx + r.lat*k, by = cy - r.vrt*k;      // patient shifts with residual
+  // patient body (axial H&N)
+  ctx.save(); ctx.translate(bx,by);
+  const g=ctx.createRadialGradient(0,0,8,0,0,46*sc); g.addColorStop(0,"#2a3344"); g.addColorStop(1,"#1a2231");
+  ctx.fillStyle=g; ctx.strokeStyle="#5e7490"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.ellipse(0,0,40*sc,44*sc,0,0,TAU); ctx.fill(); ctx.stroke();
+  // shoulders
+  ctx.beginPath(); ctx.moveTo(-40*sc,30*sc); ctx.quadraticCurveTo(0,52*sc,40*sc,30*sc); ctx.stroke();
+  // tattoos: anterior (top), two laterals
+  const marks=[[0,-44*sc],[-40*sc,0],[40*sc,0]];
+  marks.forEach(m=>{ ctx.fillStyle="#ffd24a"; ctx.strokeStyle="#7a5a10"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(m[0],m[1],4.2,0,TAU); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="rgba(255,210,74,.25)"; ctx.beginPath(); ctx.arc(m[0],m[1],8,0,TAU); ctx.fill(); });
+  ctx.restore();
+  // field light (jaw projection) at isocentre
+  if(PEN.field){ const fx=(M.jaws[0]+M.jaws[1])*sc*2.4, fy=(M.jaws[2]+M.jaws[3])*sc*2.4;
+    ctx.fillStyle="rgba(245,181,61,.16)"; ctx.strokeStyle="rgba(245,181,61,.6)"; ctx.lineWidth=1;
+    ctx.fillRect(cx-fx/2,cy-fy/2,fx,fy); ctx.strokeRect(cx-fx/2,cy-fy/2,fx,fy); }
+  // room lasers (fixed at isocentre)
+  if(PEN.lasers){
+    ctx.save(); ctx.strokeStyle="rgba(255,60,80,.85)"; ctx.lineWidth=1.4; ctx.shadowColor="rgba(255,60,80,.8)"; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.moveTo(cx,6); ctx.lineTo(cx,h-26); ctx.stroke();         // sagittal (vertical)
+    ctx.beginPath(); ctx.moveTo(8,cy); ctx.lineTo(w-8,cy); ctx.stroke();          // transverse (horizontal)
+    ctx.restore();
+  } else {
+    ctx.fillStyle="rgba(255,120,120,.5)"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="center";
+    ctx.fillText("lasers off", cx, cy);
+  }
+  // ODI / SSD readout
+  if(PEN.odi){ ctx.fillStyle="#ff8a8a"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="right";
+    ctx.fillText("SSD "+fmt(100-M.vrt,1)+" cm", w-10, 18); }
+  // longitudinal scale (Lng residual vs target plane)
+  const ly=h-14, lw=w-40, lx=20;
+  ctx.strokeStyle="rgba(150,180,210,.3)"; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx+lw,ly); ctx.stroke();
+  ctx.strokeStyle="rgba(255,60,80,.8)"; ctx.beginPath(); ctx.moveTo(lx+lw/2,ly-7); ctx.lineTo(lx+lw/2,ly+7); ctx.stroke(); // transverse laser plane
+  const lpos=clamp(lx+lw/2 + (TRI.active?r.lng:0)*k, lx, lx+lw);
+  ctx.fillStyle="#ffd24a"; ctx.beginPath(); ctx.arc(lpos,ly,4,0,TAU); ctx.fill();   // long tattoo
+  ctx.fillStyle="rgba(150,180,210,.6)"; ctx.font="9px ui-monospace,monospace"; ctx.textAlign="left";
+  ctx.fillText("LONG", lx, ly-9);
+}
+
+/* ===================== CBCT GENERATION (3 orthogonal planes) =====================
+   Each plane is drawn from the SAME shape code in two modes: "fill" builds the
+   grey CBCT slice; "ref" strokes the teal planning contour that overlays it. */
+function ell(x,cx,cy,rx,ry,fill){ x.beginPath(); x.ellipse(cx,cy,rx,ry,0,0,TAU); fill?x.fill():x.stroke(); }
+function refStroke(x){ x.strokeStyle="rgba(52,214,198,.92)"; x.lineWidth=1.5; x.shadowColor="rgba(52,214,198,.45)"; x.shadowBlur=3; }
+const PLANES = {
+  ax(x,cx,cy,R,mode){                                   // transverse: head cross-section
+    if(mode==="fill"){
+      let g=x.createRadialGradient(cx,cy,R*0.2,cx,cy,R*1.06); g.addColorStop(0,"#5d5d5d"); g.addColorStop(.8,"#454545"); g.addColorStop(1,"#2c2c2c");
+      x.fillStyle=g; ell(x,cx,cy,R,R*1.05,true);
+      x.strokeStyle="#d6d6d6"; x.lineWidth=R*0.11; x.lineCap="round"; x.beginPath(); x.arc(cx,cy-R*0.05,R*0.52,0.2*Math.PI,0.8*Math.PI); x.stroke();
+      x.fillStyle="#cfcfcf"; ell(x,cx,cy+R*0.55,R*0.23,R*0.18,true);
+      x.fillStyle="#3a3a3a"; ell(x,cx,cy+R*0.55,R*0.09,R*0.08,true);
+      x.fillStyle="#0c0c0c"; ell(x,cx,cy-R*0.1,R*0.18,R*0.23,true);
+    } else { refStroke(x); ell(x,cx,cy,R,R*1.05,false);
+      x.beginPath(); x.arc(cx,cy-R*0.05,R*0.52,0.2*Math.PI,0.8*Math.PI); x.stroke(); ell(x,cx,cy+R*0.55,R*0.23,R*0.18,false); }
+  },
+  cor(x,cx,cy,R,mode){                                  // coronal: front view, head→shoulders
+    const sil=()=>{ x.beginPath();
+      x.moveTo(cx-R*0.55,cy-R*0.2); x.quadraticCurveTo(cx-R*0.6,cy-R*1.15,cx,cy-R*1.15);
+      x.quadraticCurveTo(cx+R*0.6,cy-R*1.15,cx+R*0.55,cy-R*0.2);
+      x.quadraticCurveTo(cx+R*0.5,cy+R*0.05,cx+R*0.25,cy+R*0.16); x.lineTo(cx+R*0.22,cy+R*0.5);
+      x.quadraticCurveTo(cx+R*0.95,cy+R*0.6,cx+R*1.05,cy+R*1.15); x.lineTo(cx-R*1.05,cy+R*1.15);
+      x.quadraticCurveTo(cx-R*0.95,cy+R*0.6,cx-R*0.22,cy+R*0.5); x.lineTo(cx-R*0.25,cy+R*0.16);
+      x.quadraticCurveTo(cx-R*0.5,cy+R*0.05,cx-R*0.55,cy-R*0.2); x.closePath(); };
+    if(mode==="fill"){
+      x.fillStyle="#3f3f3f"; sil(); x.fill();
+      x.fillStyle="#6f6f6f"; ell(x,cx,cy-R*0.6,R*0.5,R*0.55,true);
+      x.fillStyle="#111"; ell(x,cx-R*0.22,cy-R*0.55,R*0.12,R*0.1,true); ell(x,cx+R*0.22,cy-R*0.55,R*0.12,R*0.1,true);
+      x.fillStyle="#cfcfcf"; for(let i=0;i<4;i++) ell(x,cx,cy+R*(0.12+i*0.22),R*0.12,R*0.08,true);
+    } else { refStroke(x); sil(); x.stroke(); for(let i=0;i<4;i++) ell(x,cx,cy+R*(0.12+i*0.22),R*0.12,R*0.08,false); }
+  },
+  sag(x,cx,cy,R,mode){                                  // sagittal: side profile, face to the right
+    const sil=()=>{ x.beginPath();
+      x.moveTo(cx-R*0.7,cy-R*0.2); x.quadraticCurveTo(cx-R*0.85,cy-R*0.95,cx-R*0.1,cy-R*1.05);
+      x.quadraticCurveTo(cx+R*0.5,cy-R*1.05,cx+R*0.62,cy-R*0.55); x.quadraticCurveTo(cx+R*0.82,cy-R*0.35,cx+R*0.6,cy-R*0.2);
+      x.quadraticCurveTo(cx+R*0.76,cy-R*0.05,cx+R*0.5,cy+R*0.12); x.quadraticCurveTo(cx+R*0.3,cy+R*0.2,cx+R*0.2,cy+R*0.46);
+      x.quadraticCurveTo(cx+R*0.35,cy+R*0.9,cx+R*0.7,cy+R*1.15); x.lineTo(cx-R*0.95,cy+R*1.15);
+      x.quadraticCurveTo(cx-R*0.5,cy+R*0.7,cx-R*0.45,cy+R*0.4); x.quadraticCurveTo(cx-R*0.62,cy+R*0.1,cx-R*0.7,cy-R*0.2); x.closePath(); };
+    if(mode==="fill"){
+      x.fillStyle="#3f3f3f"; sil(); x.fill();
+      x.fillStyle="#6f6f6f"; ell(x,cx-R*0.05,cy-R*0.55,R*0.5,R*0.45,true);
+      x.fillStyle="#111"; ell(x,cx+R*0.25,cy-R*0.12,R*0.12,R*0.16,true);
+      x.fillStyle="#cfcfcf"; for(let i=0;i<5;i++) ell(x,cx-R*0.28+i*R*0.02,cy+R*(0.18+i*0.18),R*0.1,R*0.07,true);
+    } else { refStroke(x); sil(); x.stroke(); for(let i=0;i<5;i++) ell(x,cx-R*0.28+i*R*0.02,cy+R*(0.18+i*0.18),R*0.1,R*0.07,false); }
+  }
+};
+function noiseSlice(planeFn){
+  const N=220; const c=document.createElement("canvas"); c.width=N; c.height=N; const x=c.getContext("2d");
+  x.fillStyle="#070a0e"; x.fillRect(0,0,N,N);
+  planeFn(x, N/2, N/2, N*0.34, "fill");
+  const img=x.getImageData(0,0,N,N), d=img.data;
+  for(let i=0;i<d.length;i+=4){ if(d[i+3]<5) continue; const n=(Math.random()*2-1)*16; d[i]=clamp(d[i]+n,0,255); d[i+1]=clamp(d[i+1]+n,0,255); d[i+2]=clamp(d[i+2]+n,0,255); }
+  x.putImageData(img,0,0); return c;
+}
+function genCBCT(){ CBCT.off={ ax:noiseSlice(PLANES.ax), cor:noiseSlice(PLANES.cor), sag:noiseSlice(PLANES.sag) }; CBCT.userImg=false; }
+function genCBCTfromImg(img){
+  if(!CBCT.off || !CBCT.off.ax) genCBCT();              // keep synthetic coronal/sagittal
+  const N=220; const c=document.createElement("canvas"); c.width=N; c.height=N; const x=c.getContext("2d");
+  x.fillStyle="#000"; x.fillRect(0,0,N,N);
+  const r=Math.min(N/img.width,N/img.height), iw=img.width*r, ih=img.height*r;
+  x.drawImage(img,(N-iw)/2,(N-ih)/2,iw,ih);
+  CBCT.off.ax=c; CBCT.acquired=true;                    // uploaded image fills the transverse pane
+}
+function loop(now){ if(bev) drawBEV(now); if(room) drawRoom(now); if(setupCv) drawSetup(now); requestAnimationFrame(loop); }
+
+/* ===================== WIRING ===================== */
+$("emrTabs").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  [...$("emrTabs").children].forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on")); $("tab-"+b.dataset.t).classList.add("on"); });
+
+$("modality").addEventListener("change",e=>{ M.modality=e.target.value; M.energyIdx=0; fillEnergy(); evaluateReady(); });
+$("energy").addEventListener("change",e=>{ M.energyIdx=+e.target.value; applyEnergy(); });
+$("doseRate").addEventListener("change",e=>{ M.doseRate=+e.target.value; });
+$("muSet").addEventListener("input",e=>setMU(+e.target.value));
+
+$("prepBtn").addEventListener("click",prepare);
+$("resetBtn").addEventListener("click",()=>{ cancelAnimationFrame(raf);
+  M.interlocks={door:false,key:false,mlc:true,jaws:true,couch:true,imager:true};
+  M.muDone=0; M.beamTime=0; setState("standby"); renderInterlocks(); updateMUReadout(); log("Console reset to standby."); });
+$("beamOn").addEventListener("click",()=>{ if(M.state==="interrupt") resumeFromInterrupt(); else beamOn(); });
+$("beamHold").addEventListener("click",interrupt);
+$("beamOff").addEventListener("click",()=>terminate(true));
+$("estop").addEventListener("click",()=>faultAll("EMERGENCY STOP"));
+
+document.querySelectorAll('.axis .ab button[data-ax]').forEach(b=>b.addEventListener("click",()=>bumpAxis(b.dataset.ax,+b.dataset.d)));
+document.querySelectorAll('[data-sh]').forEach(b=>b.addEventListener("click",()=>bumpShift(b.dataset.sh,+b.dataset.d)));
+$("autoMatch").addEventListener("click",autoMatch);
+$("applyShift").addEventListener("click",applyShift);
+
+window.addEventListener("resize",()=>{ initCanvases(); });
+
+/* pendant + triangulation + CBCT wiring */
+document.querySelectorAll('.pbtn[data-tog]').forEach(b=>b.addEventListener("click",()=>penToggle(b.dataset.tog)));
+const mlcBtn=document.querySelector('.pbtn[data-mlc]'); if(mlcBtn) mlcBtn.addEventListener("click",penMLC);
+const acqBtn=document.querySelector('.pbtn[data-act="acq"]'); if(acqBtn) acqBtn.addEventListener("click",penAcquire);
+document.querySelectorAll('[data-hold]').forEach(b=>{
+  const ax=b.dataset.hold, d=+b.dataset.d;
+  b.addEventListener("pointerdown",e=>{ e.preventDefault(); startHold(ax,d); });
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,stopHold));
+});
+window.addEventListener("pointerup",stopHold);
+document.querySelectorAll('#roomChips .rchip').forEach(c=>c.addEventListener("click",()=>penToggle(c.dataset.k)));
+$("triNew").addEventListener("click",triNewSetup);
+$("triReveal").addEventListener("click",triReveal);
+
+$("acquireBtn").addEventListener("click",penAcquire);
+$("blend").addEventListener("input",e=>{ CBCT.blend=+e.target.value/100; drawIGRT(); });
+$("viewSeg").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  [...$("viewSeg").children].forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  CBCT.view=b.dataset.v; drawIGRT(); });
+$("cbctFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const img=new Image(); img.onload=()=>{ genCBCTfromImg(img); CBCT.userImg=true;
+    $("igrtHint").textContent="loaded image · match to reference"; log("Loaded CBCT image “"+f.name+"”."); drawIGRT(); };
+  img.onerror=()=>log("Could not load that image file."); img.src=URL.createObjectURL(f); });
+
+/* ===================== BOOT ===================== */
+function boot(){
+  $("modality").value="x"; fillEnergy();
+  initCanvases();
+  renderInterlocks(); renderFields(); refreshMotion(); refreshFieldSize(); updateMUReadout(); refreshIGRT();
+  setRoomChips(); penUpdateLCD(); $("acquireBtn").disabled=true;
+  setState("standby");
+  log("Console initialised. Set up with lasers/CBCT, clear interlocks, then prepare beam.");
+  requestAnimationFrame(loop); drawIGRT();
+}
+// redraw IGRT whenever shifts change
+const _ri=refreshIGRT; refreshIGRT=function(){ _ri(); drawIGRT(); };
+boot();
+</script>
+
+<style id="rtaModuleBridgeStyle">
+#rtaHubRibbon{position:fixed;right:8px;top:8px;z-index:2147483647;display:none;max-width:330px;
+background:rgba(7,13,21,.94);color:#dce7f4;border:1px solid rgba(52,214,198,.45);border-radius:9px;
+padding:6px 9px;box-shadow:0 8px 24px rgba(0,0,0,.35);font:10px ui-monospace,Consolas,monospace;
+pointer-events:none;line-height:1.35}
+#rtaHubRibbon b{color:#34d6c6}#rtaHubRibbon span{color:#8fa3bb}
+</style>
+<div id="rtaHubRibbon"></div>
+<script id="rtaModuleBridge">
+(function(){
+  const MODULE_KEY="linac-console";
+  window.RadTherapyBridge={
+    context:null,
+    emit(event,detail){ parent.postMessage({type:'RTA_MODULE_EVENT',module:MODULE_KEY,event,detail:detail||{}},'*'); }
+  };
+  function showContext(ctx){
+    window.RadTherapyBridge.context=ctx;
+    const p=ctx&&ctx.patient, el=document.getElementById('rtaHubRibbon');
+    if(!el) return;
+    if(!p){el.style.display='none';return;}
+    el.style.display='block';
+    el.innerHTML='<b>SIMULATED CENTER</b><br>'+String(p.name||'Patient')+
+      ' <span>· MRN '+String(p.mrn||p.id||'—')+' · '+String(p.site||'')+'</span>';
+    window.dispatchEvent(new CustomEvent('rta:context',{detail:ctx}));
+  }
+  window.addEventListener('message',ev=>{
+    const d=ev.data||{};
+    if(d.type==='RTA_CONTEXT') showContext(d.context||{});
+  });
+  parent.postMessage({type:'RTA_MODULE_READY',module:MODULE_KEY},'*');
+  parent.postMessage({type:'RTA_REQUEST_CONTEXT',module:MODULE_KEY},'*');
+  
+  window.addEventListener('rta:context',ev=>{
+    const p=(ev.detail||{}).patient; if(!p) return;
+    const hdr=document.querySelector('header .pt');
+    if(hdr) hdr.innerHTML='PT <b>'+String(p.name||'Center Patient')+'</b> · MRN '+String(p.mrn||'—')+
+      ' · <span class="rdg">Center workflow</span>';
+    const vals=document.querySelectorAll('#tab-demo .kv b');
+    if(vals[0]) vals[0].textContent=p.name||'Center Patient';
+    if(vals[2]) vals[2].textContent=p.diagnosis||p.site||'Radiation oncology case';
+    const planVals=document.querySelectorAll('#tab-plan .kv b');
+    if(planVals[0]&&p.rx) planVals[0].textContent=p.rx.technique||planVals[0].textContent;
+    if(planVals[1]&&p.rx) planVals[1].textContent=String(p.rx.dose||'—')+' Gy / '+String(p.rx.fractions||'—')+' fx';
+  });
+  try{
+    if(typeof completeField==='function'){
+      const _completeField=completeField;
+      completeField=function(){_completeField.apply(this,arguments);
+        if(loadedField>=0 && delivered.filter((d,i)=>d>=PLAN[i].mu).length===PLAN.length)
+          window.RadTherapyBridge.emit('fraction-complete',{fields:PLAN.length});
+      };
+    }
+  }catch(e){}
+
+})();
+</script>
+
+</body>
+</html>
