@@ -1,0 +1,52 @@
+{
+  "platform": "RadTherapyApps Enterprise",
+  "version": "0.1.0-consolidation",
+  "shell": "index.html",
+  "modules": [
+    {
+      "id": "rt-workflow-suite",
+      "room": [
+        "lobby",
+        "ct",
+        "phys"
+      ],
+      "path": "modules/rt-workflow-suite.html",
+      "patientContext": true
+    },
+    {
+      "id": "dicom-alignment-lab",
+      "room": [
+        "ct",
+        "vault"
+      ],
+      "path": "modules/dicom-alignment-lab.html",
+      "patientContext": true
+    },
+    {
+      "id": "integrated-igrt-hub",
+      "room": [
+        "vault"
+      ],
+      "path": "modules/integrated-igrt-hub.html",
+      "patientContext": true
+    },
+    {
+      "id": "linac-console",
+      "room": [
+        "vault"
+      ],
+      "path": "modules/linac-console.html",
+      "patientContext": true
+    }
+  ],
+  "messageProtocol": {
+    "parentToModule": [
+      "RTA_CONTEXT"
+    ],
+    "moduleToParent": [
+      "RTA_MODULE_READY",
+      "RTA_REQUEST_CONTEXT",
+      "RTA_MODULE_EVENT"
+    ]
+  }
+}
