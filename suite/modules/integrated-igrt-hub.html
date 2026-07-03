@@ -124,11 +124,17 @@ button{cursor:pointer}
 .tcontrols{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 12px 12px}
 /* chart */
 .chartWrap{height:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.noteList{display:grid;gap:8px}.note{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:12px}.note .d{font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:4px}
+
+.dicomMode{height:100%;display:grid;grid-template-rows:42px 1fr;background:var(--console);border:1px solid var(--consoleLine);border-radius:12px;overflow:hidden}
+.dicomModeBar{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--console2);border-bottom:1px solid var(--consoleLine);color:var(--inkDark)}
+.dicomModeBar .title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;color:var(--mutedDark)}
+.dicomFrame{width:100%;height:100%;border:0;background:#06090e;display:block}
+
 @media(max-width:1200px){.pb-fields{grid-template-columns:repeat(3,minmax(0,1fr))}.imagingWrap,.treatWrap,.chartWrap,.scheduleGrid{grid-template-columns:1fr}.paneGrid{grid-template-columns:1fr 1fr;grid-template-rows:repeat(2,1fr)}}
 </style>
 </head>
-<body><a href="../index.html" target="_top" style="position:fixed;top:10px;left:10px;z-index:99999;padding:8px 12px;border:1px solid #3a506b;border-radius:6px;background:#16202e;color:#fff;font:600 12px 'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,.35);">← Simulated Center</a>
-  <div class="app">
+<body>
+<div class="app">
   <aside class="sidebar">
     <div class="logo"><div class="mark">R</div></div>
     <button class="navbtn active" data-view="schedule"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Schedule</button>
@@ -159,19 +165,17 @@ button{cursor:pointer}
 const TOL=2.0;
 const state={view:'schedule',patientId:null};
 const PATIENTS={
-  'P100247':{mrn:'100247',name:'Chen, Margaret',dob:'1958-03-12',age:68,sex:'F',site:'Prostate',technique:'VMAT',machine:'LINAC-A',energy:'6 MV',rxDose:6000,fxDose:300,fxTotal:20,fxDone:7,oncologist:'Dr. A. Pereira',allergies:['Penicillin'],flags:['Full bladder / empty rectum'],position:'Supine, kneefix',imaging:'Daily CBCT',setupNote:'Match to prostate + fiducials. 3 gold seeds.',fields:[{id:'CBCT',type:'Setup',energy:'kV',gantry:'0→360',coll:'0.0',mu:0,note:'Volumetric setup'},{id:'ARC1',type:'Treat',energy:'6 MV',gantry:'181→179',coll:'30.0',mu:312,note:'CW VMAT'},{id:'ARC2',type:'Treat',energy:'6 MV',gantry:'179→181',coll:'330.0',mu:298,note:'CCW VMAT'}],couch:{vrt:-3.2,lng:12.6,lat:-0.4,rtn:0},anatomy:'pelvis',notes:['Daily bladder protocol review.','Align to fiducials and soft tissue.','Observe urinary symptom trend weekly.']},
+  'P100247':{mrn:'100247',name:'Wilson, James',dob:'1958-03-12',age:68,sex:'M',site:'Prostate',technique:'VMAT',machine:'LINAC-A',energy:'6 MV',rxDose:6000,fxDose:300,fxTotal:20,fxDone:7,oncologist:'Dr. A. Pereira',allergies:['Penicillin'],flags:['Full bladder / empty rectum'],position:'Supine, kneefix',imaging:'Daily CBCT',setupNote:'Match to prostate + fiducials. 3 gold seeds.',fields:[{id:'CBCT',type:'Setup',energy:'kV',gantry:'0→360',coll:'0.0',mu:0,note:'Volumetric setup'},{id:'ARC1',type:'Treat',energy:'6 MV',gantry:'181→179',coll:'30.0',mu:312,note:'CW VMAT'},{id:'ARC2',type:'Treat',energy:'6 MV',gantry:'179→181',coll:'330.0',mu:298,note:'CCW VMAT'}],couch:{vrt:-3.2,lng:12.6,lat:-0.4,rtn:0},anatomy:'pelvis',notes:['Daily bladder protocol review.','Align to fiducials and soft tissue.','Observe urinary symptom trend weekly.']},
   'P100892':{mrn:'100892',name:'Okafor, Robert',dob:'1965-11-02',age:60,sex:'M',site:'Oropharynx (H&N)',technique:'IMRT',machine:'LINAC-A',energy:'6 MV',rxDose:7000,fxDose:200,fxTotal:35,fxDone:18,oncologist:'Dr. S. Lindqvist',allergies:[],flags:['5-point mask','Daily kV + weekly CBCT'],position:'Supine, S-frame mask',imaging:'Daily kV pair',setupNote:'Match to C2 vertebra and mandible. Watch mask fit.',fields:[{id:'kV-AP',type:'Setup',energy:'kV',gantry:'0',coll:'0.0',mu:0,note:'AP setup'},{id:'kV-LAT',type:'Setup',energy:'kV',gantry:'270',coll:'0.0',mu:0,note:'Lateral setup'},{id:'F1',type:'Treat',energy:'6 MV',gantry:'180',coll:'0.0',mu:142,note:'Step & shoot'},{id:'F2',type:'Treat',energy:'6 MV',gantry:'230',coll:'0.0',mu:131,note:'Step & shoot'},{id:'F3',type:'Treat',energy:'6 MV',gantry:'280',coll:'0.0',mu:118,note:'Step & shoot'},{id:'F4',type:'Treat',energy:'6 MV',gantry:'80',coll:'0.0',mu:127,note:'Step & shoot'},{id:'F5',type:'Treat',energy:'6 MV',gantry:'130',coll:'0.0',mu:139,note:'Step & shoot'}],couch:{vrt:-1.8,lng:24.1,lat:0.6,rtn:0},anatomy:'head',notes:['Assess mask fit and weight loss changes.','Review mucositis / pain management.','Verify bite block and shoulder pull consistency.']},
   'P101455':{mrn:'101455',name:'Vance, Eleanor',dob:'1971-07-19',age:54,sex:'F',site:'Breast (Left)',technique:'Tangents (FiF)',machine:'LINAC-B',energy:'6 MV',rxDose:4005,fxDose:267,fxTotal:15,fxDone:11,oncologist:'Dr. A. Pereira',allergies:['Contrast dye'],flags:['DIBH','Breast board 12.5°'],position:'Supine, breast board, both arms up',imaging:'Daily kV (DIBH)',setupNote:'Match to chest wall / carina. Confirm breath-hold baseline.',fields:[{id:'kV-AP',type:'Setup',energy:'kV',gantry:'0',coll:'0.0',mu:0,note:'AP DIBH'},{id:'MED',type:'Treat',energy:'6 MV',gantry:'305',coll:'0.0',mu:178,note:'Medial tangent'},{id:'LAT',type:'Treat',energy:'6 MV',gantry:'125',coll:'0.0',mu:184,note:'Lateral tangent'}],couch:{vrt:-2.5,lng:9.3,lat:1.2,rtn:0},anatomy:'chest',notes:['Coach breath-hold before imaging and treatment.','Watch skin reaction and arm comfort.','Confirm board angle and indexing.']}
 };
 const sessions={};
 function sess(pid){
   if(!sessions[pid]){
-    sessions[pid]={view:'overlay',applied:{vrt:0,lng:0,lat:0,pitch:0,roll:0,yaw:0},truthError:randomTruth(),igrtApproved:false,delivered:new Set(),con:null};
+    sessions[pid]={igrtApproved:false,dicomResult:null,delivered:new Set(),con:null};
   }
   return sessions[pid];
 }
-function randomTruth(){return {vrt:rr(-8,8),lng:rr(-10,10),lat:rr(-8,8),pitch:rr(-1.5,1.5),roll:rr(-1.5,1.5),yaw:rr(-1.5,1.5)}}
-function rr(a,b){return Math.round((a+Math.random()*(b-a))*10)/10}
 function activePatient(){return state.patientId?PATIENTS[state.patientId]:null}
 function setPatient(pid){state.patientId=pid; sess(pid); updatePatientBand(); renderAll();}
 function updatePatientBand(){
@@ -208,7 +212,7 @@ function renderSchedule(){
     <div class="col card"><div class="cardHead"><h3>Daily Practice Schedule</h3></div>
       <div class="cardBody" style="display:grid;grid-template-rows:auto 1fr;gap:10px;min-height:0">
         <table class="miniTable"><thead><tr><th>Time</th><th>Patient</th><th>Activity</th><th>Machine</th></tr></thead><tbody>
-          <tr><td class="mono">08:00</td><td>Margaret Chen</td><td>Daily CBCT + VMAT</td><td>LINAC-A</td></tr>
+          <tr><td class="mono">08:00</td><td>James Wilson</td><td>Daily CBCT + VMAT</td><td>LINAC-A</td></tr>
           <tr><td class="mono">08:20</td><td>Robert Okafor</td><td>Daily kV pair + IMRT</td><td>LINAC-A</td></tr>
           <tr><td class="mono">08:40</td><td>Eleanor Vance</td><td>DIBH kV + Tangents</td><td>LINAC-B</td></tr>
           <tr><td class="mono">09:00</td><td>Physics QA</td><td>Review shifts / coaching</td><td>Workstation</td></tr>
@@ -227,105 +231,52 @@ function renderSchedule(){
         </div>
       </div></div>
       <div class="card"><div class="cardHead"><h3>Instructional Notes</h3></div><div class="cardBody">
-        <div class="help">This integrated hub is fullscreen and non-scrolling by design. It uses the hub’s practice-patient roster for synthetic IGRT drills, while preserving access to a dedicated uploaded-DICOM workflow.</div>
+        <div class="help">This integrated hub is fullscreen and non-scrolling by design. It uses the hub’s practice-patient roster to establish clinical context while the Imaging module uses uploaded DICOM data for the registration exercise.</div>
         <div style="margin-top:10px"><button class="btn primary" onclick="switchView('imaging')">Open Imaging Workspace</button></div>
       </div></div>
     </div>
   </div>`;
 }
 
-/* ---------- Imaging ---------- */
-const PLANES=[
-  {key:'axial',h:'lat',v:'vrt',rot:'roll',hSign:1,vSign:1,title:'Axial',sub:'LAT ↔ · VRT ↕ · Roll ⟳'},
-  {key:'coronal',h:'lat',v:'lng',rot:'yaw',hSign:1,vSign:-1,title:'Coronal',sub:'LAT ↔ · LNG ↕ · Yaw ⟳'},
-  {key:'sagittal',h:'lng',v:'vrt',rot:'pitch',hSign:-1,vSign:1,title:'Sagittal',sub:'LNG ↔ · VRT ↕ · Pitch ⟳'}
-];
-const AXES=[['vrt','VRT','mm'],['lng','LNG','mm'],['lat','LAT','mm'],['pitch','PITCH','°'],['roll','ROLL','°'],['yaw','YAW','°']];
-function residual(){const s=sess(state.patientId), r={}; AXES.forEach(([k])=>r[k]=Math.round((s.truthError[k]-s.applied[k])*10)/10); return r;}
-function unitOf(k){return ['pitch','roll','yaw'].includes(k)?'°':'mm'}
-function tcls(v){const m=Math.abs(v); return m<=TOL?'tol-ok':m<=TOL*2?'tol-warn':'tol-bad'}
-function vmag(r){return Math.sqrt(r.vrt*r.vrt+r.lng*r.lng+r.lat*r.lat)}
+/* ---------- Imaging: embedded DICOM registration workspace ---------- */
+function dicomContext(){
+  const p=activePatient(); if(!p) return {};
+  return {patient:{
+    id:state.patientId,mrn:p.mrn,name:p.name,dob:p.dob,age:p.age,sex:p.sex,site:p.site,
+    immobilization:p.position,imaging:p.imaging,setupNote:p.setupNote,
+    rx:{dose:p.rxDose/100,fractions:p.fxTotal,dosePerFraction:p.fxDose/100,technique:p.technique,energy:p.energy},
+    fractionsDelivered:p.fxDone
+  }};
+}
+function sendDicomContext(){
+  const fr=document.getElementById('dicomFrame');
+  if(fr&&fr.contentWindow) fr.contentWindow.postMessage({type:'RTA_CONTEXT',context:dicomContext()},'*');
+}
 function renderImaging(){
   const host=document.getElementById('view-imaging'); const p=activePatient();
-  if(!p){host.innerHTML='<div class="card" style="height:100%;display:grid;place-items:center"><div style="text-align:center;color:var(--muted)">No patient loaded.<br><br><button class="btn primary" onclick="switchView(\'schedule\')">Choose patient from Schedule</button></div></div>'; return;}
-  const s=sess(state.patientId); const r=residual(); const mag=vmag(r), ready=AXES.every(([k])=>Math.abs(r[k])<=TOL);
-  host.innerHTML=`<div class="imagingWrap">
-    <div class="imagingMain">
-      <div class="imgbar"><span class="lbl">${p.imaging} · ${p.site}</span>
-        <div class="seg" id="viewSeg">
-          <button data-v="overlay" class="${s.view==='overlay'?'on':''}">Overlay</button>
-          <button data-v="split" class="${s.view==='split'?'on':''}">Split</button>
-          <button data-v="checker" class="${s.view==='checker'?'on':''}">Checker</button>
-        </div>
-        <div class="spacer"></div>
-        <span class="lbl">Reference CT vs Moving Daily Image</span>
-      </div>
-      <div class="paneGrid">
-        ${PLANES.map(pl=>`<div class="pane"><div class="paneLabel">${pl.title}<small>${pl.sub}</small></div><canvas id="cv-${pl.key}" width="380" height="280"></canvas><div class="paneMeta" id="corner-${pl.key}"></div><div class="paneHint">drag image to shift</div></div>`).join('')}
-        <div class="pane paneSummary"><div class="cap">Residual 3D Vector</div><div class="big ${mag<=TOL?'ok':mag<=TOL*2?'warn':'bad'}" id="offset3d">${mag.toFixed(1)}</div><div class="cap">mm</div><div id="sumStatus">${ready?'<span class="pill ok">Ready to approve</span>':'<span class="pill warn">Out of tolerance</span>'}</div></div>
-      </div>
+  if(!p){
+    host.innerHTML='<div class="card" style="height:100%;display:grid;place-items:center"><div style="text-align:center;color:var(--muted)">No patient loaded.<br><br><button class="btn primary" onclick="switchView(\'schedule\')">Choose patient from Schedule</button></div></div>';
+    return;
+  }
+  const s=sess(state.patientId);
+  host.innerHTML=`<div class="dicomMode">
+    <div class="dicomModeBar">
+      <div class="title">OIS / IGRT · DICOM Registration Workspace</div>
+      <span class="pill info">${p.imaging}</span>
+      <span class="pill ${s.igrtApproved?'ok':'warn'}">${s.igrtApproved?'IGRT approved':'Approval pending'}</span>
+      <div class="spacer"></div>
+      <span class="pill info">${p.name} · MRN ${p.mrn}</span>
+      <button class="btn dark" onclick="reloadDicomWorkspace()">Clear / Reload Viewer</button>
     </div>
-    <div class="igrtPanel">
-      <div class="igrtSection"><div class="igrtTitle">Registration Workflow</div><div class="statusNote">Use the fixed practice patient as the reference image. A hidden random setup offset is applied to the moving daily image. Correct the match using couch-style buttons or mouse dragging in the MPR panes.</div></div>
-      <div class="igrtSection"><div class="igrtTitle">Display & Options</div><div style="display:grid;gap:7px"><button class="btn dark" onclick="newOffset()">New Random Offset</button><button class="btn dark" onclick="resetShift()">Reset Student Shift</button><button class="btn dark" onclick="autoMatch()">Auto-Match</button><button class="btn" onclick="openDicomLab()">Open Uploaded-DICOM Lab</button></div></div>
-      <div class="igrtSection"><div class="igrtTitle">Couch Correction</div>${AXES.map(([k,l,u])=>`<div class="axisCtl"><div class="axisTop"><span>${l}</span><b id="sv-${k}">${fmt(s.applied[k])}</b></div><div class="nudge"><button class="btn dark" onclick="nudge('${k}',-${u==='°'?0.5:1})">−</button><div class="step">${u}</div><button class="btn dark" onclick="nudge('${k}',${u==='°'?0.5:1})">+</button></div></div>`).join('')}</div>
-      <div class="igrtSection"><div class="igrtTitle">Residual Error</div><div class="resBox" id="tolBody">${AXES.map(([k,l,u])=>`<div class="rrow"><span>${l}</span><span class="${tcls(r[k])}">${fmt(r[k])} ${u}</span></div>`).join('')}</div></div>
-      <div class="igrtSection"><div class="igrtTitle">Status</div><div class="statusNote" id="statusText">Action level: ±${TOL.toFixed(1)} mm / deg. ${s.igrtApproved?'Shift has been applied and approved.':'Approve only after all axes are within tolerance.'}</div></div>
-      <div class="btnCol"><button class="btn primary" id="approveBtn" ${ready&&!s.igrtApproved?'':'disabled'} onclick="approveShift()">Apply Shift & Approve</button><button class="btn go" onclick="switchView('treat')">Go to LINAC Console</button></div>
-    </div>
+    <iframe id="dicomFrame" class="dicomFrame" src="dicom-alignment-lab.html?embedded=1" title="OIS DICOM IGRT registration viewer"></iframe>
   </div>`;
-  document.querySelectorAll('#viewSeg button').forEach(b=>b.onclick=()=>{s.view=b.dataset.v; renderImaging();});
-  attachCanvasDrag(); drawIGRT(); refreshImagingStatus();
+  const fr=document.getElementById('dicomFrame');
+  if(fr) fr.addEventListener('load',sendDicomContext);
 }
-function fmt(v){return (v>0?'+':'')+Number(v).toFixed(1)}
-function newOffset(){const s=sess(state.patientId); s.truthError=randomTruth(); s.applied={vrt:0,lng:0,lat:0,pitch:0,roll:0,yaw:0}; s.igrtApproved=false; renderImaging();}
-function resetShift(){const s=sess(state.patientId); s.applied={vrt:0,lng:0,lat:0,pitch:0,roll:0,yaw:0}; s.igrtApproved=false; renderImaging();}
-function autoMatch(){const s=sess(state.patientId); s.applied={...s.truthError}; renderImaging();}
-function approveShift(){const s=sess(state.patientId); const r=residual(); const ready=AXES.every(([k])=>Math.abs(r[k])<=TOL); if(!ready) return; s.igrtApproved=true; renderImaging(); renderTreat(); renderChart();}
-function nudge(k,d){const s=sess(state.patientId); s.applied[k]=Math.round((s.applied[k]+d)*10)/10; s.igrtApproved=false; renderImaging();}
-function openDicomLab(){ window.open('radtherapyapps_dicom_alignment_lab.html','_blank'); }
-function drawIGRT(){const p=activePatient(); const s=sess(state.patientId); PLANES.forEach(pl=>{const cvs=document.getElementById('cv-'+pl.key); if(cvs) drawPlane(cvs.getContext('2d'),cvs,pl,p,s);}); updateCorners();}
-function drawPlane(c,cvs,pl,p,s){
-  const W=cvs.width,H=cvs.height,r=residual(); const ox=-(r[pl.h])*4*pl.hSign, oy=-(r[pl.v])*4*pl.vSign, rot=(r[pl.rot]||0)*Math.PI/180;
-  c.clearRect(0,0,W,H); c.fillStyle='#05080c'; c.fillRect(0,0,W,H);
-  if(s.view==='split'){
-    c.save(); c.beginPath(); c.rect(0,0,W/2,H); c.clip(); paintAnatomy(c,W,H,p.anatomy,pl.key,0,0,0,'#beddff'); c.restore();
-    c.save(); c.beginPath(); c.rect(W/2,0,W/2,H); c.clip(); paintAnatomy(c,W,H,p.anatomy,pl.key,ox,oy,rot,'#ffd49c'); c.restore();
-    c.strokeStyle='#24c7bf'; c.lineWidth=2; c.beginPath(); c.moveTo(W/2,0); c.lineTo(W/2,H); c.stroke();
-  } else if(s.view==='checker'){
-    const n=6, sz=Math.ceil(W/n); for(let i=0;i<n;i++) for(let j=0;j<n;j++){
-      c.save(); c.beginPath(); c.rect(i*sz,j*sz,sz,sz); c.clip();
-      if((i+j)%2===0) paintAnatomy(c,W,H,p.anatomy,pl.key,0,0,0,'#beddff'); else paintAnatomy(c,W,H,p.anatomy,pl.key,ox,oy,rot,'#ffd49c');
-      c.restore();
-    }
-  } else {
-    c.globalCompositeOperation='lighter'; paintAnatomy(c,W,H,p.anatomy,pl.key,0,0,0,'#1b7288'); paintAnatomy(c,W,H,p.anatomy,pl.key,ox,oy,rot,'#7d5a22'); c.globalCompositeOperation='source-over';
-  }
-  drawGraticule(c,W,H);
+function reloadDicomWorkspace(){
+  const s=sess(state.patientId); s.igrtApproved=false; s.dicomResult=null;
+  updatePatientBand(); renderImaging(); renderTreat(); renderChart();
 }
-function updateCorners(){const r=residual(); PLANES.forEach(pl=>{const el=document.getElementById('corner-'+pl.key); if(el) el.innerHTML=`${pl.h.toUpperCase()} <span class="${tcls(r[pl.h])}">${fmt(r[pl.h])}${unitOf(pl.h)}</span><br>${pl.v.toUpperCase()} <span class="${tcls(r[pl.v])}">${fmt(r[pl.v])}${unitOf(pl.v)}</span><br>${pl.rot.toUpperCase()} <span class="${tcls(r[pl.rot])}">${fmt(r[pl.rot])}°</span>`;});}
-function refreshImagingStatus(){const p=activePatient(); if(!p||state.view!=='imaging') return; const s=sess(state.patientId); const r=residual(); const ready=AXES.every(([k])=>Math.abs(r[k])<=TOL); AXES.forEach(([k,l,u])=>{const sv=document.getElementById('sv-'+k); if(sv) sv.textContent=fmt(s.applied[k]);}); const tb=document.getElementById('tolBody'); if(tb) tb.innerHTML=AXES.map(([k,l,u])=>`<div class="rrow"><span>${l}</span><span class="${tcls(r[k])}">${fmt(r[k])} ${u}</span></div>`).join(''); const o=document.getElementById('offset3d'); if(o){const mag=vmag(r); o.textContent=mag.toFixed(1); o.className='big '+(mag<=TOL?'ok':mag<=TOL*2?'warn':'bad');} const ss=document.getElementById('sumStatus'); if(ss) ss.innerHTML=ready?'<span class="pill ok">Ready to approve</span>':'<span class="pill warn">Out of tolerance</span>'; const st=document.getElementById('statusText'); if(st) st.textContent='Action level: ±'+TOL.toFixed(1)+' mm / deg. '+(s.igrtApproved?'Shift has been applied and approved.':'Approve only after all axes are within tolerance.'); const ap=document.getElementById('approveBtn'); if(ap) ap.disabled=!(ready&&!s.igrtApproved);}
-function drawGraticule(c,W,H){c.strokeStyle='rgba(120,220,220,.42)'; c.lineWidth=1; c.setLineDash([6,5]); c.beginPath(); c.moveTo(W/2,0); c.lineTo(W/2,H); c.moveTo(0,H/2); c.lineTo(W,H/2); c.stroke(); c.setLineDash([]); c.strokeStyle='rgba(120,220,220,.85)'; c.beginPath(); c.moveTo(W/2-10,H/2); c.lineTo(W/2+10,H/2); c.moveTo(W/2,H/2-10); c.lineTo(W/2,H/2+10); c.stroke();}
-function paintAnatomy(c,W,H,site,plane,ox,oy,rot,tint){
-  c.save(); c.translate(W/2+ox,H/2+oy); c.rotate(rot); c.translate(-W/2,-H/2); c.strokeStyle=tint; c.fillStyle=tint; c.lineWidth=2.2; c.globalAlpha=.9;
-  const cx=W/2, cy=H/2; const ring=(x,y,r)=>{c.beginPath();c.arc(x,y,r,0,7);c.stroke();}; const ell=(x,y,rx,ry,a=0)=>{c.beginPath();c.ellipse(x,y,rx,ry,a,0,7);c.stroke();}; const rect=(x,y,w,h)=>c.strokeRect(x,y,w,h); const line=(a,b,d,e)=>{c.beginPath();c.moveTo(a,b);c.lineTo(d,e);c.stroke();}; const arc=(x,y,r,a,b)=>{c.beginPath();c.arc(x,y,r,a,b);c.stroke();}; const dash=on=>c.setLineDash(on?[4,3]:[]); const fid=(x,y)=>{const sv=c.globalAlpha;c.globalAlpha=1;c.beginPath();c.arc(x,y,3.4,0,7);c.fill();c.globalAlpha=sv;}; const tri=(x,y,s)=>{c.beginPath();c.moveTo(x,y);c.lineTo(x-s,y+s*1.6);c.lineTo(x+s,y+s*1.6);c.closePath();c.stroke();}; const tgt=(x,y,r)=>{dash(true);const sv=c.globalAlpha;c.globalAlpha=.85;ring(x,y,r);c.globalAlpha=sv;dash(false);};
-  switch(site+'_'+plane){
-    case 'pelvis_axial': c.globalAlpha=.45; c.lineWidth=3; ell(cx,cy,W*.34,H*.24); c.lineWidth=2.4; c.globalAlpha=.9; ring(cx-74,cy+44,24); ring(cx+74,cy+44,24); c.globalAlpha=.6; c.lineWidth=7; arc(cx,cy+28,52,-2.5,-.64); c.lineWidth=2.2; c.globalAlpha=.85; ring(cx,cy+60,14); tgt(cx,cy+4,26); fid(cx-9,cy-4); fid(cx+11,cy+2); fid(cx-1,cy+18); break;
-    case 'pelvis_coronal': c.lineWidth=10; c.globalAlpha=.5; arc(cx-104,cy-44,80,-.5,2.3); arc(cx+104,cy-44,80,.85,3.6); c.lineWidth=2.4; c.globalAlpha=.9; ring(cx-82,cy+82,30); ring(cx+82,cy+82,30); c.globalAlpha=.55; c.lineWidth=12; line(cx-26,cy+104,cx+26,cy+104); tgt(cx,cy+24,34); fid(cx-10,cy+14); fid(cx+12,cy+20); fid(cx-2,cy+40); break;
-    case 'pelvis_sagittal': c.lineWidth=8; c.globalAlpha=.5; arc(cx+66,cy-30,92,1.0,2.7); c.lineWidth=2; c.globalAlpha=.55; rect(cx-88,cy+34,24,40); c.lineWidth=2.2; c.globalAlpha=.85; ring(cx-34,cy-4,30); tgt(cx-28,cy+42,24); fid(cx-36,cy+36); fid(cx-20,cy+46); fid(cx-30,cy+54); c.globalAlpha=.6; c.lineWidth=6; arc(cx+28,cy+42,40,1.4,2.9); break;
-    case 'head_axial': c.lineWidth=4; c.globalAlpha=.5; ell(cx,cy-6,W*.3,H*.27); c.globalAlpha=.55; c.lineWidth=3; arc(cx,cy-58,40,.3,2.84); c.lineWidth=2.4; c.globalAlpha=.9; ring(cx,cy+38,16); tri(cx,cy+54,7); tgt(cx+44,cy+6,26); break;
-    case 'head_coronal': c.lineWidth=4; c.globalAlpha=.55; ring(cx,cy-26,108); c.lineWidth=5; c.globalAlpha=.5; arc(cx,cy+40,82,.2,Math.PI-.2); c.lineWidth=2.4; c.globalAlpha=.9; for(let i=0;i<4;i++) rect(cx-20,cy+82+i*30,40,24); tgt(cx+20,cy+4,42); break;
-    case 'head_sagittal': c.lineWidth=4; c.globalAlpha=.55; arc(cx-4,cy-30,98,-2.45,1.0); c.globalAlpha=.5; c.lineWidth=4; arc(cx-66,cy+28,44,-.6,1.25); c.lineWidth=2.4; c.globalAlpha=.9; for(let i=0;i<4;i++) rect(cx+16+i*5,cy+48+i*30,30,24); tgt(cx-6,cy+8,40); break;
-    case 'chest_axial': c.lineWidth=3; c.globalAlpha=.42; ell(cx,cy,W*.36,H*.26); c.lineWidth=2.4; c.globalAlpha=.9; ring(cx,cy+52,18); tri(cx,cy+70,7); c.lineWidth=5; c.globalAlpha=.5; rect(cx-9,cy-68,18,15); c.globalAlpha=.38; c.lineWidth=3; arc(cx-148,cy+4,150,-.5,.5); arc(cx+148,cy+4,150,Math.PI-.5,Math.PI+.5); tgt(cx-62,cy-20,30); fid(cx-62,cy-20); break;
-    case 'chest_coronal': c.lineWidth=3; c.globalAlpha=.38; for(let i=0;i<5;i++) arc(cx-150,cy-50+i*36,200,-.5,.5); c.lineWidth=2.4; c.globalAlpha=.85; for(let i=0;i<6;i++) rect(cx-16,cy-100+i*36,32,26); c.globalAlpha=.9; fid(cx+4,cy-8); tgt(cx-100,cy+34,52); break;
-    case 'chest_sagittal': c.lineWidth=2.4; c.globalAlpha=.85; for(let i=0;i<6;i++) rect(cx+44,cy-100+i*36,28,26); c.globalAlpha=.5; c.lineWidth=5; line(cx-58,cy-78,cx-58,cy+8); c.lineWidth=4; c.globalAlpha=.42; arc(cx-8,cy+72,120,-1.0,-.1); tgt(cx-58,cy-28,40); break;
-    default: ring(cx,cy,60);
-  }
-  c.restore();
-}
-function attachCanvasDrag(){PLANES.forEach(pl=>{const cvs=document.getElementById('cv-'+pl.key); if(!cvs||cvs._bound) return; cvs._bound=true; cvs._pl=pl; cvs.addEventListener('mousedown',e=>{const s=sess(state.patientId); cvs._drag={x:e.clientX,y:e.clientY,h:s.applied[pl.h],v:s.applied[pl.v]}; cvs.classList.add('dragging');});}); if(window._igrtBound) return; window._igrtBound=true; window.addEventListener('mousemove',paneMove); window.addEventListener('mouseup',()=>document.querySelectorAll('.pane canvas').forEach(c=>{c._drag=null;c.classList.remove('dragging');}));}
-function paneMove(e){document.querySelectorAll('.pane canvas').forEach(cvs=>{if(!cvs._drag) return; const pl=cvs._pl, s=sess(state.patientId); const rect=cvs.getBoundingClientRect(), scale=cvs.width/rect.width; const dx=(e.clientX-cvs._drag.x)*scale, dy=(e.clientY-cvs._drag.y)*scale; s.applied[pl.h]=Math.round((cvs._drag.h + dx/(4*pl.hSign))*10)/10; s.applied[pl.v]=Math.round((cvs._drag.v + dy/(4*pl.vSign))*10)/10; s.igrtApproved=false; drawIGRT(); refreshImagingStatus();});}
-
 /* ---------- Treat ---------- */
 function initConsole(pid){const s=sess(pid), p=PATIENTS[pid]; if(s.con) return s.con; s.con={field:null,door:'open',state:'parked',mu:0,gantryNow:0,actual:{coll:0,vrt:p.couch.vrt,lng:p.couch.lng,lat:p.couch.lat,energy:'—'}}; return s.con;}
 function parseGantry(g){if(g.includes('→')){const [a,b]=g.split('→').map(parseFloat); return [a,b];} const v=parseFloat(g); return [v,v];}
@@ -388,19 +339,39 @@ function holdBeam(){const con=initConsole(state.patientId); if(con.state==='beam
 function terminateField(){const con=initConsole(state.patientId); con.field=null; con.mu=0; con.state='parked'; renderTreat();}
 
 /* ---------- Chart ---------- */
-function renderChart(){const host=document.getElementById('view-chart'); const p=activePatient(); if(!p){host.innerHTML='<div class="card" style="height:100%;display:grid;place-items:center"><div style="text-align:center;color:var(--muted)">No patient loaded.<br><br><button class="btn primary" onclick="switchView(\'schedule\')">Choose patient from Schedule</button></div></div>'; return;} const s=sess(state.patientId); const r=residual();
+function renderChart(){
+  const host=document.getElementById('view-chart'); const p=activePatient();
+  if(!p){host.innerHTML='<div class="card" style="height:100%;display:grid;place-items:center"><div style="text-align:center;color:var(--muted)">No patient loaded.<br><br><button class="btn primary" onclick="switchView(\'schedule\')">Choose patient from Schedule</button></div></div>'; return;}
+  const s=sess(state.patientId), d=s.dicomResult||{}, c=d.correction||{}, r=d.residual||{}, ds=d.dataset||{};
+  const correctionRows=s.dicomResult?`<dt>LAT</dt><dd class="mono">${Number(c.lat||0).toFixed(1)} mm</dd><dt>VRT</dt><dd class="mono">${Number(c.vrt||0).toFixed(1)} mm</dd><dt>LNG</dt><dd class="mono">${Number(c.lng||0).toFixed(1)} mm</dd><dt>Roll</dt><dd class="mono">${Number(c.roll||0).toFixed(1)}°</dd><dt>Pitch</dt><dd class="mono">${Number(c.pitch||0).toFixed(1)}°</dd><dt>Yaw</dt><dd class="mono">${Number(c.yaw||0).toFixed(1)}°</dd><dt>Residual</dt><dd class="mono">${Number(d.maxTranslationResidual||0).toFixed(1)} mm / ${Number(d.maxRotationResidual||0).toFixed(1)}°</dd>`:'<dt>Registration</dt><dd>No approved DICOM match recorded</dd>';
   host.innerHTML=`<div class="chartWrap">
     <div class="card"><div class="cardHead"><h3>Demographics & Plan</h3></div><div class="cardBody">
-      <dl class="kv"><dt>Name</dt><dd>${p.name}</dd><dt>MRN</dt><dd>${p.mrn}</dd><dt>DOB</dt><dd>${p.dob}</dd><dt>Diagnosis</dt><dd>${p.site}</dd><dt>Technique</dt><dd>${p.technique}</dd><dt>Prescription</dt><dd>${p.rxDose} cGy / ${p.fxTotal} fx</dd><dt>Machine</dt><dd>${p.machine}</dd><dt>Position</dt><dd>${p.position}</dd><dt>Imaging</dt><dd>${p.imaging}</dd><dt>Physician</dt><dd>${p.oncologist}</dd></dl>
+      <dl class="kv"><dt>Name</dt><dd>${p.name}</dd><dt>MRN</dt><dd>${p.mrn}</dd><dt>Sex</dt><dd>${p.sex}</dd><dt>DOB</dt><dd>${p.dob}</dd><dt>Diagnosis</dt><dd>${p.site}</dd><dt>Technique</dt><dd>${p.technique}</dd><dt>Prescription</dt><dd>${p.rxDose} cGy / ${p.fxTotal} fx</dd><dt>Machine</dt><dd>${p.machine}</dd><dt>Position</dt><dd>${p.position}</dd><dt>Imaging</dt><dd>${p.imaging}</dd><dt>Physician</dt><dd>${p.oncologist}</dd></dl>
     </div></div>
-    <div class="card"><div class="cardHead"><h3>IGRT Session Summary</h3></div><div class="cardBody">
-      <div style="display:grid;gap:8px;margin-bottom:10px">${s.igrtApproved?'<span class="pill ok">Approved</span>':'<span class="pill warn">Pending approval</span>'}<span class="pill info">Practice synthetic match</span></div>
-      <dl class="kv"><dt>Student VRT</dt><dd class="mono">${fmt(s.applied.vrt)} mm</dd><dt>Student LNG</dt><dd class="mono">${fmt(s.applied.lng)} mm</dd><dt>Student LAT</dt><dd class="mono">${fmt(s.applied.lat)} mm</dd><dt>Student Pitch</dt><dd class="mono">${fmt(s.applied.pitch)} °</dd><dt>Student Roll</dt><dd class="mono">${fmt(s.applied.roll)} °</dd><dt>Student Yaw</dt><dd class="mono">${fmt(s.applied.yaw)} °</dd><dt>Residual 3D</dt><dd class="mono">${vmag(r).toFixed(1)} mm</dd></dl>
-      <div class="help" style="margin-top:10px">Answer key remains implicit during the exercise. If desired, open the standalone uploaded-DICOM alignment lab for custom CT series.</div>
+    <div class="card"><div class="cardHead"><h3>DICOM IGRT Session</h3></div><div class="cardBody">
+      <div style="display:grid;gap:8px;margin-bottom:10px">${s.igrtApproved?'<span class="pill ok">Approved</span>':'<span class="pill warn">Pending approval</span>'}<span class="pill info">${d.mode||'DICOM registration'}</span></div>
+      <dl class="kv"><dt>Dataset patient</dt><dd>${ds.patient||'—'}</dd><dt>Series</dt><dd>${ds.description||'—'}</dd><dt>Modality</dt><dd>${ds.modality||'—'}</dd><dt>Registration mode</dt><dd>${d.mode||'—'}</dd>${correctionRows}</dl>
+      <div class="help" style="margin-top:10px">These values are returned directly from the embedded DICOM registration workspace and are used to release the treatment-console IGRT interlock.</div>
     </div></div>
     <div class="card"><div class="cardHead"><h3>Progress Notes</h3></div><div class="cardBody noteList">${p.notes.map((n,i)=>`<div class="note"><div class="d">Teaching note ${i+1}</div>${n}</div>`).join('')}</div></div>
   </div>`;
 }
+
+window.addEventListener('message',ev=>{
+  const d=ev.data||{};
+  if(d.type==='RTA_REQUEST_CONTEXT'&&d.module==='dicom-alignment-lab') sendDicomContext();
+  if(d.type==='RTA_MODULE_EVENT'&&d.module==='dicom-alignment-lab'&&state.patientId){
+    const s=sess(state.patientId);
+    if(d.event==='igrt-approved'){
+      s.igrtApproved=true; s.dicomResult=d.detail||{};
+      updatePatientBand(); renderTreat(); renderChart();
+    }
+    if(d.event==='igrt-rejected'){
+      s.igrtApproved=false; s.dicomResult=d.detail||null;
+      updatePatientBand(); renderTreat(); renderChart();
+    }
+  }
+});
 
 updatePatientBand(); renderAll();
 </script>
