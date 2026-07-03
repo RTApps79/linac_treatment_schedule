@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RT Workflow Suite — Sim · Plan · QA · Treat</title>
+<style>
+  :root{
+    --paper:#eef2f6;--card:#fff;--ink:#16212e;--ink-soft:#56657a;--ink-mute:#8493a6;
+    --rule:#d9e1ea;--rule-soft:#e7edf2;--teal:#0e8f86;--teal-d:#0a6f68;--slate:#34506b;--slate-d:#26405a;
+    --ok:#18794e;--warn:#b25f00;--alert:#c0392b;--alert-bg:#fdecec;--gold:#b8860b;
+    --vault:#0c1118;--vault2:#121a24;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .mono{font-family:var(--mono)}
+  h1,h2,h3,h4{margin:0;font-weight:700}
+  button{font-family:inherit}
+
+  header{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--slate),var(--slate-d));color:#fff;padding:9px 18px;position:sticky;top:0;z-index:30}
+  header .tre{width:28px;height:28px}
+  header b{font-size:15px;letter-spacing:.04em}
+  header .mid{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#bcd0e0}
+  header .spacer{flex:1}
+  header .badge{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.14);padding:4px 9px;border-radius:20px;color:#dfeaf2}
+
+  .app{display:grid;grid-template-columns:284px 1fr;height:calc(100vh - 48px)}
+  @media(max-width:860px){.app{grid-template-columns:1fr;height:auto}}
+  .rail{border-right:1px solid var(--rule);background:#fff;display:flex;flex-direction:column;min-height:0}
+  @media(max-width:860px){.rail{max-height:44vh;border-right:0;border-bottom:1px solid var(--rule)}}
+  .rail .search{padding:11px 11px 7px}
+  .rail input{width:100%;border:1px solid var(--rule);border-radius:9px;padding:8px 11px;font-size:13.5px;color:var(--ink)}
+  .rail input:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:transparent}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 11px 7px}
+  .chip{font-family:var(--mono);font-size:10px;color:var(--ink-soft);background:var(--paper);border:1px solid var(--rule);border-radius:20px;padding:3px 9px;cursor:pointer}
+  .chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .plist{flex:1;overflow-y:auto;padding:3px 8px 16px}
+  .pitem{width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:10px;padding:9px 11px;cursor:pointer;display:block}
+  .pitem:hover{background:var(--paper)}
+  .pitem.on{background:#e9f5f3;border-color:#bfe3de}
+  .pitem .nm{font-weight:700;font-size:13.5px}
+  .pitem .dx{font-size:11.5px;color:var(--ink-soft);margin-top:1px;line-height:1.3}
+  .pitem .meta{display:flex;gap:6px;margin-top:5px;align-items:center}
+  .rtag{font-family:var(--mono);font-size:9px;text-transform:uppercase;padding:2px 6px;border-radius:5px;color:#fff;background:var(--teal)}
+  .wfdots{display:flex;gap:3px;margin-left:auto}
+  .wfdots i{width:7px;height:7px;border-radius:50%;background:#dde4ec;display:inline-block}
+  .wfdots i.on{background:var(--teal)} .wfdots i.warn{background:var(--gold)}
+
+  .main{overflow-y:auto;min-height:0}
+  .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:62vh;color:var(--ink-mute);text-align:center;gap:10px;padding:20px}
+  .empty .tre{width:52px;height:52px;opacity:.5}
+
+  .banner{background:#fff;border-bottom:1px solid var(--rule);padding:14px 22px 12px;position:sticky;top:0;z-index:12}
+  .banner .row1{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .banner h2{font-size:20px}
+  .banner .ids{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .banner .dx1{color:var(--ink-soft);font-size:13px;margin-top:2px}
+  .course{display:flex;align-items:center;gap:12px;margin-top:9px;flex-wrap:wrap}
+  .ribbon{display:flex;gap:3px;flex-wrap:wrap;max-width:560px}
+  .tick{width:8px;height:18px;border-radius:2px;background:#e3e9ef;border:1px solid #d4dde6;transition:.2s}
+  .tick.done{background:var(--teal);border-color:var(--teal-d)}
+  .course .stat{font-family:var(--mono);font-size:12px;color:var(--ink-soft)} .course .stat b{color:var(--ink)}
+
+  /* workflow stepper */
+  .stepper{display:flex;gap:0;padding:10px 22px;background:#fbfcfd;border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:11;overflow-x:auto}
+  .step{display:flex;align-items:center;gap:9px;padding:7px 16px 7px 13px;cursor:pointer;border-radius:10px;white-space:nowrap}
+  .step+.step{margin-left:4px}
+  .step .ico{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;background:#e4eaf1;color:var(--ink-mute);border:1.5px solid #d2dbe5}
+  .step .tx{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-mute)}
+  .step .sub{font-size:10px;color:var(--ink-mute);font-family:var(--sans);letter-spacing:0;text-transform:none}
+  .step.active{background:#eef6f5}
+  .step.active .tx{color:var(--teal-d)} .step.active .ico{background:var(--teal);color:#fff;border-color:var(--teal-d)}
+  .step.done .ico{background:var(--ok);color:#fff;border-color:#0f5c3a}
+  .step.done .tx{color:var(--ok)}
+  .step.locked{opacity:.45;cursor:not-allowed}
+  .step .arrow{margin:0 2px;color:var(--ink-mute)}
+
+  .station{padding:18px 22px 50px;display:none}
+  .station.on{display:block}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:980px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:15px 16px}
+  .card h3{font-size:11px;font-family:var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--teal-d);margin-bottom:11px;padding-bottom:8px;border-bottom:1px solid var(--rule-soft)}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:8px;padding:5px 0;border-bottom:1px dashed var(--rule-soft);font-size:13px}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--ink-mute);font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding-top:1px}
+  .kv .v.mono{font-family:var(--mono);font-size:12.5px}
+  .btn{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:0;border-radius:9px;padding:11px 16px;cursor:pointer;background:var(--paper);color:var(--ink);border:1px solid var(--rule)}
+  .btn:hover{border-color:var(--teal)}
+  .btn.go{background:linear-gradient(180deg,#16b8a6,#0e8f86);color:#04211d;border:0}
+  .btn.go:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}
+  .btn.slate{background:var(--slate);color:#fff;border:0}
+  .row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .selrow{display:grid;grid-template-columns:130px 1fr 22px;gap:9px;align-items:center;margin:7px 0}
+  .selrow label{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+  .selrow select{padding:8px 10px;border:1px solid var(--rule);border-radius:8px;font-size:13px;color:var(--ink);background:#fff;width:100%}
+  .mark{font-family:var(--mono);font-weight:700} .mark.ok{color:var(--ok)} .mark.no{color:var(--alert)}
+  .feedback{font-size:12.5px;border-radius:8px;padding:9px 11px;margin-top:8px}
+  .feedback.ok{background:#e9f6ef;color:var(--ok);border:1px solid #bfe3cd}
+  .feedback.no{background:var(--alert-bg);color:#922;border:1px solid #f1cbc6}
+  .feedback.info{background:#eef4f8;color:var(--slate);border:1px solid #cfe0ec}
+
+  /* dark viewport (sim + linac) */
+  .viewport{background:radial-gradient(120% 120% at 50% 0%,var(--vault2),var(--vault));border:1px solid #243244;border-radius:12px;padding:12px}
+  .viewport .vlab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6a8099;margin-bottom:8px}
+  .simwrap{position:relative}
+  canvas{display:block;width:100%;height:auto;border-radius:8px;touch-action:none}
+  .simread{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-family:var(--mono);font-size:11.5px;color:#9fb6cc}
+  .simread b{color:#dff3ef}
+  .border-tag{color:#ffd24a}
+
+  /* checklist */
+  .check{display:flex;align-items:flex-start;gap:9px;padding:8px 4px;border-bottom:1px dashed var(--rule-soft);cursor:pointer;font-size:13px}
+  .check:last-child{border-bottom:0}
+  .check .box{width:18px;height:18px;border:1.5px solid #c2ccd8;border-radius:5px;flex:0 0 auto;display:grid;place-items:center;margin-top:1px;color:#fff;font-size:11px}
+  .check.on .box{background:var(--teal);border-color:var(--teal-d)}
+  .qa-metric{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--rule-soft);font-size:13px}
+  .qa-metric .lab{font-family:var(--mono);font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft)}
+  .qa-metric .val{font-family:var(--mono);font-weight:700}
+  .qa-metric .val.pass{color:var(--ok)} .qa-metric .val.fail{color:var(--alert)} .qa-metric .val.pend{color:var(--ink-mute)}
+
+  /* interlocks */
+  .ilk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:1px solid #25405c;border-radius:9px;margin-bottom:7px;background:#0e1822}
+  .ilk .nm{font-family:var(--mono);font-size:11.5px;color:#cfe0ee}
+  .ilk .st{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+  .ilk .st.clear{background:#10342b;color:#52e0b8} .ilk .st.set{background:#3a1414;color:#ff7a6b}
+  .ilk button{font-family:var(--mono);font-size:10px;text-transform:uppercase;background:#1b2c3e;color:#bcd;border:1px solid #2c4660;border-radius:7px;padding:5px 9px;cursor:pointer}
+  .mubar{height:20px;background:#0e1822;border:1px solid #25405c;border-radius:8px;overflow:hidden;margin:8px 0}
+  .mufill{height:100%;width:0;background:linear-gradient(90deg,#0e8f86,#3ee0c8);transition:width .1s linear}
+  .mono-read{font-family:var(--mono);color:#dff3ef;font-size:13px}
+
+  .disc{padding:16px 22px;font-size:11.5px;color:var(--ink-mute);line-height:1.6;border-top:1px solid var(--rule)}
+  .disc b{color:var(--ink-soft)}
+  .lockmsg{padding:30px;text-align:center;color:var(--ink-mute)}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<header>
+  <svg class="tre" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="4.4" fill="#7fe9dc"/><g fill="#7fe9dc"><path d="M20 20 L31 13.6 A13 13 0 0 0 20 7 Z"/><path d="M20 20 L31 26.4 A13 13 0 0 1 20 33 Z"/><path d="M20 20 L9 26.4 A13 13 0 0 1 9 13.6 Z"/></g></svg>
+  <div><b>RT WORKFLOW SUITE</b> <span class="mid">sim · plan · qa · treat</span></div>
+  <div class="spacer"></div>
+  <span class="badge" id="hdrCount"></span>
+  <span class="badge">teaching simulator</span>
+</header>
+
+<div class="app">
+  <aside class="rail">
+    <div class="search"><input id="search" type="text" placeholder="Search name, diagnosis, site…" autocomplete="off"></div>
+    <div class="chips" id="chips"></div>
+    <div class="plist" id="plist"></div>
+  </aside>
+  <section class="main" id="main">
+    <div class="empty" id="emptyState">
+      <svg class="tre" viewBox="0 0 40 40"><circle cx="20" cy="20" r="4.4" fill="#0e8f86"/><g fill="#0e8f86"><path d="M20 20 L31 13.6 A13 13 0 0 0 20 7 Z"/><path d="M20 20 L31 26.4 A13 13 0 0 1 20 33 Z"/><path d="M20 20 L9 26.4 A13 13 0 0 1 9 13.6 Z"/></g></svg>
+      <div>Select a patient to begin their treatment workflow.<br><span style="font-size:12px">Chart → CT Simulation → Physics (Plan &amp; QA) → LINAC Delivery</span></div>
+    </div>
+    <div id="workspace" style="display:none">
+      <div class="banner" id="banner"></div>
+      <div class="stepper" id="stepper"></div>
+      <div class="station on" id="st-chart"></div>
+      <div class="station" id="st-sim"></div>
+      <div class="station" id="st-physics"></div>
+      <div class="station" id="st-deliver"></div>
+      <div class="disc"><b>Teaching simulator — not a medical device.</b> Cases are fictional. Scan-border targets, protocols, plan/QA tolerances and delivery are simplified teaching models that do not represent any specific institution's protocol or any real planning/QA system, and must never guide clinical care.</div>
+    </div>
+  </section>
+</div>
+
+<script type="application/json" id="wfData">[{"id":"22334","name":"Alice Brown","dob":"1960-04-12","gender":"Female","region":"Skeletal","dx":{"primary":"Metastatic Breast Cancer (ER/PR+, HER2-)","location":"Right Proximal Femur (lytic lesion involving femoral neck/subtrochanteric region)","stage":"Stage IV (metastatic at initial presentation of bone mets in 2025)","site":"Right Proximal Femur (Metastatic Lesion)"},"plan":{"intent":"Palliative (Pain control, prevention/stabilization of impending fracture, improvement of m\u2026","modality":"External Beam Radiation Therapy (EBRT) - 3D-Conformal Radiation Therapy (3D-CRT)","technique":"3D-CRT utilizing opposed Anterior-Posterior (AP) and Posterior-Anterior (PA) fields. Fields shaped by MLCs to conform to\u2026","totalDose":"20 Gy","fractionation":"5 fx","rtRx":"20 Gy / 5 fx (4 Gy/fx daily), delivered 5 days per week (Monday-Friday) over 1 week.","radOnc":"Dr. Michael Evans","constraints":"Skin Max \u003c 110% (achieved 105% at flash); Femoral Head Contralateral Max: \u003c 5 Gy (achieved 0.5 Gy); Bladder Max: \u003c 10 Gy (achieved 0.1 Gy); Rectum Max: \u003c 10 Gy (achieved 0.1 Gy)"},"dose":{"technique":"3D-CRT (Opposed AP/PA fields)","energy":"6MV (photon energy)","nFields":2,"beams":[{"fieldName":"AP Femur","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":155,"fieldSize":"10 cm x 15 cm","ssd":"90.5 cm"},{"fieldName":"PA Femur","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":160,"fieldSize":"10 cm x 15 cm","ssd":"89.0 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag (custom molded for legs/pelvis), ankle/foot immobilization device (e.g., Alpha Cradle), knee sponge.","setup":"Supine in custom Vac-Lok bag (legs/pelvis) with legs in a custom ankle/foot immobilization device for rotational stability. Arms crossed over chest. Patient instructed to breathe normally. SSD setup (\u2026","referenceMarks":"3-point tattoos for alignment (at right hip, right mid-thigh, and midline). Additional marks outlining field borders. Isocenter placed at ce\u2026","slice":"3.0 mm (optimal for bone lesion contouring).","contrast":"Non-contrast (Standard for palliative bone RT. Target delineation relies on fused diagnost\u2026"},"fxTotal":5,"fxDelivered":5},{"id":"SB-001","name":"Alice Johnson","dob":"1968-03-15","gender":"Female","region":"Abdomen","dx":{"primary":"Adenocarcinoma of the Duodenum, Intestinal-type","location":"","stage":"pT3 N0 M0, Stage IIA (AJCC 8th Edition)","site":"Duodenal Bed + Regional Nodes"},"plan":{"intent":"Adjuvant","modality":"Adjuvant Chemoradiation (Chemotherapy followed by concurrent Chemotherapy and Radiation)","technique":"Intensity-Modulated Radiation Therapy (IMRT) is used to deliver a conformal dose to the complex target volume in the upp\u2026","totalDose":"45 Gy","fractionation":"25 fx","rtRx":"45 Gy in 25 fractions (1.8 Gy/fx) to the tumor bed and at-risk regional nodes.","radOnc":"Dr. Sarah Lee","constraints":"Right Kidney Mean \u003c 15 Gy (achieved 14.1 Gy); Left Kidney Mean \u003c 15 Gy (achieved 10.5 Gy); Liver Mean \u003c 25 Gy (achieved 22.0 Gy); Stomach Max \u003c 45 Gy (achieved 44.5 Gy); Spinal Cord Max \u003c 45 Gy (achie\u2026"},"dose":{"technique":"IMRT","energy":"6MV","nFields":5,"beams":[{"fieldName":"Field 1 (AP)","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":120,"fieldSize":"18.0 x 15.0 cm MLC defined","ssd":"90.5 cm"},{"fieldName":"Field 2 (RAO)","gantryAngle":"50","collimatorAngle":"340","couchAngle":"0","energy":"6MV","monitorUnits":135,"fieldSize":"18.0 x 15.0 cm MLC defined","ssd":"91.2 cm"},{"fieldName":"Field 3 (RPO)","gantryAngle":"130","collimatorAngle":"340","couchAngle":"0","energy":"6MV","monitorUnits":140,"fieldSize":"18.0 x 15.0 cm MLC defined","ssd":"93.0 cm"},{"fieldName":"Field 4 (LPO)","gantryAngle":"230","collimatorAngle":"20","couchAngle":"0","energy":"6MV","monitorUnits":138,"fieldSize":"18.0 x 15.0 cm MLC defined","ssd":"92.8 cm"},{"fieldName":"Field 5 (LAO)","gantryAngle":"310","collimatorAngle":"20","couchAngle":"0","energy":"6MV","monitorUnits":125,"fieldSize":"18.0 x 15.0 cm MLC defined","ssd":"90.9 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag (torso), Wingboard for arm support.","setup":"Supine in a custom Vac-Lok bag with both arms up on a wingboard. Patient to follow full bladder / empty stomach protocol (NPO 3 hours prior).","referenceMarks":"3-point tattoos at isocenter projections (AP and bilateral laterals).","slice":"2.5 mm","contrast":"IV contrast for vessel delineation and Oral contrast (Omnipaque) to help delineate small b\u2026"},"fxTotal":25,"fxDelivered":25},{"id":"55443","name":"Anna Bellwether","dob":"1965-06-18","gender":"Female","region":"Breast","dx":{"primary":"Invasive Ductal Carcinoma (IDC) of the Right Breast","location":"Right Lumpectomy Cavity (Lateral Aspect)","stage":"","site":"Right Lumpectomy Cavity (Lateral Aspect)"},"plan":{"intent":"Adjuvant Boost - To deliver a higher, targeted dose to the lumpectomy cavity, which is the\u2026","modality":"External Beam Radiation Therapy (EBRT) - Electron Boost","technique":"Electrons (Direct en face field using a custom cutout/cone or standard applicator). Delivered in left lateral decubitus\u2026","totalDose":"10 Gy","fractionation":"5 fx (2 Gy/fx daily)","rtRx":"10 Gy / 5 fx (2 Gy/fx daily)","radOnc":"Dr. Angela Rossi","constraints":"Skin Max \u003c 110% of prescription (achieved 105%); Heart Max \u003c 0.5 Gy (achieved 0.1 Gy); Ipsilateral Lung Max \u003c 0.5 Gy (achieved 0.2 Gy); Rib Max \u003c 10 Gy. All critical organ constraints met. Avoidance o\u2026"},"dose":{"technique":"Electrons (Single direct en face field)","energy":"9 MeV (Electron energy selected to ensure appropri\u2026","nFields":1,"beams":[{"fieldName":"Direct Lateral Electron Boost (R Breast)","gantryAngle":"0","collimatorAngle":"0","couchAngle":"90","energy":"9 MeV","monitorUnits":255,"fieldSize":"Custom Cutout (e.g., 6x6 cm oval)","ssd":"100 cm (Standard electron setup distance)"}]},"sim":{"position":"","immobilization":"Custom Vac-Lok bag molded to patient's torso in left lateral decubitus position for reproducible setup. Headrest (Type A\u2026","setup":"Patient positioned in left lateral decubitus position (lying on left side) on a flat tabletop, with right arm abducted above head and resting in arm supports. Head turned slightly left. This presents\u2026","referenceMarks":"Using prior WBRT tattoos and new clinical markup (using a marker) on skin/bolus for precise lateral boost field placement. Isocenter placed\u2026","slice":"N/A","contrast":"N/A"},"fxTotal":5,"fxDelivered":5},{"id":"SB001","name":"Arthur Pendelton","dob":"1975-06-22","gender":"Male","region":"Brain","dx":{"primary":"Chordoma, Conventional Type, WHO Grade 1","location":"Clivus (Skull Base)","stage":"T2 N0 M0 (Skull Base Chordoma Staging)","site":"Skull Base/Clivus"},"plan":{"intent":"Definitive (Curative)","modality":"High-Dose Proton Beam Radiation Therapy","technique":"Intensity-Modulated Proton Therapy (IMPT) using pencil beam scanning. This technique is chosen over standard photon radi\u2026","totalDose":"74 Gy(RBE)","fractionation":"37 fx","rtRx":"74 Gy(RBE) in 37 fractions (2.0 Gy(RBE)/fx)","radOnc":"Dr. Robert Evans","constraints":"Brainstem Max \u003c 54 Gy(RBE) (achieved 53.8 Gy(RBE)); Optic Chiasm Max \u003c 54 Gy(RBE) (achieved 52.1 Gy(RBE)); Left Optic Nerve Max \u003c 54 Gy(RBE) (achieved 51.5 Gy(RBE)); Right Temporal Lobe V45Gy \u003c 10cc (\u2026"},"dose":{"technique":"IMPT (Pencil Beam Scanning)","energy":"Protons (variable range/energy)","nFields":null,"beams":[{"fieldName":"Left Posterior Oblique","gantryAngle":"220","collimatorAngle":null,"couchAngle":null,"energy":"Variable","monitorUnits":null,"fieldSize":"Aperture defined","ssd":"N/A (Proton)"},{"fieldName":"Right Posterior Oblique","gantryAngle":"140","collimatorAngle":null,"couchAngle":null,"energy":"Variable","monitorUnits":null,"fieldSize":"Aperture defined","ssd":"N/A (Proton)"},{"fieldName":"Vertex","gantryAngle":"0","collimatorAngle":null,"couchAngle":null,"energy":"Variable","monitorUnits":null,"fieldSize":"Aperture defined","ssd":"N/A (Proton)"}]},"sim":{"position":"","immobilization":"Custom thermoplastic mask (Head), integrated bite block, custom headrest.","setup":"Supine in a custom thermoplastic mask with a personalized bite block to ensure reproducibility of jaw position. Head is in a neutral position, immobilized to the couch.","referenceMarks":"Marks placed on the mask are aligned to room lasers. Isocenter coordinates managed by the TPS.","slice":"1.0 mm","contrast":"IV Contrast was administered for the CT scan to aid in fusion with the diagnostic MRI."},"fxTotal":37,"fxDelivered":37},{"id":"11223","name":"Barbara Davis","dob":"1980-09-10","gender":"Female","region":"Breast","dx":{"primary":"Invasive Ductal Carcinoma (IDC) of the Left Breast","location":"Central/Inner Quadrant (Lump+ALND site)","stage":"","site":"Left Breast + Left Regional Lymph Node Basins (Supraclavicular, Axillary Levels I-III, Int\u2026"},"plan":{"intent":"Adjuvant (Post-lumpectomy/ALND, Post-chemotherapy) - To reduce local and regional recurren\u2026","modality":"External Beam Radiation Therapy (EBRT) - Whole Breast RT (WBRT) + Regional Nodal Radiation","technique":"3D-Conformal Radiation Therapy (3D-CRT) utilizing opposed tangential fields for the breast and an anterior supraclavicul\u2026","totalDose":"50 Gy to Breast/Regional Nodes + 10 Gy Boost to Lumpectomy C\u2026","fractionation":"25 fx (2 Gy/fx) to Breast/Regional Nodes + 5 fx (2 Gy/fx) se\u2026","rtRx":"50 Gy / 25 fx (2 Gy/fx daily) to Left Breast and Left Regional Nodal Basins (Supraclavicular Fossa, Axillary Level I-III, Internal Mammary N\u2026","radOnc":"Dr. Angela Rossi","constraints":"Heart Mean \u003c 5 Gy (achieved 3.2 Gy); Ipsilateral Lung V20Gy \u003c 30% (achieved 28.5%, Mean Lung Dose 18.0 Gy); Brachial Plexus Max \u003c 60 Gy (achieved 58.5 Gy); Esophagus Max \u003c 50 Gy (achieved 48.1 Gy); Sp\u2026"},"dose":{"technique":"3D-CRT (Tangential Fields for Breast, Anterior Field for Supraclavicular/Axilla)\u2026","energy":"6MV (for tangents), 6MV (for SCV field for superfi\u2026","nFields":3,"beams":[{"fieldName":"L Medial Tangent","gantryAngle":"300","collimatorAngle":"345","couchAngle":"0","energy":"6MV","monitorUnits":210,"fieldSize":"MLC defined (e.g., 18x22 cm)","ssd":"Variable"},{"fieldName":"L Lateral Tangent","gantryAngle":"120","collimatorAngle":"15","couchAngle":"0","energy":"6MV","monitorUnits":225,"fieldSize":"MLC defined (e.g., 18x22 cm)","ssd":"Variable"},{"fieldName":"L Anterior SCV","gantryAngle":"15","collimatorAngle":"90","couchAngle":"0","energy":"6MV","monitorUnits":195,"fieldSize":"MLC defined (e.g., 15x15 cm)","ssd":"Variable"}]},"sim":{"position":"","immobilization":"Breast board/Wing board (e.g., Med-Tec Breastboard), custom foam headrest, arm supports.","setup":"Supine on breast board/wing board with both arms abducted above head and resting in arm supports. Head turned to the right (contralateral side) to open up the left supraclavicular fossa. Patient instr\u2026","referenceMarks":"3-point tattoos placed at breast isocenter and supraclavicular field center (split isocenter setup). Wires on surgical scars (lumpectomy, AL\u2026","slice":"2.5 mm (optimal for breast/nodal contouring).","contrast":"Non-contrast (Standard for adjuvant breast/nodal RT. Tumor bed visualization relies on sur\u2026"},"fxTotal":25,"fxDelivered":30},{"id":"REHN01","name":"Brenda Smith","dob":"1962-09-01","gender":"Female","region":"Head & Neck","dx":{"primary":"Recurrent Squamous Cell Carcinoma (SCCa)","location":"Left Base of Tongue / Oropharynx (within prior radiation field)","stage":"Recurrent Stage rT2 N0 M0","site":"Left Base of Tongue/Oropharynx"},"plan":{"intent":"Definitive (Curative Intent Re-irradiation)","modality":"High-Dose Proton Beam Re-irradiation","technique":"Intensity-Modulated Proton Therapy (IMPT) using pencil beam scanning. Proton therapy is considered mandatory in this re-\u2026","totalDose":"66 Gy(RBE)","fractionation":"33 fx","rtRx":"66 Gy(RBE) in 33 fractions (2.0 Gy(RBE)/fx)","radOnc":"Dr. Maria Garcia","constraints":"Spinal Cord Max (Cumulative) \u003c 50 Gy(RBE) (achieved 48.5); Brainstem Max (Cumulative) \u003c 60 Gy(RBE) (achieved 58.1); Mandible Max (Cumulative) \u003c 70 Gy(RBE) (achieved 69.5); Carotid Artery max dose mini\u2026"},"dose":{"technique":"IMPT (Pencil Beam Scanning)","energy":"Protons (variable)","nFields":null,"beams":[{"fieldName":"Left Posterior Oblique","gantryAngle":"225","collimatorAngle":null,"couchAngle":null,"energy":"Variable","monitorUnits":null,"fieldSize":"Aperture defined","ssd":"N/A (Proton)"},{"fieldName":"Right Posterior Oblique","gantryAngle":"135","collimatorAngle":null,"couchAngle":null,"energy":"Variable","monitorUnits":null,"fieldSize":"Aperture defined","ssd":"N/A (Proton)"},{"fieldName":"Left Anterior Oblique","gantryAngle":"300","collimatorAngle":null,"couchAngle":null,"energy":"Variable","monitorUnits":null,"fieldSize":"Aperture defined","ssd":"N/A (Proton)"}]},"sim":{"position":"","immobilization":"Custom thermoplastic mask (Head & Neck), bite block.","setup":"Supine in a custom thermoplastic mask with bite block for reproducibility. Shoulders pulled down with straps.","referenceMarks":"Marks placed on the mask are aligned to room lasers.","slice":"","contrast":""},"fxTotal":33,"fxDelivered":33},{"id":"KS001","name":"Carlos Jones","dob":"1985-05-01","gender":"Male","region":"Skin/TSEBT","dx":{"primary":"Kaposi Sarcoma (KS), HIV-Associated","location":"","stage":"AIDS Clinical Trials Group (ACTG) Stage T1 I1 S0 (Tumor Stage: extensive oral/cu\u2026","site":"Oral Palate & Left Lower Leg (LLE) Lesions"},"plan":{"intent":"Palliative (Control of painful oral lesions to improve nutrition, palliation of painful/ul\u2026","modality":"External Beam Radiation Therapy (EBRT) concurrent with Systemic Therapy and Antiretroviral\u2026","technique":"Palate: 3D-CRT with opposed lateral photon fields to treat the hard palate while sparing the tongue. LLE: A single direc\u2026","totalDose":"Palate: 20 Gy; LLE: 8 Gy","fractionation":"Palate: 5 fx; LLE: 1 fx","rtRx":"Oral Palate: 20 Gy in 5 fractions (4 Gy/fx). Left Lower Leg: 8 Gy in 1 fraction.","radOnc":"Dr. Samuel Chen","constraints":"Palate Plan: Tongue Max Dose \u003c 15 Gy (achieved 14.5 Gy); LLE Plan: Dose falls off before reaching bone."},"dose":{"technique":"3D-CRT Photons (Palate) / Electrons (LLE)","energy":"6MV / 6 MeV","nFields":null,"beams":[{"fieldName":"R Lat Palate","gantryAngle":"90","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":210,"fieldSize":"5.0 x 5.0 cm","ssd":"95.0 cm"},{"fieldName":"L Lat Palate","gantryAngle":"270","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":210,"fieldSize":"5.0 x 5.0 cm","ssd":"95.0 cm"},{"fieldName":"Direct LLE Electron","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6 MeV","monitorUnits":300,"fieldSize":"10x10 cone w/ 6x8cm cutout","ssd":"100.0 cm"}]},"sim":{"position":"","immobilization":"Head mask with bite block (palate), Vac-Lok bag and sponges (LLE).","setup":"Two separate setups: 1) Supine with a custom thermoplastic head mask and bite block to depress the tongue. 2) Supine with Vac-Lok bag for LLE, with bolus material placed over the clinical target.","referenceMarks":"Mask marks for palate setup; clinical skin markings with tattoos for LLE electron field.","slice":"","contrast":""},"fxTotal":"5 (Palate), 1 (LLE)","fxDelivered":5},{"id":"88990","name":"Carson Johnson","dob":"1995-11-20","gender":"Male","region":"Brain","dx":{"primary":"Medulloblastoma, Classic Histology","location":"Cerebellum","stage":"","site":"Craniospinal Axis and Posterior Fossa"},"plan":{"intent":"Adjuvant (Post-operative)","modality":"External Beam Radiation Therapy (EBRT) - Craniospinal Irradiation (CSI) with involved fiel\u2026","technique":"3D-CRT with gapped abutting fields for craniospinal axis, followed by 3D-CRT for posterior fossa boost. Proton therapy c\u2026","totalDose":"","fractionation":"","rtRx":"23.4 Gy in 13 fractions to Craniospinal Axis, followed by 30.6 Gy in 17 fractions boost to Posterior Fossa (Total 54 Gy to Posterior Fossa)","radOnc":"Dr. Emily Roberts","constraints":"Lens Max \u003c 10 Gy; Optic Nerves Max \u003c 35 Gy; Brainstem Max \u003c 54 Gy; Spinal Cord Max \u003c 45 Gy; Kidney V10Gy \u003c 10%; Liver Mean \u003c 20 Gy. All constraints met."},"dose":{"technique":"3D-CRT (CSI with abutted fields, PFB boost with 3D fields)","energy":"6MV","nFields":"Multiple fields for CSI; multiple fields for boost","beams":[{"fieldName":"CSI - Brain (PA)","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":150,"fieldSize":"Dynamic MLC","ssd":"Variable"},{"fieldName":"CSI - Upper Spine (PA)","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":145,"fieldSize":"Dynamic MLC","ssd":"Variable"},{"fieldName":"CSI - Lower Spine (PA)","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":130,"fieldSize":"Dynamic MLC","ssd":"Variable"},{"fieldName":"PFB - AP","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":200,"fieldSize":"Dynamic MLC","ssd":"Variable"},{"fieldName":"PFB - L Lat","gantryAngle":"90","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":210,"fieldSize":"Dynamic MLC","ssd":"Variable"},{"fieldName":"PFB - R Lat","gantryAngle":"270","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":205,"fieldSize":"Dynamic MLC","ssd":"Variable"}]},"sim":{"position":"","immobilization":"Custom Aquaplast thermoplastic mask, prone belly board, knee/ankle immobilization.","setup":"Prone, head neutral in custom Aquaplast mask indexed to table, arms abducted above head for craniospinal setup. Patient aligned to room lasers using anterior and bilateral marks.","referenceMarks":"Tattoos placed per protocol. Isocenter for CSI set at Cranial: V+0.0, L+0.0, S+10.0 relative to CT sim reference point. Spine fields aligned\u2026","slice":"3 mm","contrast":"Contrast-enhanced"},"fxTotal":30,"fxDelivered":14},{"id":"55667","name":"David Garcia","dob":"1958-06-10","gender":"Male","region":"Thorax","dx":{"primary":"Non-Small Cell Lung Cancer (NSCLC) - Adenocarcinoma","location":"Right Lower Lobe (RLL)","stage":"pT3 pN1 M0 (Clinical staging based on pre-treatment imaging and biopsy; definiti\u2026","site":"Right Lower Lobe Primary Lung Tumor + Involved Hilar (Level 10) and Mediastinal (Level 7)\u2026"},"plan":{"intent":"Definitive (Curative) - Eradication of macroscopic and microscopic disease to maximize sur\u2026","modality":"External Beam Radiation Therapy (EBRT) with concurrent Chemotherapy","technique":"3D Conformal Radiation Therapy (3D-CRT) utilizing 4 oblique fields (AP, PA, RAO, LAO) with MLC shaping. Fields designed\u2026","totalDose":"","fractionation":"","rtRx":"66 Gy in 33 fractions (2 Gy/fx) to Gross Tumor Volume (GTV) and Involved Nodal Clinical Target Volume (CTV_node).","radOnc":"Dr. Sarah Jenkins","constraints":"Spinal Cord Max \u003c 45 Gy (achieved 42.1 Gy); Esophagus Mean \u003c 34 Gy (achieved 30.5 Gy); Heart V30 \u003c 40% (achieved 35.8%); Total Lung V20 \u003c 30% (achieved 28.1%, Mean Lung Dose 15.5 Gy). All constraints\u2026"},"dose":{"technique":"3D-CRT (Conformal Radiation Therapy with multiple static fields)","energy":"6MV (for AP/RAO/LAO fields), 10MV (for PA field fo\u2026","nFields":4,"beams":[{"fieldName":"AP Field","gantryAngle":"0","collimatorAngle":"5","couchAngle":"0","energy":"6MV","monitorUnits":85,"fieldSize":"12.5 x 15.0 cm (MLC defined)","ssd":"88.0 cm (Calculated)"},{"fieldName":"PA Field","gantryAngle":"180","collimatorAngle":"5","couchAngle":"0","energy":"10MV","monitorUnits":90,"fieldSize":"12.5 x 15.0 cm (MLC defined)","ssd":"87.5 cm (Calculated)"},{"fieldName":"LAO Field","gantryAngle":"45","collimatorAngle":"355","couchAngle":"0","energy":"10MV","monitorUnits":110,"fieldSize":"14.0 x 15.0 cm (MLC defined)","ssd":"91.0 cm (Calculated)"},{"fieldName":"RAO Field","gantryAngle":"285","collimatorAngle":"355","couchAngle":"0","energy":"6MV","monitorUnits":105,"fieldSize":"14.0 x 15.0 cm (MLC defined)","ssd":"90.5 cm (Calculated)"}]},"sim":{"position":"","immobilization":"BodyFix vacuum bag (molded to torso), Wingboard (Arms Up), Headrest (Type B).","setup":"Supine on wingboard with arms up and secured in arm rests, immobilized in BodyFix vacuum bag molded to torso. Patient instructed on shallow breathing for 4D-CT acquisition. SAD setup with skin marks p\u2026","referenceMarks":"3-point tattoos placed at anterior chest and bilateral mid-axillary line at isocenter projections. Isocenter derived from 4D-CT Mid-Ventilat\u2026","slice":"3.0 mm (for primary planning). 2.0 mm for 4D-CT ac\u2026","contrast":"IV Contrast (100ml Omnipaque 300mgI/ml) administered for enhanced visualization of tumor a\u2026"},"fxTotal":33,"fxDelivered":33},{"id":"SB-004","name":"David Lee","dob":"1960-05-01","gender":"Male","region":"Abdomen","dx":{"primary":"Adenocarcinoma of the Jejunum","location":"","stage":"pT4 N0 M0, Stage IIB (AJCC 8th Edition)","site":"Jejunal Bed + Regional Nodes"},"plan":{"intent":"Adjuvant","modality":"Adjuvant Chemotherapy followed by Adjuvant External Beam Radiation Therapy (EBRT)","technique":"Intensity-Modulated Radiation Therapy (IMRT) is used to deliver a conformal dose to the target in the mid-abdomen while\u2026","totalDose":"50 Gy","fractionation":"25 fx","rtRx":"50 Gy in 25 fractions (2.0 Gy/fx)","radOnc":"Dr. Thomas Wilson","constraints":"Bilateral Kidney Mean \u003c 15 Gy (achieved L: 14.5, R: 13.8 Gy); Liver Mean \u003c 25 Gy (achieved 20.1 Gy); Small Bowel Max \u003c 50 Gy (achieved 49.5 Gy); Spinal Cord Max \u003c 45 Gy (achieved 40 Gy)."},"dose":{"technique":"IMRT","energy":"6MV","nFields":null,"beams":[{"fieldName":"Field 1 (AP)","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":110,"fieldSize":"16.0 x 17.0 cm MLC defined","ssd":"91.0 cm"},{"fieldName":"Field 2 (RAO)","gantryAngle":"50","collimatorAngle":"340","couchAngle":"0","energy":"6MV","monitorUnits":135,"fieldSize":"16.0 x 17.0 cm MLC defined","ssd":"92.5 cm"},{"fieldName":"Field 3 (RPO)","gantryAngle":"130","collimatorAngle":"340","couchAngle":"0","energy":"6MV","monitorUnits":130,"fieldSize":"16.0 x 17.0 cm MLC defined","ssd":"94.0 cm"},{"fieldName":"Field 4 (LPO)","gantryAngle":"230","collimatorAngle":"20","couchAngle":"0","energy":"6MV","monitorUnits":132,"fieldSize":"16.0 x 17.0 cm MLC defined","ssd":"93.1 cm"},{"fieldName":"Field 5 (LAO)","gantryAngle":"310","collimatorAngle":"20","couchAngle":"0","energy":"6MV","monitorUnits":128,"fieldSize":"16.0 x 17.0 cm MLC defined","ssd":"91.8 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag (torso), Wingboard.","setup":"Supine in a custom Vac-Lok bag with arms up on a wingboard to clear the lateral fields. Patient instructed to be NPO for 3 hours prior to simulation.","referenceMarks":"3-point tattoos at isocenter projections (AP and bilateral laterals).","slice":"2.5 mm","contrast":"IV and Oral Contrast were administered to help delineate the bowel, kidneys, and vascular\u2026"},"fxTotal":25,"fxDelivered":25},{"id":"SS001","name":"David Miller","dob":"1955-11-30","gender":"Male","region":"Skin/TSEBT","dx":{"primary":"S\u00e9zary Syndrome (Leukemic variant of Cutaneous T-Cell Lymphoma)","location":"","stage":"Stage IVA1 (T4 N1a M0 B2)","site":"Total Skin"},"plan":{"intent":"Palliative / Disease Debulking","modality":"Low-Dose Total Skin Electron Beam Therapy (TSEBT)","technique":"Stanford Technique utilizing 6 dual-fields (AP/PA, RAO/LPO, LAO/RPO). Patient stands on a rotating platform at an extend\u2026","totalDose":"12 Gy","fractionation":"12 fx","rtRx":"12 Gy in 12 fractions (1 Gy/fx), delivered 3 times per week over 4 weeks.","radOnc":"Dr. Samuel Green","constraints":"Lens dose \u003c 2 Gy (achieved \u003c1 Gy with shields); Fingernails/Toenails dose \u003c 4 Gy (achieved \u003c2 Gy with shields)."},"dose":{"technique":"TSEBT - Stanford Technique","energy":"6 MeV","nFields":null,"beams":[{"fieldName":"AP/PA Pair","gantryAngle":"Dual Gantry Angles","collimatorAngle":null,"couchAngle":null,"energy":"6 MeV","monitorUnits":null,"fieldSize":"Open Field","ssd":"Extended SSD (~380 cm)"},{"fieldName":"RAO/LPO Pair","gantryAngle":"Dual Gantry Angles","collimatorAngle":null,"couchAngle":null,"energy":"6 MeV","monitorUnits":null,"fieldSize":"Open Field","ssd":"Extended SSD (~380 cm)"},{"fieldName":"LAO/RPO Pair","gantryAngle":"Dual Gantry Angles","collimatorAngle":null,"couchAngle":null,"energy":"6 MeV","monitorUnits":null,"fieldSize":"Open Field","ssd":"Extended SSD (~380 cm)"}]},"sim":{"position":"","immobilization":"Standing position with support frame and overhead straps for stability.","setup":"Clinical simulation for TSEBT. Patient stands on a rotating platform at an extended distance from the machine (380 cm). Patient holds various positions (6 total) to expose all skin surfaces. Patient r\u2026","referenceMarks":"N/A (alignment is to room lasers and floor markings).","slice":"","contrast":""},"fxTotal":12,"fxDelivered":12},{"id":"HL002","name":"Eleanor Vance","dob":"1995-03-25","gender":"Female","region":"Lymphoma","dx":{"primary":"Classic Hodgkin Lymphoma (CHL), Mixed Cellularity Subtype","location":"Infradiaphragmatic Nodal Disease","stage":"","site":"Involved Site RT (ISRT) to Para-aortic/Iliac Nodes (Inverted-Y Field)"},"plan":{"intent":"Curative Consolidation","modality":"Combined Modality Therapy: Systemic Chemotherapy followed by Laparoscopic Ovarian Transpos\u2026","technique":"3D-Conformal Radiation Therapy (3D-CRT) using opposed Anterior-Posterior/Posterior-Anterior (AP/PA) fields. This techniq\u2026","totalDose":"30 Gy","fractionation":"15 fx (2.0 Gy/fx)","rtRx":"30 Gy in 15 fractions to the PTV.","radOnc":"Dr. Lisa Ray","constraints":"{'Small Bowel Max': '\u003c 35 Gy (achieved 31.5 Gy)', 'Rectum V30Gy': '\u003c 20% (achieved 15%)', 'Bladder V30Gy': '\u003c 30% (achieved 22%)', 'Left Ovary Mean': '\u003c 5 Gy (achieved 3.1 Gy)', 'Right Ovary Mean': '\u003c\u2026"},"dose":{"technique":"3D-CRT","energy":"6MV","nFields":2,"beams":[{"fieldName":"AP Pelvis Inverted-Y","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":160,"fieldSize":"18.0 cm x 24.5 cm","ssd":"88.0 cm"},{"fieldName":"PA Pelvis Inverted-Y","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":165,"fieldSize":"18.0 cm x 24.5 cm","ssd":"85.5 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok body bag, knee/foot positioning device.","setup":"Supine in a custom Vac-Lok bag from upper abdomen to knees. A knee and foot positioning sponge is used for comfort and stability. Arms are placed on chest. Patient instructed on full bladder / empty r\u2026","referenceMarks":"3-point tattoos placed at isocenter projections (anterior midline, R/L lateral). Additional marks on skin for initial alignment.","slice":"2.5 mm","contrast":"IV contrast administered to delineate kidneys, major vessels, and bowel."},"fxTotal":15,"fxDelivered":15},{"id":"77665","name":"Elizabeth Green","dob":"1960-11-02","gender":"Female","region":"Pelvis","dx":{"primary":"Endometrial Adenocarcinoma, Endometrioid Type","location":"","stage":"FIGO Stage II (2009). Clinical stage cT1b N0 M0 based on pre-op imaging/biopsy.","site":"Pelvis (EBRT) + Vaginal Cuff (Brachytherapy)"},"plan":{"intent":"Adjuvant (Post-operative) - To reduce locoregional recurrence risk given FIGO Stage II dis\u2026","modality":"External Beam Radiation Therapy (EBRT) to Pelvis followed by Vaginal Cuff Brachytherapy","technique":"IMRT for Pelvic EBRT with daily CBCT guidance. High Dose Rate (HDR) vaginal brachytherapy.","totalDose":"EBRT: 45 Gy, Brachytherapy Boost: 7 Gy x 3 fractions (HDR)","fractionation":"EBRT: 25 fx (1.8 Gy/fx); Brachytherapy: 3 fx (7 Gy/fx)","rtRx":"EBRT: 45 Gy / 25 fx (1.8 Gy/fx) to Pelvis. Followed by Vaginal Brachytherapy: 21 Gy (in 3 fractions of 7 Gy each) prescribed to 0.5 cm below\u2026","radOnc":"Dr. Susan Clark","constraints":"Rectum V40Gy \u003c 35% (achieved 32.1%); Rectum Max \u003c 48 Gy (achieved 46.5 Gy); Bladder V40Gy \u003c 50% (achieved 45.2%); Bladder Max \u003c 48 Gy (achieved 47.0 Gy); Femoral Head Mean \u003c 35 Gy (achieved L: 30.1 Gy\u2026"},"dose":{"technique":"IMRT (5 static fields, step-and-shoot delivery for EBRT). HDR Brachytherapy (Ir-\u2026","energy":"6MV (photon energy for IMRT)","nFields":5,"beams":[{"fieldName":"Field 1 (AP)","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":95,"fieldSize":"MLC defined","ssd":"Variable"},{"fieldName":"Field 2 (LAO)","gantryAngle":"72","collimatorAngle":"30","couchAngle":"0","energy":"6MV","monitorUnits":110,"fieldSize":"MLC defined","ssd":"Variable"},{"fieldName":"Field 3 (LPO)","gantryAngle":"144","collimatorAngle":"330","couchAngle":"0","energy":"6MV","monitorUnits":105,"fieldSize":"MLC defined","ssd":"Variable"},{"fieldName":"Field 4 (PA)","gantryAngle":"216","collimatorAngle":"30","couchAngle":"0","energy":"6MV","monitorUnits":105,"fieldSize":"MLC defined","ssd":"Variable"},{"fieldName":"Field 5 (RAO)","gantryAngle":"288","collimatorAngle":"330","couchAngle":"0","energy":"6MV","monitorUnits":110,"fieldSize":"MLC defined","ssd":"Variable"}]},"sim":{"position":"","immobilization":"VacLok bag (pelvic region), knee/ankle sponge. Custom leg roll for comfort and reproducibility.","setup":"Supine in VacLok bag with knee/ankle immobilization. Full bladder / empty rectum protocol followed strictly prior to scan. Vaginal marker (e.g., vaginal cylinder or contrast paste) placed for precise\u2026","referenceMarks":"3-point tattoos at isocenter projections (anterior pelvic midline, bilateral lateral iliac crests). Vaginal marker position recorded. Isocen\u2026","slice":"2.5 mm (optimal for pelvic contouring)","contrast":"IV contrast (100ml Omnipaque 300mgI/ml) for vascular/nodal delineation. Oral contrast (Omn\u2026"},"fxTotal":25,"fxDelivered":28},{"id":"88991","name":"George Harris","dob":"1958-10-05","gender":"Male","region":"Pelvis","dx":{"primary":"Metastatic Castration-Resistant Prostate Cancer (mCRPC)","location":"L3 Vertebral Body (with mild epidural extension)","stage":"Stage IV (mCRPC) - widespread osseous metastases.","site":"L3 Vertebral Body (Painful Metastasis)"},"plan":{"intent":"Palliative (Pain control, prevention of progressive pain, potential fracture prevention, a\u2026","modality":"External Beam Radiation Therapy (EBRT) - 3D-Conformal Radiation Therapy (3D-CRT)","technique":"3D-CRT utilizing opposed Anterior-Posterior (AP) and Posterior-Anterior (PA) fields. Fields shaped by MLCs to conform to\u2026","totalDose":"30 Gy","fractionation":"10 fx","rtRx":"30 Gy / 10 fx (3 Gy/fx daily), delivered 5 days per week (Monday-Friday) over 2 weeks.","radOnc":"Dr. Laura Fisher","constraints":"Spinal Cord Max \u003c 25 Gy (achieved 23.1 Gy); Kidney Max (Rt/Lt) \u003c 18 Gy (achieved Rt: 1.5 Gy, Lt: 1.2 Gy); Small Bowel Max \u003c 30 Gy (achieved 25.0 Gy)"},"dose":{"technique":"3D-CRT (Opposed AP/PA fields)","energy":"6MV (photon energy)","nFields":2,"beams":[{"fieldName":"AP Spine","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":165,"fieldSize":"10 cm x 12 cm","ssd":"90.0 cm"},{"fieldName":"PA Spine","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":170,"fieldSize":"10 cm x 12 cm","ssd":"90.0 cm"}]},"sim":{"position":"","immobilization":"VacLok bag (custom molded for torso/pelvis), knee sponge, ankle immobilization cushion.","setup":"Supine in custom VacLok bag, with knee sponge and ankle immobilization for comfort and stability. Arms crossed over chest. Patient instructed to breathe normally. SAD setup. External skin marks placed\u2026","referenceMarks":"3-point tattoos placed at anterior mid-line, and bilateral lateral mid-axillary lines (at level of L3). Additional small marks placed to out\u2026","slice":"3.0 mm (optimal for spine contouring and dose calc\u2026","contrast":"Non-contrast (Standard for palliative spine RT. Target delineation relies on fused diagnos\u2026"},"fxTotal":10,"fxDelivered":10},{"id":"99001","name":"Henry Davis","dob":"1948-02-14","gender":"Male","region":"Skin/TSEBT","dx":{"primary":"Squamous Cell Carcinoma (SCCa), Poorly Differentiated, with Perineural Invasion (PNI)","location":"Left Scalp (Vertex and Temporal region)","stage":"pT2 N0 M0 (AJCC 8th ed.) - High-risk due to size, differentiation, PNI, and posi\u2026","site":"Left Scalp (Vertex and Temporal)"},"plan":{"intent":"Adjuvant (Post-operative)","modality":"External Beam Radiation Therapy (EBRT)","technique":"Complex plan using abutting electron and photon fields to cover a large, curved surface while sparing the underlying bra\u2026","totalDose":"60 Gy","fractionation":"30 fx (2.0 Gy/fx)","rtRx":"60 Gy in 30 fractions to the PTV.","radOnc":"Dr. Brian Carter","constraints":"{'Brain Max': '\u003c 45 Gy (achieved 42.1 Gy)', 'Brain V50Gy': '\u003c 5cc (achieved 2.1 cc)', 'Left Lens Max': '\u003c 10 Gy (achieved 5.5 Gy)', 'Right Lens Max': '\u003c 5 Gy (achieved 1.2 Gy)', 'Optic Chiasm Max': '\u003c\u2026"},"dose":{"technique":"Abutting Fields: 2 Electron Fields (Superior Scalp) + 1 IMRT Photon Field (Infer\u2026","energy":"6MV Photons / 9 MeV Electrons","nFields":3,"beams":[{"fieldName":"Anterior Scalp Electron","gantryAngle":"0","collimatorAngle":"15","couchAngle":"0","energy":"9 MeV","monitorUnits":310,"fieldSize":"15x15 applicator w/ custom cutout","ssd":"100.0 cm"},{"fieldName":"Posterior Scalp Electron","gantryAngle":"0","collimatorAngle":"195","couchAngle":"0","energy":"9 MeV","monitorUnits":315,"fieldSize":"15x15 applicator w/ custom cutout","ssd":"100.0 cm"},{"fieldName":"Left Temporal Photon (IMRT)","gantryAngle":"90","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":180,"fieldSize":"7.0x9.4 MLC defined","ssd":"91.5 cm"}]},"sim":{"position":"","immobilization":"Thermoplastic mask (Head and Neck type), indexed to couch.","setup":"Supine. A custom thermoplastic mask covering the head and neck was fabricated for immobilization. Patient's head is neutral. Arms at sides.","referenceMarks":"Reference tattoos placed on chest. Marks for daily alignment drawn on the mask and aligned to room lasers. A wire was placed along the surgi\u2026","slice":"2.0 mm","contrast":"IV Contrast was administered to help delineate any residual enhancing tissue and define th\u2026"},"fxTotal":30,"fxDelivered":30},{"id":"44556","name":"James Wilson","dob":"1950-07-15","gender":"Male","region":"Pelvis","dx":{"primary":"Prostate Adenocarcinoma","location":"Prostate Gland, Bilateral (apex, mid, base involvement)","stage":"pT2c N0 M0 (based on biopsy and imaging, awaiting surgical pathology if applicab\u2026","site":"Prostate Gland + Seminal Vesicles (proximal portions)"},"plan":{"intent":"Definitive (Curative) - High-dose radiation to the prostate gland and seminal vesicles com\u2026","modality":"External Beam Radiation Therapy (EBRT) with Concurrent Androgen Deprivation Therapy (ADT)","technique":"Volumetric Modulated Arc Therapy (VMAT) - Two full arcs (clockwise and counter-clockwise) to create a highly conformal d\u2026","totalDose":"79.2 Gy","fractionation":"44 fx (1.8 Gy/fx daily)","rtRx":"79.2 Gy / 44 fx (1.8 Gy/fx), delivered once daily, 5 days per week, Monday-Friday, over approximately 9 weeks.","radOnc":"Dr. Maria Garcia","constraints":"Rectum V70Gy \u003c 20% (achieved 18.5%); Rectal Dmax \u003c 79.2 Gy (point dose, achieved 76.5 Gy); Bladder V75Gy \u003c 15% (achieved 13.2%); Femoral Head Max \u003c 50 Gy (achieved L: 45.1 Gy, R: 46.8 Gy); Small Bowel\u2026"},"dose":{"technique":"VMAT (Volumetric Modulated Arc Therapy - 2 full arcs)","energy":"6MV FFF (Flattening Filter Free for high dose rate\u2026","nFields":2,"beams":[{"fieldName":"Arc 1 (CW)","gantryAngle":"181\u00b0 to 179\u00b0 (CW)","collimatorAngle":"0","couchAngle":"0","energy":"6MV FFF","monitorUnits":410,"fieldSize":"Dynamic MLC (variable field shape)","ssd":"Variable (VMAT isocenter is fixed, SSD varies dynamically)"},{"fieldName":"Arc 2 (CCW)","gantryAngle":"179\u00b0 to 181\u00b0 (CCW)","collimatorAngle":"0","couchAngle":"0","energy":"6MV FFF","monitorUnits":405,"fieldSize":"Dynamic MLC (variable field shape)","ssd":"Variable (VMAT isocenter is fixed, SSD varies dynamically)"}]},"sim":{"position":"","immobilization":"VacLok bag (custom molded to pelvis/legs for reproducibility), ankle immobilization cushion, custom leg roll.","setup":"Supine in custom VacLok bag (pelvic region), with ankle immobilization cushion and custom leg roll for comfort and stability. Patient instructed on full bladder / empty rectum protocol prior to scan.\u2026","referenceMarks":"3-point tattoos placed at isocenter projections (anterior mid-line, bilateral lateral hips). Small anterior tattoo for visual alignment. Iso\u2026","slice":"2.5 mm (Optimal for prostate contouring).","contrast":"IV Contrast (Ultravist 370mgI/mL, 100mL) to visualize vasculature and nodal regions if app\u2026"},"fxTotal":44,"fxDelivered":44},{"id":"SVCS-002","name":"Jane Smith","dob":"1975-03-20","gender":"Female","region":"Lymphoma","dx":{"primary":"Superior Vena Cava (SVC) Syndrome secondary to a compressive mediastinal mass; likely Lymphoma or Lung Cancer (biopsy pe\u2026","location":"Mediastinum","stage":"Staging deferred pending biopsy results.","site":"Mediastinum"},"plan":{"intent":"Palliative (Emergent)","modality":"External Beam Radiation Therapy (EBRT)","technique":"A simple 3D-Conformal AP/PA (Anterior-Posterior/Posterior-Anterior) technique is used for rapid planning and treatment i\u2026","totalDose":"30 Gy","fractionation":"10 fx","rtRx":"Initial emergent course: 30 Gy in 10 fractions (3 Gy/fx). Plan may be adapted after first few fractions and once tissue diagnosis is obtaine\u2026","radOnc":"Dr. Laura Brown","constraints":"Spinal Cord Max \u003c 30 Gy; Heart V25 \u003c 40%; Total Lung V20 \u003c 25%"},"dose":{"technique":"3D-CRT","energy":"6MV","nFields":null,"beams":[{"fieldName":"AP Mediastinum","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":160,"fieldSize":"14.0 x 16.0 cm","ssd":"92.0 cm"},{"fieldName":"PA Mediastinum","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":175,"fieldSize":"14.0 x 16.0 cm","ssd":"88.5 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag cradle.","setup":"Supine with arms up on wingboard as tolerated. Head of couch elevated 30 degrees to alleviate orthopnea. SAD setup.","referenceMarks":"3-point tattoos placed for daily alignment (anterior midline, R/L lateral).","slice":"","contrast":""},"fxTotal":10,"fxDelivered":5},{"id":"MSCC-001","name":"John Doe","dob":"1960-06-12","gender":"Male","region":"Skeletal","dx":{"primary":"Malignant Spinal Cord Compression at T10-T11","location":"","stage":"Metastatic Disease, primary likely lung cancer (pending full staging and biopsy)\u2026","site":"T9-T12 Spine"},"plan":{"intent":"Palliative (Emergent)","modality":"External Beam Radiation Therapy (EBRT)","technique":"A simple 3D-Conformal AP/PA (Anterior-Posterior/Posterior-Anterior) technique is used for rapid planning and immediate t\u2026","totalDose":"30 Gy","fractionation":"10 fx","rtRx":"30 Gy in 10 fractions (3 Gy/fx)","radOnc":"Dr. Robert Green","constraints":"Spinal Cord Max dose \u003c 28 Gy (achieved 24.5 Gy)."},"dose":{"technique":"3D-CRT","energy":"6MV","nFields":null,"beams":[{"fieldName":"AP Spine T9-T12","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":160,"fieldSize":"8.0 x 15.0 cm","ssd":"92.0 cm"},{"fieldName":"PA Spine T9-T12","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":165,"fieldSize":"8.0 x 15.0 cm","ssd":"88.0 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag (torso).","setup":"Supine in a custom Vac-Lok bag as tolerated due to severe back pain. Arms at side. SAD setup.","referenceMarks":"3-point tattoos at isocenter projections (AP and bilateral laterals).","slice":"","contrast":""},"fxTotal":10,"fxDelivered":10},{"id":"67890","name":"John Smith","dob":"1978-06-15","gender":"Male","region":"Heme/TBI","dx":{"primary":"Acute Myeloid Leukemia (AML), Not Otherwise Specified (NOS)","location":"","stage":"N/A (Staging for AML is based on risk stratification, not solid tumor staging).\u2026","site":"Total Body"},"plan":{"intent":"Myeloablative Conditioning Regimen for Allogeneic Hematopoietic Cell Transplant (HCT)","modality":"Total Body Irradiation (TBI) followed by high-dose Cyclophosphamide","technique":"Opposed lateral fields delivered at an extended source-to-surface distance (SSD) to encompass the entire body. Patient i\u2026","totalDose":"12 Gy","fractionation":"6 fx","rtRx":"12 Gy in 6 fractions, delivered twice-daily (BID) over 3 consecutive days (2 Gy/fx).","radOnc":"Dr. David Lee","constraints":"Total Lung Dose \u003c 8 Gy (achieved with custom lead blocks)."},"dose":{"technique":"TBI - Opposed Lateral Fields","energy":"6MV","nFields":null,"beams":[{"fieldName":"Right Lateral","gantryAngle":"90","collimatorAngle":"90","couchAngle":"270","energy":"6MV","monitorUnits":280,"fieldSize":"40.0 x 40.0 cm (Open)","ssd":"400 cm"},{"fieldName":"Left Lateral","gantryAngle":"270","collimatorAngle":"90","couchAngle":"90","energy":"6MV","monitorUnits":280,"fieldSize":"40.0 x 40.0 cm (Open)","ssd":"400 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag, patient positioning sponges.","setup":"Two setups simulated: Patient lying on right side (Left Lateral) and left side (Right Lateral) on a low gurney. A custom Vac-Lok bag is used for immobilization. Knees bent, arms holding a support bar\u2026","referenceMarks":"Marks placed on the patient for alignment to room lasers at the level of the umbilicus.","slice":"","contrast":""},"fxTotal":6,"fxDelivered":"5 & 6"},{"id":"77880","name":"Kevin Young","dob":"2007-11-01","gender":"Male","region":"Skeletal","dx":{"primary":"Osteosarcoma, Conventional High-Grade","location":"Metadiaphysis of the Distal Right Femur","stage":"Stage IIB (AJCC 8th Edition for Bone Sarcoma)","site":"Distal Right Femur"},"plan":{"intent":"Neoadjuvant (Pre-operative)","modality":"Neoadjuvant Chemotherapy followed by Neoadjuvant External Beam Radiation Therapy (EBRT), f\u2026","technique":"Intensity-Modulated Radiation Therapy (IMRT) using a 5-field static beam arrangement. Daily image guidance with kV ortho\u2026","totalDose":"55.8 Gy","fractionation":"31 fx (1.8 Gy/fx)","rtRx":"55.8 Gy / 31 fx (1.8 Gy/fx) to the Planning Target Volume (PTV).","radOnc":"Dr. Brian Carter","constraints":"Femoral Head Max \u003c 40 Gy (achieved 15.2 Gy); Skin Max \u003c 50 Gy (achieved 48.9 Gy); Distal Femoral Physis Mean \u003c 20 Gy (achieved 18.5 Gy); Knee Joint V40Gy \u003c 10% (achieved 8.0%)"},"dose":{"technique":"IMRT","energy":"6MV","nFields":5,"beams":[{"fieldName":"Field 1","gantryAngle":"310","collimatorAngle":"20","couchAngle":"0","energy":"6MV","monitorUnits":110,"fieldSize":"15 cm x 20 cm","ssd":"90.0 cm"},{"fieldName":"Field 2","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":150,"fieldSize":"15 cm x 20 cm","ssd":"92.5 cm"},{"fieldName":"Field 3","gantryAngle":"50","collimatorAngle":"340","couchAngle":"0","energy":"6MV","monitorUnits":115,"fieldSize":"15 cm x 20 cm","ssd":"91.0 cm"},{"fieldName":"Field 4","gantryAngle":"120","collimatorAngle":"290","couchAngle":"0","energy":"6MV","monitorUnits":80,"fieldSize":"15 cm x 20 cm","ssd":"88.5 cm"},{"fieldName":"Field 5","gantryAngle":"240","collimatorAngle":"70","couchAngle":"0","energy":"6MV","monitorUnits":85,"fieldSize":"15 cm x 20 cm","ssd":"89.0 cm"}]},"sim":{"position":"","immobilization":"Custom alpha cradle for right lower extremity.","setup":"Supine with a custom alpha cradle immobilizing the right leg from mid-thigh to ankle. Knee in slight flexion for comfort. Arms at sides. SAD setup.","referenceMarks":"3-point tattoos placed at isocenter (anterior midline, R/L lateral). Additional marks drawn to delineate field borders.","slice":"2.0 mm","contrast":"IV Contrast administered to help delineate residual enhancing tumor and vascular structure\u2026"},"fxTotal":31,"fxDelivered":31},{"id":"33445","name":"Linda Jones","dob":"1962-08-25","gender":"Female","region":"Thorax","dx":{"primary":"Non-Small Cell Lung Cancer (NSCLC) - Squamous Cell Carcinoma","location":"Left Hilum involving mediastinal nodes (Station 7, 4L)","stage":"pT2b pN2 M0 (Clinical staging based on pre-treatment imaging and biopsy confirmi\u2026","site":"Left Hilum Primary Tumor + Mediastinum (Involved nodes: Station 7, 4L; Elective nodes: Sta\u2026"},"plan":{"intent":"Definitive (Curative) - Goal is local-regional tumor control and eradication of microscopi\u2026","modality":"External Beam Radiation Therapy (EBRT) with concurrent Chemotherapy","technique":"Volumetric Modulated Arc Therapy (VMAT) utilizing two full arcs (CW/CCW). Technique optimized for high dose conformity t\u2026","totalDose":"","fractionation":"","rtRx":"60 Gy in 30 fractions (2 Gy/fx) to PTV_Primary+Nodes (GTV + 0.8cm CTV + 0.5cm PTV margin). Simultaneously Integrated Boost (SIB) approach no\u2026","radOnc":"Dr. Sarah Jenkins","constraints":"Spinal Cord Max \u003c 45 Gy (achieved 40.5 Gy); Esophagus Mean \u003c 34 Gy (achieved 31.2 Gy); Heart V30 \u003c 40% (achieved 38.5%, Mean Heart Dose 18.2 Gy); Total Lung V20 \u003c 30% (achieved 26.5%, Mean Lung Dose 1\u2026"},"dose":{"technique":"VMAT (Volumetric Modulated Arc Therapy, 2 arcs: CW/CCW)","energy":"6MV FFF (Flattening Filter Free for higher dose ra\u2026","nFields":2,"beams":[{"fieldName":"Arc 1 (CW)","gantryAngle":"181-179 CW","collimatorAngle":"30","couchAngle":"0","energy":"6MV FFF","monitorUnits":450,"fieldSize":"Dynamic MLC (variable field shape)","ssd":"Variable (VMAT isocenter is fixed, SSD varies dynamically)"},{"fieldName":"Arc 2 (CCW)","gantryAngle":"179-181 CCW","collimatorAngle":"330","couchAngle":"0","energy":"6MV FFF","monitorUnits":440,"fieldSize":"Dynamic MLC (variable field shape)","ssd":"Variable (VMAT isocenter is fixed, SSD varies dynamically)"}]},"sim":{"position":"","immobilization":"BodyFix vacuum bag (custom molded for torso), Wingboard (Arms Up), Headrest (Type B).","setup":"Supine in BodyFix vacuum bag with arms up on wingboard and secured in arm rests. Patient instructed on shallow breathing for 4D-CT acquisition. SAD setup. Room lasers aligned to external marks on body\u2026","referenceMarks":"3-point tattoos placed at anterior chest and bilateral mid-axillary line at isocenter projections. Isocenter derived from 4D-CT Mid-Ventilat\u2026","slice":"2.5 mm (for optimal contouring and dose calculatio\u2026","contrast":"IV Contrast (100ml Omnipaque 350mgI/ml) administered for enhanced visualization of primary\u2026"},"fxTotal":30,"fxDelivered":30},{"id":"RC-003","name":"Maria Garcia","dob":"1970-11-10","gender":"Female","region":"Pelvis","dx":{"primary":"Adenocarcinoma of the Rectum","location":"","stage":"Clinical Stage: cT3 N0 M0. Pathologic Stage (post-neoadjuvant chemoRT): ypT2 N0\u2026","site":"Rectum + Mesorectum + Pelvic Lymph Nodes"},"plan":{"intent":"Neoadjuvant followed by Adjuvant","modality":"Neoadjuvant concurrent Chemoradiation, followed by Surgical Resection, followed by Adjuvan\u2026","technique":"3D-Conformal Radiation Therapy (3D-CRT) using a 3-field technique (PA and opposed laterals). Patient is treated in the p\u2026","totalDose":"45 Gy","fractionation":"25 fx","rtRx":"45 Gy in 25 fractions (1.8 Gy/fx) to the pelvis.","radOnc":"Dr. Linda White","constraints":"Femoral Head Max \u003c 40 Gy (achieved L: 35, R: 36 Gy); Bladder V40Gy \u003c 50% (achieved 45%); Small Bowel Max \u003c 45 Gy (achieved 44.8 Gy)."},"dose":{"technique":"3D-CRT (3-Field PA/Lats)","energy":"10MV","nFields":null,"beams":[{"fieldName":"PA Pelvis","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":190,"fieldSize":"15.0 x 16.0 cm","ssd":"92.0 cm"},{"fieldName":"R Lat Pelvis","gantryAngle":"90","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":145,"fieldSize":"15.0 x 16.0 cm","ssd":"85.5 cm"},{"fieldName":"L Lat Pelvis","gantryAngle":"270","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":145,"fieldSize":"15.0 x 16.0 cm","ssd":"85.0 cm"}]},"sim":{"position":"","immobilization":"Prone belly board, prone head pillow.","setup":"Patient positioned prone on a belly board with a prone head pillow. Arms are down at sides. Patient instructed to have a comfortably full bladder and empty rectum.","referenceMarks":"3-point tattoos at isocenter projections (posterior and bilateral laterals).","slice":"","contrast":""},"fxTotal":25,"fxDelivered":25},{"id":"66778","name":"Mary Peterson","dob":"1973-05-01","gender":"Female","region":"Breast","dx":{"primary":"Invasive Ductal Carcinoma (IDC) of the Right Breast","location":"Upper Outer Quadrant (UOQ)","stage":"","site":"Right Breast (Post-lumpectomy cavity and entire breast parenchyma)"},"plan":{"intent":"Adjuvant (Post-lumpectomy radiation to reduce local recurrence risk, following breast-cons\u2026","modality":"External Beam Radiation Therapy (EBRT) - Whole Breast Radiation Therapy (WBRT)","technique":"3D-CRT - Opposed Tangential Fields (Medial and Lateral tangential fields). Optimized for dose homogeneity within breast\u2026","totalDose":"","fractionation":"","rtRx":"42.56 Gy in 16 fractions (2.66 Gy/fx). Hypofractionated regimen.","radOnc":"Dr. Angela Rossi","constraints":"Heart Mean \u003c 3 Gy (achieved 1.2 Gy); Heart Max \u003c 15 Gy (achieved 9.8 Gy); Ipsilateral Lung V20Gy \u003c 15% (achieved 12.1%, Mean Lung Dose 7.5 Gy); Contralateral Breast/Lung V5Gy \u003c 5% (achieved \u003c1%); Rib\u2026"},"dose":{"technique":"3D-CRT (Opposed Tangential Fields with Field-in-Field dose modulation)","energy":"6MV (photon energy)","nFields":2,"beams":[{"fieldName":"Medial Tangent","gantryAngle":"305","collimatorAngle":"340","couchAngle":"0","energy":"6MV","monitorUnits":182,"fieldSize":"10x18 cm (MLC defined)","ssd":"90.5 cm (Calculated)"},{"fieldName":"Lateral Tangent","gantryAngle":"125","collimatorAngle":"160","couchAngle":"0","energy":"6MV","monitorUnits":188,"fieldSize":"10x18 cm (MLC defined)","ssd":"89.5 cm (Calculated)"}]},"sim":{"position":"","immobilization":"Supine Breast Board (e.g., CIVCO, Med-Tec), custom foam headrest, arms up arm supports.","setup":"Supine on breast board (customized for incline) with both arms abducted above head and resting in arm supports. Head turned slightly left to open right breast field. Patient instructed to breathe norm\u2026","referenceMarks":"3-point tattoos placed per protocol (anterior chest midline, bilateral lateral chest wall at level of isocenter). Wires placed on surgical s\u2026","slice":"2.5 mm (Optimal for breast contouring and dose cal\u2026","contrast":"Non-contrast (Standard for adjuvant breast WBRT to avoid unnecessary contrast and motion a\u2026"},"fxTotal":16,"fxDelivered":16},{"id":"HL001","name":"Michael Rivera","dob":"1998-08-15","gender":"Male","region":"Lymphoma","dx":{"primary":"Classic Hodgkin Lymphoma (CHL), Nodular Sclerosis type","location":"Supradiaphragmatic Nodes (Neck/Chest)","stage":"","site":"Involved Sites Neck/Supraclavicular/Mediastinum (Mantle Field)"},"plan":{"intent":"Curative","modality":"Combined Modality Therapy: Abbreviated Chemotherapy followed by Involved Site Radiation Th\u2026","technique":"3D-Conformal Radiation Therapy (3D-CRT) using opposed Anterior-Posterior/Posterior-Anterior (AP/PA) fields. This is a mo\u2026","totalDose":"20 Gy","fractionation":"10 fx","rtRx":"20 Gy in 10 fractions (2.0 Gy/fx)","radOnc":"Dr. Robert Jones","constraints":"{'Heart Mean': '\u003c 5 Gy (achieved 4.1 Gy)', 'Total Lung V20': '\u003c 15% (achieved 12.5%)', 'Spinal Cord Max': '\u003c 20 Gy (achieved 18.9 Gy)', 'Thyroid Gland Mean': '\u003c 20 Gy (achieved 19.5 Gy)'}"},"dose":{"technique":"3D-CRT","energy":"6MV","nFields":2,"beams":[{"fieldName":"AP Mantle","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":115,"fieldSize":"24.0 cm x 20.0 cm","ssd":"89.0 cm"},{"fieldName":"PA Mantle","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":120,"fieldSize":"24.0 cm x 20.0 cm","ssd":"88.0 cm"}]},"sim":{"position":"","immobilization":"Aquaplast mask (Head and Shoulders type), indexed to couch.","setup":"Supine with head in a neutral position. A custom thermoplastic mask covering the head and shoulders was fabricated for immobilization. Arms are down at sides. Patient instructed to breathe shallowly d\u2026","referenceMarks":"Reference tattoos placed on chest. Marks for daily alignment drawn on the mask and aligned to room lasers. Isocenter placed at the sternal a\u2026","slice":"2.5 mm","contrast":"IV Contrast administered to delineate vessels and nodal anatomy in the mediastinum."},"fxTotal":10,"fxDelivered":10},{"id":"55668","name":"Michael Turner","dob":"1966-02-15","gender":"Male","region":"Pelvis","dx":{"primary":"Squamous Cell Carcinoma (SCCa) of the Anal Canal","location":"Anal Canal, extending to involve anal margin (anterior and posterior aspects)","stage":"","site":"Anal Canal + Pelvis + Bilateral Inguinal Nodes"},"plan":{"intent":"Definitive (Curative) - Aiming for complete tumor eradication and organ preservation (avoi\u2026","modality":"External Beam Radiation Therapy (EBRT) with concurrent Chemotherapy","technique":"Volumetric Modulated Arc Therapy (VMAT) - Two full arcs (clockwise and counter-clockwise). Delivered in prone (face down\u2026","totalDose":"58 Gy (Simultaneous Integrated Boost - SIB)","fractionation":"32 fx","rtRx":"58 Gy / 32 fx (1.81 Gy/fx) SIB. PTV_Elective (Pelvic/Inguinal Nodes): 45 Gy; PTV_Intermediate (Primary Anal Canal): 54 Gy; PTV_High (Gross T\u2026","radOnc":"Dr. Patricia Clark","constraints":"Femoral Head Mean: \u003c 45 Gy (L: 42.0 Gy, R: 43.1 Gy), Bladder V40Gy: \u003c 50% (achieved 48.5%), Small Bowel V45Gy: \u003c 10% (achieved 8.0%), External Genitalia Mean: \u003c 30 Gy (achieved 28.5% - minimized signi\u2026"},"dose":{"technique":"VMAT (Two full arcs: 358 degrees clockwise and counter-clockwise)","energy":"6MV FFF (Flattening Filter Free for high dose rate\u2026","nFields":2,"beams":[{"fieldName":"Arc 1 (CW)","gantryAngle":"179-181 CW","collimatorAngle":"15","couchAngle":"180","energy":"6MV FFF","monitorUnits":550,"fieldSize":"20 cm x 20 cm","ssd":"Variable"},{"fieldName":"Arc 2 (CCW)","gantryAngle":"181-179 CCW","collimatorAngle":"345","couchAngle":"180","energy":"6MV FFF","monitorUnits":565,"fieldSize":"20 cm x 20 cm","ssd":"Variable"}]},"sim":{"position":"","immobilization":"Carbon fiber belly board system (with adjustable aperture), prone pillow for head/chest comfort, knee sponge, ankle immo\u2026","setup":"Patient positioned prone on a specialized carbon fiber belly board system with an adjustable aperture to displace small bowel from the treatment field. Arms up on a wing board or to sides per comfort,\u2026","referenceMarks":"3-point tattoos at isocenter projections (anterior pelvic midline, bilateral lateral hips/thighs at level of anal canal). Additional marks f\u2026","slice":"2.5 mm (optimal for pelvic/anal contouring).","contrast":"IV contrast (100ml Omnipaque 300mgI/ml) for vascular/nodal delineation. Oral contrast (Omn\u2026"},"fxTotal":32,"fxDelivered":32},{"id":"MF001","name":"Olivia Chen","dob":"1968-07-11","gender":"Female","region":"Skin/TSEBT","dx":{"primary":"Mycosis Fungoides (Cutaneous T-Cell Lymphoma)","location":"","stage":"Stage IB (T2b N0 M0 B0)","site":"Total Skin"},"plan":{"intent":"Disease control and palliation of symptoms (primarily pruritus).","modality":"Total Skin Electron Beam Therapy (TSEBT)","technique":"Stanford Technique utilizing 6 dual-fields (AP/PA, RAO/LPO, LAO/RPO). Patient stands on a rotating platform at an extend\u2026","totalDose":"36 Gy","fractionation":"36 fx","rtRx":"36 Gy in 36 fractions (1 Gy/fx), delivered 4 times per week over 9 weeks.","radOnc":"Dr. Samuel Green","constraints":"Lens dose \u003c 2 Gy (achieved \u003c1 Gy with shields); Fingernails/Toenails dose \u003c 5 Gy (achieved \u003c3 Gy with shields)."},"dose":{"technique":"TSEBT - Stanford Technique","energy":"6 MeV","nFields":6,"beams":[{"fieldName":"Dual Field 1 (AP/PA)","gantryAngle":"Dual Gantry (270+/-20)","collimatorAngle":90,"couchAngle":0,"energy":"6 MeV","monitorUnits":120,"fieldSize":"Open Field","ssd":"380 cm"},{"fieldName":"Dual Field 2 (RAO/LPO)","gantryAngle":"Dual Gantry (270+/-20)","collimatorAngle":90,"couchAngle":60,"energy":"6 MeV","monitorUnits":120,"fieldSize":"Open Field","ssd":"380 cm"},{"fieldName":"Dual Field 3 (LAO/RPO)","gantryAngle":"Dual Gantry (270+/-20)","collimatorAngle":90,"couchAngle":300,"energy":"6 MeV","monitorUnits":120,"fieldSize":"Open Field","ssd":"380 cm"}]},"sim":{"position":"","immobilization":"Standing position with support frame and overhead straps.","setup":"Clinical simulation for TSEBT. Patient stands on a rotating platform at an extended distance from the machine (380 cm). Patient holds various positions to expose all skin surfaces for the 6 dual field\u2026","referenceMarks":"N/A (alignment is to room lasers and patient position, not tattoos).","slice":"","contrast":""},"fxTotal":36,"fxDelivered":36},{"id":"PR-LUNG-001","name":"Patricia Rodriguez","dob":"1955-09-10","gender":"Female","region":"Thorax","dx":{"primary":"Non-Small Cell Lung Cancer (NSCLC) - Squamous Cell Carcinoma","location":"Right Upper Lobe (RUL)","stage":"Stage IIIA (T2b N2 M0)","site":"Right Upper Lobe Tumor and Mediastinal Lymph Nodes (4R, 7)"},"plan":{"intent":"Curative (Definitive radiation after induction chemo)","modality":"Proton Beam Therapy (PBT)","technique":"Intensity Modulated Proton Therapy (IMPT) to deliver a highly conformal dose distribution, minimizing dose to the uninvo\u2026","totalDose":"60 Gy (CGE)","fractionation":"30 fx","rtRx":"60 Gy (CGE) in 30 fractions (2 Gy/fx) using Pencil Beam Scanning (PBS) proton therapy.","radOnc":"Dr. Evelyn Reed","constraints":"Mean Lung Dose \u003c 18 Gy, Heart V30 \u003c 25%, Esophagus max \u003c 65 Gy. All constraints met."},"dose":{"technique":"Pencil Beam Scanning (PBS) / IMPT","energy":"Protons","nFields":null,"beams":[{"fieldName":"Anterior Oblique Field","gantryAngle":"45","collimatorAngle":"0","couchAngle":"0","energy":"70-180 MeV (scanned)","monitorUnits":2250,"fieldSize":"Variable (scanned beam)","ssd":"100 cm"},{"fieldName":"Posterior Oblique Field","gantryAngle":"210","collimatorAngle":"0","couchAngle":"0","energy":"80-210 MeV (scanned)","monitorUnits":1980,"fieldSize":"Variable (scanned beam)","ssd":"100 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok (full body), Wing Board","setup":"Supine, arms overhead in wing board. Immobilized with a custom Vac-Lok bag.","referenceMarks":"Tattoos placed at isocenter reference.","slice":"","contrast":""},"fxTotal":30,"fxDelivered":30},{"id":"99112","name":"Robert Miller","dob":"1955-03-15","gender":"Male","region":"Thorax","dx":{"primary":"Non-Small Cell Lung Cancer (NSCLC) - Adenocarcinoma","location":"Right Upper Lobe (RUL)","stage":"pT2a pN0 M0 (Clinical staging based on pre-treatment imaging and biopsy. No noda\u2026","site":"Right Upper Lobe (Primary Tumor)"},"plan":{"intent":"Definitive (Curative) - High-dose radiation delivered precisely to eradicate the tumor.","modality":"Stereotactic Body Radiation Therapy (SBRT)","technique":"Volumetric Modulated Arc Therapy (VMAT) utilizing multiple non-coplanar arcs to achieve highly conformal dose distributi\u2026","totalDose":"","fractionation":"","rtRx":"54 Gy in 3 fractions (18 Gy/fx), delivered every other day (Mon/Wed/Fri schedule for example), over one week.","radOnc":"Dr. Kevin Black","constraints":"Spinal Cord Max \u003c 20 Gy (achieved 15.2 Gy); Esophagus Max \u003c 27 Gy (achieved 21.0 Gy); Heart Max \u003c 30 Gy (achieved 18.5 Gy); Total Lung V20 \u003c 10% (achieved 9.2%, Mean Lung Dose 3.5 Gy); Contralateral L\u2026"},"dose":{"technique":"VMAT (Volumetric Modulated Arc Therapy with multiple non-coplanar arcs)","energy":"10MV FFF (Flattening Filter Free for high dose rat\u2026","nFields":2,"beams":[{"fieldName":"Arc 1 (CW)","gantryAngle":"200-160 CW","collimatorAngle":"30","couchAngle":"0","energy":"10MV FFF","monitorUnits":2750,"fieldSize":"Dynamic MLC (variable field shape)","ssd":"Variable (VMAT isocenter fixed, SSD varies dynamically)"},{"fieldName":"Arc 2 (CCW)","gantryAngle":"160-200 CCW","collimatorAngle":"330","couchAngle":"0","energy":"10MV FFF","monitorUnits":2810,"fieldSize":"Dynamic MLC (variable field shape)","ssd":"Variable (VMAT isocenter fixed, SSD varies dynamically)"}]},"sim":{"position":"","immobilization":"BodyFix vacuum bag (custom molded to torso for maximal reproducibility), Wingboard (Arms Up), Headrest (Type A).","setup":"Supine on wingboard with arms up and secured in arm rests, immobilized in BodyFix vacuum bag molded to torso. Respiratory motion assessed using Varian RPM (Real-time Position Management) system for 4D\u2026","referenceMarks":"3-point tattoos placed at anterior chest and bilateral mid-axillary line at isocenter projections. Isocenter derived from 4D-CT Mid-Ventilat\u2026","slice":"2.5 mm (for primary planning). 1.5 mm for 4D-CT ac\u2026","contrast":"Non-contrast (Preferred for SBRT to avoid motion artifacts during contrast bolus, target d\u2026"},"fxTotal":3,"fxDelivered":3},{"id":"CC-002","name":"Robert Smith","dob":"1955-07-22","gender":"Male","region":"Pelvis","dx":{"primary":"Adenocarcinoma of the Sigmoid Colon","location":"","stage":"Stage IIIB (pT3, pN2a, M0)","site":"Pelvis"},"plan":{"intent":"Adjuvant","modality":"Adjuvant Chemotherapy followed by Adjuvant External Beam Radiation Therapy (EBRT)","technique":"3D-Conformal Radiation Therapy (3D-CRT) using a 4-field box technique (AP, PA, Right and Left Laterals) to deliver a uni\u2026","totalDose":"50.4 Gy","fractionation":"28 fx","rtRx":"50.4 Gy in 28 fractions (1.8 Gy/fx)","radOnc":"Dr. Emily Carter","constraints":"Femoral Head Max \u003c 45 Gy (achieved L: 42, R: 43 Gy); Bladder V45Gy \u003c 30% (achieved 25%); Small Bowel Max \u003c 50 Gy (achieved 48.5 Gy); Rectum V50Gy \u003c 50% (achieved 45%)."},"dose":{"technique":"3D-CRT (4-Field Box)","energy":"10MV","nFields":4,"beams":[{"fieldName":"AP Pelvis","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":140,"fieldSize":"16.0 x 18.0 cm","ssd":"91.0 cm"},{"fieldName":"PA Pelvis","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":145,"fieldSize":"16.0 x 18.0 cm","ssd":"90.5 cm"},{"fieldName":"R Lat Pelvis","gantryAngle":"90","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":180,"fieldSize":"16.0 x 18.0 cm","ssd":"82.0 cm"},{"fieldName":"L Lat Pelvis","gantryAngle":"270","collimatorAngle":"0","couchAngle":"0","energy":"10MV","monitorUnits":180,"fieldSize":"16.0 x 18.0 cm","ssd":"82.5 cm"}]},"sim":{"position":"","immobilization":"Vac-Lok bag (pelvis), knee and foot positioning sponges.","setup":"Supine in a custom Vac-Lok bag with knee and ankle immobilization sponges. Patient instructed to follow full bladder / empty rectum protocol (drink 32oz water 1 hour prior, empty rectum before sim).","referenceMarks":"3-point tattoos at isocenter projections (AP and bilateral laterals).","slice":"3.0 mm","contrast":"IV and Oral Contrast to help delineate bowel, bladder, and vascular structures."},"fxTotal":28,"fxDelivered":28},{"id":"HL003","name":"Samuel Green","dob":"1988-05-10","gender":"Male","region":"Lymphoma","dx":{"primary":"Classic Hodgkin Lymphoma (CHL), Nodular Sclerosis type","location":"Supradiaphragmatic and Infradiaphragmatic Nodes + Spleen","stage":"Ann Arbor Stage IIIB-S. International Prognostic Score (IPS): 2 (Stage IV [due t\u2026","site":"Mediastinum, Supraclavicular, and Para-aortic Nodes"},"plan":{"intent":"Curative","modality":"Combined Modality Therapy: Full course chemotherapy followed by consolidative Involved Sit\u2026","technique":"Intensity-Modulated Radiation Therapy (IMRT) delivered using a Deep-Inspiration Breath-Hold (DIBH) technique. IMRT is ne\u2026","totalDose":"30.6 Gy","fractionation":"17 fx","rtRx":"30.6 Gy in 17 fractions (1.8 Gy/fx)","radOnc":"Dr. Kevin Black","constraints":"Heart Mean \u003c 20 Gy (achieved 14.5 Gy); Heart V25 \u003c 10% (achieved 8.2%); Total Lung V20 \u003c 30% (achieved 22.1%); Left Kidney Mean \u003c 12 Gy (achieved 7.8 Gy); Spinal Cord Max \u003c 35 Gy (achieved 28.0 Gy)"},"dose":{"technique":"IMRT","energy":"6MV","nFields":7,"beams":[{"fieldName":"Field 1","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":105,"fieldSize":"20x22 MLC defined","ssd":"88.5 cm"},{"fieldName":"Field 2","gantryAngle":"51","collimatorAngle":"25","couchAngle":"0","energy":"6MV","monitorUnits":120,"fieldSize":"20x22 MLC defined","ssd":"89.0 cm"},{"fieldName":"Field 3","gantryAngle":"102","collimatorAngle":"335","couchAngle":"0","energy":"6MV","monitorUnits":115,"fieldSize":"20x22 MLC defined","ssd":"92.1 cm"},{"fieldName":"Field 4","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":95,"fieldSize":"20x22 MLC defined","ssd":"94.0 cm"},{"fieldName":"Field 5","gantryAngle":"204","collimatorAngle":"25","couchAngle":"0","energy":"6MV","monitorUnits":115,"fieldSize":"20x22 MLC defined","ssd":"92.5 cm"},{"fieldName":"Field 6","gantryAngle":"255","collimatorAngle":"335","couchAngle":"0","energy":"6MV","monitorUnits":120,"fieldSize":"20x22 MLC defined","ssd":"89.5 cm"},{"fieldName":"Field 7","gantryAngle":"306","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":105,"fieldSize":"20x22 MLC defined","ssd":"88.0 cm"}]},"sim":{"position":"","immobilization":"Wing board, Vac-Lok bag (torso).","setup":"Supine on a wing board with both arms up, holding T-bar grips. Immobilized in a custom Vac-Lok bag from head to mid-abdomen. Patient was coached on the DIBH maneuver using an active breathing coordina\u2026","referenceMarks":"3-point tattoos on chest for initial alignment. DIBH threshold level is the primary positioning verification parameter.","slice":"2.5 mm","contrast":"IV Contrast administered to delineate vessels and nodal anatomy."},"fxTotal":17,"fxDelivered":17},{"id":"77889","name":"Sarah Chen","dob":"1968-11-20","gender":"Female","region":"Head & Neck","dx":{"primary":"Squamous Cell Carcinoma (SCCa) of the Left Tonsil","location":"Left Tonsil / Oropharynx","stage":"pT2 pN1 M0 (Clinical staging based on pre-treatment imaging)","site":"Oropharynx (left tonsil primary) + Bilateral Neck Nodal Regions (Levels IB, II, III, IV, V\u2026"},"plan":{"intent":"Definitive (Curative) - Aiming for complete tumor eradication and preservation of organ fu\u2026","modality":"External Beam Radiation Therapy (EBRT) with concurrent Chemotherapy (Cisplatin)","technique":"Intensity Modulated Radiation Therapy (IMRT) - 7-field technique. Optimized for dose conformality to targets and maximal\u2026","totalDose":"","fractionation":"","rtRx":"70 Gy / 35 fx (2 Gy/fx) to PTV_High (Primary Gross Tumor Volume + Involved Node + 5mm margin), Simultaneous Integrated Boost (SIB) with PTV_\u2026","radOnc":"Dr. James Miller","constraints":"Spinal Cord Max \u003c 45 Gy (achieved 40.1 Gy); Brainstem Max \u003c 54 Gy (achieved 48.5 Gy); Bilateral Parotid Mean \u003c 26 Gy (L: 24.3 Gy, R: 25.8 Gy); Cochlea Mean \u003c 30 Gy (L: 12.5 Gy, R: 11.9 Gy); Larynx Mea\u2026"},"dose":{"technique":"IMRT (Static gantry, step-and-shoot delivery with 7 fields)","energy":"6MV (photon energy)","nFields":7,"beams":[{"fieldName":"Field 1 AP","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":80,"fieldSize":"14.5x20.0 cm (MLC defined)","ssd":"91.5 cm (calculated from isocenter)"},{"fieldName":"Field 2 RPO","gantryAngle":"51","collimatorAngle":"30","couchAngle":"0","energy":"6MV","monitorUnits":95,"fieldSize":"15.0x20.0 cm (MLC defined)","ssd":"92.0 cm (calculated from isocenter)"},{"fieldName":"Field 3 RAO","gantryAngle":"102","collimatorAngle":"330","couchAngle":"0","energy":"6MV","monitorUnits":90,"fieldSize":"15.0x20.0 cm (MLC defined)","ssd":"92.5 cm (calculated from isocenter)"},{"fieldName":"Field 4 PA","gantryAngle":"180","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":70,"fieldSize":"14.5x20.0 cm (MLC defined)","ssd":"91.0 cm (calculated from isocenter)"},{"fieldName":"Field 5 LPO","gantryAngle":"204","collimatorAngle":"30","couchAngle":"0","energy":"6MV","monitorUnits":90,"fieldSize":"15.0x20.0 cm (MLC defined)","ssd":"92.5 cm (calculated from isocenter)"},{"fieldName":"Field 6 LAO","gantryAngle":"255","collimatorAngle":"330","couchAngle":"0","energy":"6MV","monitorUnits":95,"fieldSize":"15.0x20.0 cm (MLC defined)","ssd":"92.0 cm (calculated from isocenter)"},{"fieldName":"Field 7 L Lat","gantryAngle":"306","collimatorAngle":"0","couchAngle":"0","energy":"6MV","monitorUnits":80,"fieldSize":"14.5x20.0 cm (MLC defined)","ssd":"91.5 cm (calculated from isocenter)"}]},"sim":{"position":"","immobilization":"Custom thermoplastic mask (Head & Neck - extended to shoulders), Shoulder retraction device, Headrest (Type A).","setup":"Supine in custom thermoplastic mask extending to shoulders, arms by sides, appropriate headrest. Shoulders retracted down with shoulder pull device to optimize field-of-view and spinal cord clearance.\u2026","referenceMarks":"3-point mask marks (right, left, anterior) aligned to room lasers. Isocenter placed at L0.0 (medial-lateral), L+1.0 (superior-inferior), V-3\u2026","slice":"2.5 mm (Optimal for H&N contouring and dose calcul\u2026","contrast":"Contrast-enhanced IV (100ml Omnipaque 350mgI/ml) for GTV and nodal delineation. Bolus timi\u2026"},"fxTotal":35,"fxDelivered":35},{"id":"88776","name":"Susan Miller","dob":"1958-10-05","gender":"Female","region":"Breast","dx":{"primary":"Ductal Carcinoma In Situ (DCIS), High Grade, with microinvasion (\u003c1mm)","location":"Left Breast, Lower Inner Quadrant (LIQ)","stage":"pTis(mi) pN0(sn) M0, Stage 0 (AJCC 8th Edition - DCIS with microinvasion is Stag\u2026","site":"Left Breast (Post-lumpectomy cavity and entire breast parenchyma)"},"plan":{"intent":"Adjuvant (Post-lumpectomy radiation to reduce local recurrence risk, especially given high\u2026","modality":"External Beam Radiation Therapy (EBRT) - Whole Breast Radiation Therapy (WBRT)","technique":"3D-CRT - Opposed Tangential Fields (Medial and Lateral tangential fields). Delivered in a prone (face down) setup on a s\u2026","totalDose":"","fractionation":"","rtRx":"42.56 Gy in 16 fractions (2.66 Gy/fx). Hypofractionated regimen.","radOnc":"Dr. Angela Rossi","constraints":"Heart Max \u003c 5 Gy (achieved 1.5 Gy - excellent sparing in prone); Ipsilateral Lung V20Gy \u003c 10% (achieved 8.2%, Mean Lung Dose 4.1 Gy - excellent sparing in prone); Contralateral Breast/Lung V5Gy \u003c 1% (\u2026"},"dose":{"technique":"3D-CRT (Opposed Tangential Fields with Field-in-Field dose modulation)","energy":"6MV (photon energy)","nFields":2,"beams":[{"fieldName":"Medial Tangent (Prone)","gantryAngle":"270","collimatorAngle":"15","couchAngle":"180","energy":"6MV","monitorUnits":192,"fieldSize":"12x19 cm (MLC defined)","ssd":"91.0 cm (Calculated)"},{"fieldName":"Lateral Tangent (Prone)","gantryAngle":"90","collimatorAngle":"15","couchAngle":"180","energy":"6MV","monitorUnits":197,"fieldSize":"12x19 cm (MLC defined)","ssd":"90.5 cm (Calculated)"}]},"sim":{"position":"","immobilization":"Prone Breast Board System (e.g., Carbon Fiber Prone Breast Board with adjustable breast opening), custom foam headrest,\u2026","setup":"Patient positioned prone on dedicated prone breast board, allowing left breast to be isolated and fall through the opening. Both arms abducted above head and resting in arm troughs. Head positioned in\u2026","referenceMarks":"3-point tattoos placed for alignment per protocol (on back/side). Wires placed on surgical scar and palpable breast borders (superior, infer\u2026","slice":"2.5 mm (Optimal for breast contouring and dose cal\u2026","contrast":"Non-contrast (Standard for adjuvant breast WBRT to avoid unnecessary contrast and motion a\u2026"},"fxTotal":16,"fxDelivered":16},{"id":"44550","name":"Susan Walker","dob":"1952-07-22","gender":"Female","region":"Skin/TSEBT","dx":{"primary":"Basal Cell Carcinoma (BCC), Nodular type","location":"Left Nasal Ala","stage":"cT1 N0 M0 (AJCC 8th Edition)","site":"Left Nasal Ala"},"plan":{"intent":"Definitive (Curative)","modality":"External Beam Radiation Therapy (EBRT) using Electrons","technique":"A single, direct en-face electron field will be used. A custom cerrobend cutout will be fabricated to shape the beam pre\u2026","totalDose":"50 Gy","fractionation":"20 fx","rtRx":"50 Gy in 20 fractions (2.5 Gy/fx)","radOnc":"Dr. Angela Rossi","constraints":"Lens of the eye dose to be minimized. Dose to underlying nasal cartilage considered and deemed acceptable."},"dose":{"technique":"Electrons - Single Direct Field","energy":"9 MeV","nFields":1,"beams":[{"fieldName":"En-face L Nasal Ala","gantryAngle":"0","collimatorAngle":"0","couchAngle":"0","energy":"9 MeV","monitorUnits":315,"fieldSize":"6x6 applicator with 2.5cm cutout","ssd":"100 cm"}]},"sim":{"position":"","immobilization":"Headrest and small pillows for comfort and to ensure a stable, reproducible head position.","setup":"Supine on couch with head in a comfortable headrest. Patient is asked to remain still and breathe normally. This is a clinical setup (no CT scan).","referenceMarks":"The treatment field (a 2.5 cm circle encompassing the lesion and margin) was outlined directly on the patient's skin with a marker. Photos w\u2026","slice":"N/A","contrast":"N/A"},"fxTotal":20,"fxDelivered":20}]</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2;
+const PATIENTS=JSON.parse($("wfData").textContent);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+let selId=null, station="chart", q="", regionFilter="All";
+const WF={};
+
+/* ===== knowledge base: per-region CT-sim protocol + scan borders ===== */
+const LANDMARKS=[[.045,"Vertex"],[.10,"Orbits"],[.13,"Mandible"],[.18,"Cricoid"],[.22,"Sternal notch"],[.295,"Carina"],[.37,"Diaphragm"],[.43,"L2"],[.50,"Iliac crest"],[.565,"Pubis"],[.59,"Ischium"],[.70,"Mid-thigh"],[.82,"Knee"],[.96,"Feet"]];
+const POS=["Supine, head-first","Supine, feet-first","Prone","Supine, arms up","Standing (extended SSD)"];
+const IMMOB=["Thermoplastic head mask (3-pt)","5-pt thermoplastic mask + shoulder pull","Wing board, arms overhead","Breast board, arm abducted","Vac-Lok + knee/foot stocks","Vac-Lok bag (site-molded)","Minimal / none","TBI stand / couch"];
+const SLICE=["1.25 mm","2 mm","2.5 mm","3 mm","5 mm"];
+const CONTRAST=["None","IV contrast","IV + oral contrast"];
+const SIM={
+  "Brain":{pos:POS[0],immob:IMMOB[0],slice:SLICE[0],contrast:CONTRAST[1],sup:[.045,"Vertex"],inf:[.155,"C1/C2"],tol:.035,note:"Whole brain: vertex → C2. 3-pt mask, thin slices."},
+  "Head & Neck":{pos:POS[0],immob:IMMOB[1],slice:SLICE[1],contrast:CONTRAST[1],sup:[.045,"Vertex"],inf:[.30,"Carina"],tol:.04,note:"Skull vertex → carina to cover nodal levels & low neck."},
+  "Thorax":{pos:POS[3],immob:IMMOB[2],slice:SLICE[2],contrast:CONTRAST[1],sup:[.18,"Cricoid (C5/6)"],inf:[.44,"L2"],tol:.04,note:"Cricoid → L2: whole lungs + breathing margin (4D-CT)."},
+  "Breast":{pos:POS[3],immob:IMMOB[3],slice:SLICE[2],contrast:CONTRAST[0],sup:[.13,"Mandible"],inf:[.41,"Below inframammary fold"],tol:.04,note:"Mandible → mid-abdomen; include both lungs & humeral head."},
+  "Pelvis":{pos:POS[0],immob:IMMOB[4],slice:SLICE[2],contrast:CONTRAST[2],sup:[.47,"L4/L5"],inf:[.62,"Below ischium"],tol:.04,note:"L4/5 → below ischial tuberosities; full bladder / empty rectum."},
+  "Abdomen":{pos:POS[3],immob:IMMOB[5],slice:SLICE[2],contrast:CONTRAST[2],sup:[.295,"Carina (T8)"],inf:[.50,"Iliac crest"],tol:.04,note:"Carina/T8 → iliac crest; IV+oral contrast, 4D for motion."},
+  "Skeletal":{pos:POS[0],immob:IMMOB[5],slice:SLICE[3],contrast:CONTRAST[0],sup:[.40,"1 level above lesion"],inf:[.56,"1 level below lesion"],tol:.06,note:"Bracket the lesion: include one vertebra/joint above & below."},
+  "Lymphoma":{pos:POS[0],immob:IMMOB[1],slice:SLICE[3],contrast:CONTRAST[1],sup:[.13,"Mandible"],inf:[.37,"Diaphragm"],tol:.045,note:"Involved-site; classic mantle = mandible → diaphragm."},
+  "Skin/TSEBT":{pos:POS[4],immob:IMMOB[6],slice:SLICE[4],contrast:CONTRAST[0],sup:[.045,"Vertex"],inf:[.96,"Feet"],tol:.05,note:"Total skin — vertex → feet (Stanford 6-position)."},
+  "Heme/TBI":{pos:POS[4],immob:IMMOB[7],slice:SLICE[4],contrast:CONTRAST[0],sup:[.045,"Vertex"],inf:[.96,"Feet"],tol:.05,note:"Total body — vertex → feet at extended SSD."},
+  "Other":{pos:POS[0],immob:IMMOB[5],slice:SLICE[3],contrast:CONTRAST[0],sup:[.20,"Above target"],inf:[.55,"Below target"],tol:.06,note:"Cover target with adequate margin; include relevant nodes/joints."}
+};
+function proto(p){ return SIM[p.region]||SIM.Other; }
+function optsFor(correct,pool){ const s=[correct,...pool]; return [...new Set(s)]; }
+
+/* ===== helpers ===== */
+function age(dob){ if(!dob)return"—"; let d=/^\d{4}-\d{2}-\d{2}/.test(dob)?new Date(dob):null;
+  if(!d){const m=String(dob).split("/");if(m.length===3)d=new Date(+m[2],+m[0]-1,+m[1]);}
+  if(!d||isNaN(d))return"—"; const t=new Date();let a=t.getFullYear()-d.getFullYear();
+  if(t.getMonth()<d.getMonth()||(t.getMonth()===d.getMonth()&&t.getDate()<d.getDate()))a--;return a; }
+function doseNum(s){const m=String(s||"").match(/([\d.]+)\s*Gy/i);return m?parseFloat(m[1]):null;}
+function totMU(p){return (p.dose.beams||[]).reduce((s,b)=>s+(+b.monitorUnits||0),0);}
+function techCat(p){ const t=((p.dose.technique||"")+" "+(p.plan.modality||"")+" "+(p.plan.technique||"")).toLowerCase();
+  if(/vmat|arc/.test(t))return"VMAT"; if(/imrt|sib|intensity/.test(t))return"IMRT";
+  if(/proton|rbe|\(cge\)|cge/.test(t))return"Protons";
+  if(/tsebt|total skin|electron/.test(t))return"Electrons"; return"3D-CRT"; }
+function energyCat(p){ const e=(p.dose.energy||"").toLowerCase();
+  if(/proton/.test(e)||techCat(p)==="Protons")return"Protons";
+  if(/electron|mev/.test(e)||techCat(p)==="Electrons")return"Electrons (6–12 MeV)";
+  if(/15/.test(e))return"15 MV"; if(/10/.test(e))return"10 MV"; if(/fff/.test(e))return"6 MV FFF"; return"6 MV"; }
+const TECHS=["3D-CRT","IMRT","VMAT","Electrons","Protons"];
+const ENERGIES=["6 MV","10 MV","15 MV","6 MV FFF","Electrons (6–12 MeV)","Protons"];
+
+function ensureWF(p){ if(WF[p.id])return WF[p.id];
+  const pr=proto(p);
+  WF[p.id]={ sim:{done:false,supY:pr.sup[0]-0.13,infY:pr.inf[0]+0.13,protocol:{position:"",immob:"",slice:"",contrast:""}},
+    plan:{done:false,tech:"",energy:""},
+    qa:{done:false,passed:false,checklist:new Set(),gamma:null,point:null,output:null},
+    deliver:{fx:0, interlocks:{door:false,key:false,cbct:false}, running:false} };
+  return WF[p.id]; }
+
+/* ===== sidebar ===== */
+function buildChips(){ const rs=["All",...Array.from(new Set(PATIENTS.map(p=>p.region))).sort()];
+  $("chips").innerHTML=rs.map(r=>`<button class="chip${r===regionFilter?' on':''}" data-r="${esc(r)}">${esc(r)}</button>`).join("");
+  $("chips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{regionFilter=c.dataset.r;buildChips();renderList();}); }
+function match(p){ if(regionFilter!=="All"&&p.region!==regionFilter)return false; if(!q)return true;
+  const h=(p.name+" "+p.dx.primary+" "+p.dx.site+" "+p.region).toLowerCase();
+  return q.toLowerCase().split(/\s+/).every(w=>h.includes(w)); }
+function wfDots(p){ const w=WF[p.id]; if(!w)return'<i></i><i></i><i></i><i></i>';
+  const c=k=>k?'on':''; return `<i class="${c(w.sim.done)}"></i><i class="${c(w.plan.done)}"></i><i class="${w.qa.passed?'on':(w.qa.done?'warn':'')}"></i><i class="${w.deliver.fx>=p.fxTotal&&p.fxTotal>0?'on':(w.deliver.fx>0?'warn':'')}"></i>`; }
+function renderList(){ const list=PATIENTS.filter(match).sort((a,b)=>a.name.localeCompare(b.name));
+  $("hdrCount").textContent=`${list.length}/${PATIENTS.length}`;
+  $("plist").innerHTML=list.map(p=>`<button class="pitem${p.id===selId?' on':''}" data-id="${esc(p.id)}">
+    <div class="nm">${esc(p.name)}</div><div class="dx">${esc(p.dx.primary.slice(0,58))}</div>
+    <div class="meta"><span class="rtag">${esc(p.region)}</span><span class="mono" style="font-size:10px;color:var(--ink-mute)">${esc(p.plan.totalDose||"")}</span><span class="wfdots">${wfDots(p)}</span></div>
+  </button>`).join("")||'<div style="padding:18px;color:var(--ink-mute);font-size:13px">No matches.</div>';
+  $("plist").querySelectorAll(".pitem").forEach(b=>b.onclick=()=>selectPatient(b.dataset.id)); }
+
+/* ===== select patient + shell ===== */
+function selectPatient(id){ selId=id; const p=PATIENTS.find(x=>x.id===id); if(!p)return; ensureWF(p);
+  $("emptyState").style.display="none"; $("workspace").style.display="";
+  station="chart"; renderList(); renderAll(p); $("main").scrollTop=0; }
+function renderAll(p){ renderBanner(p); renderStepper(p); renderChart(p); renderSim(p); renderPhysics(p); renderDelivery(p); showStation(); }
+function showStation(){ ["chart","sim","physics","deliver"].forEach(s=>$("st-"+s).classList.toggle("on",s===station)); }
+function gates(p){ const w=WF[p.id]; return {chart:true,sim:true,physics:w.sim.done,deliver:w.qa.passed}; }
+function go(p,s){ const g=gates(p); if(!g[s])return; station=s;
+  if(s==="sim")renderSim(p); else if(s==="physics")renderPhysics(p); else if(s==="deliver")renderDelivery(p); else renderChart(p);
+  renderStepper(p); showStation(); $("main").scrollTo({top:$("stepper").offsetTop-2,behavior:"instant"}); }
+
+function renderBanner(p){ const w=WF[p.id],done=w.deliver.fx,total=p.fxTotal;
+  const totDose=doseNum(p.plan.totalDose)||doseNum(p.plan.rtRx),dd=total?(totDose?totDose*done/total:null):null;
+  let ticks=""; for(let i=1;i<=total;i++)ticks+=`<span class="tick${i<=done?' done':''}"></span>`;
+  $("banner").innerHTML=`<div class="row1"><h2>${esc(p.name)}</h2>
+    <span class="ids">MRN ${esc(p.id)} · ${esc(age(p.dob))} y · ${esc(p.gender)} · ${esc(p.region)}</span></div>
+    <div class="dx1">${esc(p.dx.primary)}${p.dx.location?" — "+esc(p.dx.location):""}</div>
+    <div class="course"><div class="ribbon">${ticks||'<span class="mono" style="font-size:11px;color:var(--ink-mute)">no schedule</span>'}</div>
+    <div class="stat"><b>${done}</b>/${total||"—"} fx${totDose?` · <b>${dd!=null?dd.toFixed(1):"—"}</b>/${totDose} Gy`:""}</div></div>`; }
+
+function renderStepper(p){ const w=WF[p.id],g=gates(p);
+  const steps=[["chart","Chart","1",true],["sim","CT Sim",w.sim.done?"✓":"2",g.sim],
+    ["physics","Plan · QA",w.qa.passed?"✓":"3",g.physics],["deliver","Treat",(p.fxTotal&&w.deliver.fx>=p.fxTotal)?"✓":"4",g.deliver]];
+  const doneMap={chart:true,sim:w.sim.done,physics:w.qa.passed,deliver:p.fxTotal&&w.deliver.fx>=p.fxTotal};
+  $("stepper").innerHTML=steps.map((s,i)=>{const[id,tx,ic,unlocked]=s;
+    const cls=(station===id?"active ":"")+(doneMap[id]?"done ":"")+(!unlocked?"locked":"");
+    const subs={chart:"review",sim:"borders & protocol",physics:"plan & checks",deliver:"record & verify"};
+    return `${i?'<span class="arrow">›</span>':''}<div class="step ${cls}" data-s="${id}"><div class="ico">${ic}</div><div><div class="tx">${tx}</div><div class="sub">${subs[id]}</div></div></div>`;}).join("");
+  $("stepper").querySelectorAll(".step").forEach(b=>b.onclick=()=>go(p,b.dataset.s)); }
+
+/* ===== STATION: chart ===== */
+function renderChart(p){ const w=WF[p.id];
+  const k=(a,b,m)=> b&&b!=="?"?`<div class="kv"><div class="k">${a}</div><div class="v${m?' mono':''}">${esc(b)}</div></div>`:"";
+  $("st-chart").innerHTML=`<div class="grid2">
+    <div class="card"><h3>Patient &amp; diagnosis</h3>
+      ${k("Name",p.name)}${k("Age / sex",age(p.dob)+" y · "+p.gender)}${k("Diagnosis",p.dx.primary)}${k("Location",p.dx.location)}${k("Stage",p.dx.stage)}${k("Site",p.dx.site)}${k("Rad Onc",p.plan.radOnc)}</div>
+    <div class="card"><h3>Prescription &amp; plan</h3>
+      ${k("Intent",p.plan.intent)}${k("Modality",p.plan.modality)}${k("Technique",p.dose.technique||p.plan.technique)}${k("Energy",p.dose.energy,1)}${k("Dose",(p.plan.totalDose||"")+" / "+(p.plan.fractionation||""),1)}${k("Rx detail",p.plan.rtRx)}${k("Fields/arcs",p.dose.nFields,1)}${k("Beams on plan",(p.dose.beams||[]).length,1)}</div>
+  </div>
+  <div style="height:14px"></div>
+  <div class="card"><h3>Begin workflow</h3>
+    <div class="row" style="font-size:13px;color:var(--ink-soft);margin-bottom:11px">This patient moves through CT simulation, physics planning &amp; QA, then LINAC delivery. Each step unlocks the next.</div>
+    <button class="btn go" id="beginBtn">Begin CT simulation →</button>
+    <a class="btn" href="rad-onc-emr.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center">Open full EMR chart ↗</a></div>`;
+  $("beginBtn").onclick=()=>go(p,"sim");
+}
+
+/* ===== STATION: CT SIM ===== */
+let simCanvas=null,simCtx=null,simDrag=null;
+function renderSim(p){ const w=WF[p.id],pr=proto(p);
+  const popts=(cur,pool)=>optsFor(pool[0],pool); // placeholder
+  const sel=(id,label,correct,pool,val)=>`<div class="selrow"><label>${label}</label>
+    <select id="${id}"><option value="">— select —</option>${optsFor(correct,pool).map(o=>`<option ${val===o?'selected':''}>${esc(o)}</option>`).join("")}</select>
+    <span class="mark" id="mk-${id}"></span></div>`;
+  $("st-sim").innerHTML=`
+   <div class="grid2">
+     <div class="viewport">
+       <div class="vlab">Coronal localiser — set superior &amp; inferior scan limits</div>
+       <div class="simwrap"><canvas id="simCv" width="520" height="560"></canvas></div>
+       <div class="simread">
+         <span>SUP <b class="border-tag" id="rdSup">—</b></span>
+         <span>INF <b class="border-tag" id="rdInf">—</b></span>
+         <span>SCAN LENGTH <b id="rdLen">—</b></span>
+       </div>
+     </div>
+     <div>
+       <div class="card"><h3>Scan borders — ${esc(p.region)} · ${esc(p.dx.site||p.dx.primary).slice(0,40)}</h3>
+         <div style="font-size:13px;color:var(--ink-soft);line-height:1.5">Drag the <b style="color:#caa400">amber lines</b> on the localiser to the correct superior and inferior limits for this treatment site, then choose the standard protocol.</div>
+         <div class="feedback info" id="simBorderFb" style="margin-top:10px">Borders not yet within tolerance.</div>
+       </div>
+       <div style="height:12px"></div>
+       <div class="card"><h3>CT simulation protocol</h3>
+         ${sel("spPos","Position",pr.pos,POS,w.sim.protocol.position)}
+         ${sel("spImm","Immobilisation",pr.immob,IMMOB,w.sim.protocol.immob)}
+         ${sel("spSlice","Slice thickness",pr.slice,SLICE,w.sim.protocol.slice)}
+         ${sel("spCon","Contrast",pr.contrast,CONTRAST,w.sim.protocol.contrast)}
+         <div class="row" style="margin-top:12px">
+           <button class="btn go" id="approveSim" disabled>Approve simulation →</button>
+           <button class="btn" id="revealSim">Show standard</button>
+         </div>
+         <div class="feedback info" id="simFb" style="margin-top:10px">${esc(pr.note)}</div>
+       </div>
+     </div>
+   </div>`;
+  // wire selects
+  [["spPos","position"],["spImm","immob"],["spSlice","slice"],["spCon","contrast"]].forEach(([id,key])=>{
+    $(id).onchange=e=>{ w.sim.protocol[key]=e.target.value; gradeSim(p); };
+  });
+  $("revealSim").onclick=()=>{ const pr=proto(p); w.sim.supY=pr.sup[0]; w.sim.infY=pr.inf[0];
+    $("spPos").value=pr.pos; $("spImm").value=pr.immob; $("spSlice").value=pr.slice; $("spCon").value=pr.contrast;
+    w.sim.protocol={position:pr.pos,immob:pr.immob,slice:pr.slice,contrast:pr.contrast}; drawSim(p); gradeSim(p); };
+  $("approveSim").onclick=()=>{ w.sim.done=true; renderBanner(p); renderStepper(p); renderList(); go(p,"physics"); };
+  // canvas
+  simCanvas=$("simCv"); setupCanvas(simCanvas); simCtx=simCanvas.getContext("2d");
+  simCanvas.onpointerdown=e=>simPick(p,e); simCanvas.onpointermove=e=>simMove(p,e);
+  window.addEventListener("pointerup",()=>simDrag=null);
+  drawSim(p); gradeSim(p);
+}
+function setupCanvas(cv){ const dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth||cv.width,ratio=cv.height/cv.width;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(w*ratio*dpr); const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+  cv._w=w; cv._h=w*ratio; }
+function bodyArea(cv){ return {x0:cv._w*0.30,x1:cv._w*0.62,yTop:cv._h*0.04,yBot:cv._h*0.965}; }
+function yToNorm(p,py){ const a=bodyArea(simCanvas); return clamp((py-a.yTop)/(a.yBot-a.yTop),0,1); }
+function normToY(py){ const a=bodyArea(simCanvas); return a.yTop+py*(a.yBot-a.yTop); }
+function simPick(p,e){ const r=simCanvas.getBoundingClientRect(),py=(e.clientY-r.top); const w=WF[p.id];
+  const ds=Math.abs(py-normToY(w.sim.supY)),di=Math.abs(py-normToY(w.sim.infY));
+  simDrag=(ds<di?"sup":"inf"); if(Math.min(ds,di)>40)simDrag=(ds<di?"sup":"inf"); simMove(p,e); }
+function simMove(p,e){ if(!simDrag)return; const r=simCanvas.getBoundingClientRect(),py=(e.clientY-r.top); const w=WF[p.id];
+  let n=yToNorm(p,py); if(simDrag==="sup")w.sim.supY=Math.min(n,w.sim.infY-0.02); else w.sim.infY=Math.max(n,w.sim.supY+0.02);
+  drawSim(p); gradeSim(p); }
+function nearestLandmark(y){ let best=LANDMARKS[0],d=9; LANDMARKS.forEach(l=>{const dd=Math.abs(l[0]-y);if(dd<d){d=dd;best=l;}}); return best[1]; }
+function drawSim(p){ const cv=simCanvas,c=simCtx,w=cv._w,h=cv._h,wf=WF[p.id]; c.clearRect(0,0,w,h);
+  c.fillStyle="#070b10"; c.fillRect(0,0,w,h);
+  const a=bodyArea(cv),cx=(a.x0+a.x1)/2;
+  // body silhouette (coronal)
+  c.fillStyle="#1c2735"; c.strokeStyle="#39516e"; c.lineWidth=1.5;
+  const bw=(a.x1-a.x0)/2;
+  c.beginPath();
+  c.ellipse(cx,a.yTop+ (a.yBot-a.yTop)*0.085, bw*0.62, (a.yBot-a.yTop)*0.06,0,0,TAU); // head
+  c.fill();c.stroke();
+  c.beginPath(); // torso+legs trapezoid-ish
+  const top=a.yTop+(a.yBot-a.yTop)*0.145;
+  c.moveTo(cx-bw*0.34,top); c.lineTo(cx+bw*0.34,top);
+  c.lineTo(cx+bw*1.0,top+(a.yBot-a.yTop)*0.06);          // shoulders
+  c.lineTo(cx+bw*0.55,a.yTop+(a.yBot-a.yTop)*0.50);       // waist
+  c.lineTo(cx+bw*0.75,a.yTop+(a.yBot-a.yTop)*0.56);       // hip
+  c.lineTo(cx+bw*0.42,a.yBot);                            // foot R
+  c.lineTo(cx+bw*0.06,a.yBot);
+  c.lineTo(cx+bw*0.12,a.yTop+(a.yBot-a.yTop)*0.58);       // crotch
+  c.lineTo(cx-bw*0.12,a.yTop+(a.yBot-a.yTop)*0.58);
+  c.lineTo(cx-bw*0.06,a.yBot); c.lineTo(cx-bw*0.42,a.yBot);// foot L
+  c.lineTo(cx-bw*0.75,a.yTop+(a.yBot-a.yTop)*0.56);
+  c.lineTo(cx-bw*0.55,a.yTop+(a.yBot-a.yTop)*0.50);
+  c.lineTo(cx-bw*1.0,top+(a.yBot-a.yTop)*0.06);
+  c.closePath(); c.fill(); c.stroke();
+  // landmark ticks + labels
+  c.font="9px ui-monospace,monospace"; c.textBaseline="middle";
+  LANDMARKS.forEach(l=>{ const y=normToY(l[0]);
+    c.strokeStyle="rgba(120,150,180,.25)"; c.lineWidth=1; c.beginPath(); c.moveTo(a.x0-6,y); c.lineTo(a.x1+6,y); c.stroke();
+    c.fillStyle="rgba(150,175,200,.7)"; c.textAlign="left"; c.fillText(l[1], a.x1+12, y); });
+  // target zone (faint green) when revealed? show subtle correct band always-off; show only on grade ok
+  const pr=proto(p);
+  // border lines
+  [["sup",wf.sim.supY,"#ffd24a"],["inf",wf.sim.infY,"#ffd24a"]].forEach(([id,ny,col])=>{
+    const y=normToY(ny); c.strokeStyle=col; c.lineWidth=2.5; c.shadowColor=col; c.shadowBlur=6;
+    c.beginPath(); c.moveTo(a.x0-18,y); c.lineTo(a.x1+4,y); c.stroke(); c.shadowBlur=0;
+    c.fillStyle=col; c.font="bold 10px ui-monospace,monospace"; c.textAlign="right";
+    c.fillText(id.toUpperCase(), a.x0-22, y); });
+  // readouts
+  $("rdSup").textContent=nearestLandmark(wf.sim.supY); $("rdInf").textContent=nearestLandmark(wf.sim.infY);
+  const cm=Math.round((wf.sim.infY-wf.sim.supY)*170); $("rdLen").textContent=cm+" cm (≈)";
+}
+function gradeSim(p){ const w=WF[p.id],pr=proto(p);
+  const okSup=Math.abs(w.sim.supY-pr.sup[0])<=pr.tol, okInf=Math.abs(w.sim.infY-pr.inf[0])<=pr.tol;
+  const bfb=$("simBorderFb");
+  if(bfb){ if(okSup&&okInf){bfb.className="feedback ok";bfb.innerHTML=`✓ Borders cover the target — SUP at <b>${esc(pr.sup[1])}</b>, INF at <b>${esc(pr.inf[1])}</b>.`;}
+    else{bfb.className="feedback no";bfb.innerHTML=`Adjust borders: ${okSup?'superior ✓':'superior '+(w.sim.supY<pr.sup[0]?'too high':'too low')}, ${okInf?'inferior ✓':'inferior '+(w.sim.infY<pr.inf[0]?'too high':'too low')}.`;}}
+  // protocol marks
+  const checks={spPos:pr.pos,spImm:pr.immob,spSlice:pr.slice,spCon:pr.contrast};
+  let protoOK=true;
+  Object.entries(checks).forEach(([id,corr])=>{ const mk=$("mk-"+id); if(!mk)return; const v=$(id)?$(id).value:"";
+    if(!v){mk.textContent="";protoOK=false;} else if(v===corr){mk.textContent="✓";mk.className="mark ok";} else {mk.textContent="✗";mk.className="mark no";protoOK=false;} });
+  const ab=$("approveSim"); if(ab) ab.disabled=!(okSup&&okInf&&protoOK);
+}
+
+/* ===== STATION: PHYSICS (plan + QA) ===== */
+const QA_ITEMS=[
+  ["Prescription matches the physician directive",true],
+  ["Plan reviewed and approved by the attending physician",true],
+  ["Immobilisation & setup carried over from CT simulation",true],
+  ["IGRT / imaging protocol defined for treatment",true],
+  ["Independent secondary MU check completed",true],
+  ["Transfer MU to delivery without a secondary check",false],
+  ["Skip patient orientation check in record-and-verify",false]
+];
+function renderPhysics(p){ const w=WF[p.id];
+  if(!w.sim.done){ $("st-physics").innerHTML=`<div class="lockmsg">Complete CT simulation first to unlock planning.</div>`; return; }
+  const cT=techCat(p),cE=energyCat(p);
+  const planCard=`<div class="card"><h3>Treatment planning</h3>
+     <div class="kv"><div class="k">Directive</div><div class="v">${esc(p.plan.rtRx||((p.plan.totalDose||"")+" / "+(p.plan.fractionation||"")))}</div></div>
+     <div class="kv"><div class="k">OAR constraints</div><div class="v">${esc(p.plan.constraints||"Per site protocol")}</div></div>
+     <div class="selrow"><label>Technique</label><select id="plTech"><option value="">— select —</option>${TECHS.map(t=>`<option ${w.plan.tech===t?'selected':''}>${t}</option>`).join("")}</select><span class="mark" id="mk-plTech"></span></div>
+     <div class="selrow"><label>Beam energy</label><select id="plEn"><option value="">— select —</option>${ENERGIES.map(t=>`<option ${w.plan.energy===t?'selected':''}>${t}</option>`).join("")}</select><span class="mark" id="mk-plEn"></span></div>
+     <div class="kv"><div class="k">Fields / arcs</div><div class="v mono">${esc(p.dose.nFields||(p.dose.beams||[]).length||"—")}</div></div>
+     <div class="row" style="margin-top:11px"><button class="btn go" id="confirmPlan" ${w.plan.done?'disabled':''}>${w.plan.done?'Plan confirmed ✓':'Confirm plan →'}</button><button class="btn" id="revealPlan">Show plan</button></div>
+     <div class="feedback info" id="planFb" style="margin-top:10px">Match the technique &amp; energy to the prescription and site.</div></div>`;
+  const beams=(p.dose.beams||[]);
+  const beamCard=beams.length?`<div class="card"><h3>Beam set (${beams.length})</h3>
+     <table class="data" style="width:100%;border-collapse:collapse;font-size:12px"><tbody>${beams.map(b=>`<tr><td style="padding:4px 6px;font-weight:600">${esc(b.fieldName||"")}</td><td style="padding:4px 6px;font-family:var(--mono)">G${esc(b.gantryAngle)}°</td><td style="padding:4px 6px;font-family:var(--mono)">${esc(b.energy||"")}</td><td style="padding:4px 6px;font-family:var(--mono);text-align:right">${esc(b.monitorUnits)} MU</td></tr>`).join("")}</tbody></table>
+     <div class="kv" style="margin-top:8px"><div class="k">Total MU/fx</div><div class="v mono">${totMU(p)} MU</div></div></div>`:`<div class="card"><h3>Beam set</h3><div style="font-size:13px;color:var(--ink-mute)">No discrete photon fields (brachytherapy / electrons / TSEBT).</div></div>`;
+  let qaCard;
+  if(!w.plan.done){ qaCard=`<div class="card"><h3>Physics QA</h3><div style="font-size:13px;color:var(--ink-mute)">Confirm the plan to unlock QA.</div></div>`; }
+  else{
+    const m=(lab,val,unit,pass,crit)=>`<div class="qa-metric"><span class="lab">${lab} <span style="opacity:.6">(${crit})</span></span><span class="val ${val==null?'pend':(pass?'pass':'fail')}">${val==null?'— pending':val+unit+(pass?'  PASS':'  FAIL')}</span></div>`;
+    qaCard=`<div class="card"><h3>Physics QA &amp; chart check</h3>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:4px">Select every statement that should be true</div>
+      <div id="qaChecks">${QA_ITEMS.map((it,i)=>`<div class="check${w.qa.checklist.has(i)?' on':''}" data-i="${i}"><span class="box">${w.qa.checklist.has(i)?'✓':''}</span><span>${esc(it[0])}</span></div>`).join("")}</div>
+      <div style="height:8px"></div>
+      ${m("IMRT/VMAT gamma",w.qa.gamma,"%",w.qa.gamma>=95,"≥95% @ 3%/2mm")}
+      ${m("Point-dose check",w.qa.point,"%",w.qa.point!=null&&Math.abs(w.qa.point)<=3,"±3%")}
+      ${m("MU 2nd check",w.qa.output,"%",w.qa.output!=null&&Math.abs(w.qa.output)<=2,"±2%")}
+      <div class="row" style="margin-top:11px"><button class="btn slate" id="runQA">Run measurements</button>
+        <button class="btn go" id="approveQA" ${w.qa.passed?'disabled':''}>${w.qa.passed?'Approved for treatment ✓':'Approve for treatment →'}</button></div>
+      <div class="feedback info" id="qaFb" style="margin-top:10px">Tick the correct checklist items, run measurements, then approve.</div></div>`;
+  }
+  $("st-physics").innerHTML=`<div class="grid2">${planCard}${beamCard}</div><div style="height:14px"></div>${qaCard}`;
+  // wiring
+  const gradePlan=()=>{ const t=$("plTech").value,e=$("plEn").value;
+    const okT=t===cT,okE=e===cE; $("mk-plTech").textContent=t?(okT?"✓":"✗"):""; $("mk-plTech").className="mark "+(okT?"ok":"no");
+    $("mk-plEn").textContent=e?(okE?"✓":"✗"):""; $("mk-plEn").className="mark "+(okE?"ok":"no");
+    const cb=$("confirmPlan"); if(cb&&!w.plan.done) cb.disabled=!(okT&&okE); return okT&&okE; };
+  if($("plTech")){ $("plTech").onchange=e=>{w.plan.tech=e.target.value;gradePlan();}; $("plEn").onchange=e=>{w.plan.energy=e.target.value;gradePlan();}; gradePlan(); }
+  if($("revealPlan")) $("revealPlan").onclick=()=>{ $("plTech").value=cT;$("plEn").value=cE;w.plan.tech=cT;w.plan.energy=cE;gradePlan();
+    $("planFb").className="feedback ok"; $("planFb").innerHTML=`Standard for this case: <b>${esc(cT)}</b>, <b>${esc(cE)}</b>.`; };
+  if($("confirmPlan")&&!w.plan.done) $("confirmPlan").onclick=()=>{ if(!gradePlan())return; w.plan.done=true; renderStepper(p); renderList(); renderPhysics(p); };
+  if($("qaChecks")) $("qaChecks").querySelectorAll(".check").forEach(c=>c.onclick=()=>{ const i=+c.dataset.i;
+    if(w.qa.checklist.has(i))w.qa.checklist.delete(i); else w.qa.checklist.add(i); renderPhysics(p); });
+  if($("runQA")) $("runQA").onclick=()=>runQA(p);
+  if($("approveQA")) $("approveQA").onclick=()=>approveQA(p);
+}
+function runQA(p){ const w=WF[p.id];
+  w.qa.gamma=Math.round((94+Math.random()*5.8)*10)/10;
+  w.qa.point=Math.round((Math.random()*5-2.5)*10)/10;
+  w.qa.output=Math.round((Math.random()*3.4-1.7)*10)/10;
+  w.qa.done=true; renderPhysics(p);
+  const allMetrics=w.qa.gamma>=95&&Math.abs(w.qa.point)<=3&&Math.abs(w.qa.output)<=2;
+  const fb=$("qaFb"); if(fb){ if(allMetrics){fb.className="feedback ok";fb.textContent="All measurements within tolerance. Verify the checklist, then approve.";}
+    else{fb.className="feedback no";fb.textContent="One or more measurements out of tolerance — re-run measurements (adjust plan/QA).";}}
+  renderList();
+}
+function approveQA(p){ const w=WF[p.id];
+  const checklistOK=QA_ITEMS.every((it,i)=>w.qa.checklist.has(i)===it[1]);
+  const metricsOK=w.qa.gamma!=null&&w.qa.gamma>=95&&Math.abs(w.qa.point)<=3&&Math.abs(w.qa.output)<=2;
+  const fb=$("qaFb");
+  if(!w.qa.done){fb.className="feedback no";fb.textContent="Run the QA measurements first.";return;}
+  if(!checklistOK){fb.className="feedback no";fb.textContent="Chart-check list is incorrect — select exactly the statements that should be true.";return;}
+  if(!metricsOK){fb.className="feedback no";fb.textContent="QA measurements are out of tolerance — re-run before approving.";return;}
+  w.qa.passed=true; renderBanner(p); renderStepper(p); renderList(); go(p,"deliver");
+}
+
+/* ===== STATION: LINAC DELIVERY ===== */
+function renderDelivery(p){ const w=WF[p.id];
+  if(!w.qa.passed){ $("st-deliver").innerHTML=`<div class="lockmsg">Complete physics QA &amp; approval to unlock delivery.</div>`; return; }
+  const beams=(p.dose.beams||[]); const total=p.fxTotal, done=w.deliver.fx, complete=total&&done>=total;
+  const il=w.deliver.interlocks;
+  const ilkRow=(id,nm,clearTxt,setTxt)=>`<div class="ilk"><span class="nm">${nm}</span>
+    <span style="display:flex;gap:8px;align-items:center"><span class="st ${il[id]?'clear':'set'}">${il[id]?clearTxt:setTxt}</span>
+    <button data-il="${id}">${il[id]?'reset':'set'}</button></span></div>`;
+  const planClear=true;
+  const allClear=il.door&&il.key&&il.cbct;
+  $("st-deliver").innerHTML=`<div class="grid2">
+    <div class="viewport"><div class="vlab">Treatment console — fraction ${Math.min(done+1,total)} of ${total}</div>
+      <div style="margin-bottom:8px">${ilkRow("door","Treatment door","CLOSED","OPEN")}${ilkRow("key","Console key","ON","OFF")}${ilkRow("cbct","CBCT match","APPROVED","PENDING")}
+        <div class="ilk"><span class="nm">Plan / R&amp;V</span><span class="st clear">VERIFIED</span></div></div>
+      <div class="mono-read">Beams: ${beams.length||"—"} · ${totMU(p)||"—"} MU/fraction</div>
+      <div class="mubar"><div class="mufill" id="muFill"></div></div>
+      <div class="mono-read" id="muRead">MU 0 / ${totMU(p)||"—"}</div>
+      <div class="row" style="margin-top:10px">
+        ${complete?'<span class="mono" style="color:#52e0b8">✓ Course complete</span>':
+          `<button class="btn go" id="beamOn" ${allClear?'':'disabled'}>${allClear?'▶ Beam on — deliver fx '+(done+1):'Clear all interlocks to arm'}</button>`}
+      </div>
+    </div>
+    <div class="card"><h3>Delivery summary</h3>
+      <div class="kv"><div class="k">Fractions</div><div class="v mono">${done} / ${total} delivered</div></div>
+      <div class="kv"><div class="k">Dose to date</div><div class="v mono">${(()=>{const td=doseNum(p.plan.totalDose);return td&&total?((td*done/total).toFixed(1)+" / "+td+" Gy"):"—";})()}</div></div>
+      <div class="kv"><div class="k">Technique</div><div class="v">${esc(techCat(p))} · ${esc(energyCat(p))}</div></div>
+      <div class="kv"><div class="k">Status</div><div class="v">${complete?'<span class="mark ok">Course complete</span>':(done>0?'On treatment':'Ready for first fraction')}</div></div>
+      <div class="feedback info" id="delFb" style="margin-top:10px">${complete?'All planned fractions delivered and recorded.':'Close the door, turn the key, approve the CBCT match, then beam on.'}</div>
+      <a href="linac-console-improved.html" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--teal-d);text-decoration:none">Open full LINAC console (pendant · 3-plane CBCT · triangulation) ↗</a>
+    </div></div>`;
+  $("st-deliver").querySelectorAll("[data-il]").forEach(b=>b.onclick=()=>{ il[b.dataset.il]=!il[b.dataset.il]; renderDelivery(p); });
+  const bo=$("beamOn"); if(bo&&!complete) bo.onclick=()=>beamOn(p);
+}
+let beamTimer=null;
+function beamOn(p){ const w=WF[p.id]; if(w.deliver.running)return; w.deliver.running=true;
+  const target=totMU(p)||100; let mu=0; const fill=$("muFill"),read=$("muRead"),bo=$("beamOn");
+  if(bo)bo.disabled=true;
+  beamTimer=setInterval(()=>{ mu+=Math.max(2,target/55);
+    if(mu>=target){ mu=target; clearInterval(beamTimer); w.deliver.running=false;
+      if(fill)fill.style.width="100%"; if(read)read.textContent=`MU ${target} / ${target}`;
+      w.deliver.fx=Math.min(p.fxTotal,w.deliver.fx+1); w.deliver.interlocks.cbct=false; // re-image next fx
+      renderBanner(p); renderStepper(p); renderList(); setTimeout(()=>renderDelivery(p),350);
+    } else { if(fill)fill.style.width=(mu/target*100)+"%"; if(read)read.textContent=`MU ${Math.round(mu)} / ${target}`; }
+  },70);
+}
+
+/* ===== nav / boot ===== */
+$("search").addEventListener("input",e=>{q=e.target.value.trim();renderList();});
+buildChips(); renderList();
+</script>
+
+<style id="rtaModuleBridgeStyle">
+#rtaHubRibbon{position:fixed;right:8px;top:8px;z-index:2147483647;display:none;max-width:330px;
+background:rgba(7,13,21,.94);color:#dce7f4;border:1px solid rgba(52,214,198,.45);border-radius:9px;
+padding:6px 9px;box-shadow:0 8px 24px rgba(0,0,0,.35);font:10px ui-monospace,Consolas,monospace;
+pointer-events:none;line-height:1.35}
+#rtaHubRibbon b{color:#34d6c6}#rtaHubRibbon span{color:#8fa3bb}
+</style>
+<div id="rtaHubRibbon"></div>
+<script id="rtaModuleBridge">
+(function(){
+  const MODULE_KEY="rt-workflow-suite";
+  window.RadTherapyBridge={
+    context:null,
+    emit(event,detail){ parent.postMessage({type:'RTA_MODULE_EVENT',module:MODULE_KEY,event,detail:detail||{}},'*'); }
+  };
+  function showContext(ctx){
+    window.RadTherapyBridge.context=ctx;
+    const p=ctx&&ctx.patient, el=document.getElementById('rtaHubRibbon');
+    if(!el) return;
+    if(!p){el.style.display='none';return;}
+    el.style.display='block';
+    el.innerHTML='<b>SIMULATED CENTER</b><br>'+String(p.name||'Patient')+
+      ' <span>· MRN '+String(p.mrn||p.id||'—')+' · '+String(p.site||'')+'</span>';
+    window.dispatchEvent(new CustomEvent('rta:context',{detail:ctx}));
+  }
+  window.addEventListener('message',ev=>{
+    const d=ev.data||{};
+    if(d.type==='RTA_CONTEXT') showContext(d.context||{});
+  });
+  parent.postMessage({type:'RTA_MODULE_READY',module:MODULE_KEY},'*');
+  parent.postMessage({type:'RTA_REQUEST_CONTEXT',module:MODULE_KEY},'*');
+  
+  function mapRegion(site,dx){
+    const t=((site||'')+' '+(dx||'')).toLowerCase();
+    if(/brain|gliob|medullo|skull/.test(t))return 'Brain';
+    if(/head|neck|tonsil|orophar|larynx/.test(t))return 'Head & Neck';
+    if(/lung|thorax|mediast/.test(t))return 'Thorax';
+    if(/breast/.test(t))return 'Breast';
+    if(/prostate|rectal|pelvi|endometr|anal|bladder/.test(t))return 'Pelvis';
+    if(/abdomen|pancrea|gastric|bowel/.test(t))return 'Abdomen';
+    if(/bone|spine|skeletal|femur/.test(t))return 'Skeletal';
+    return 'Other';
+  }
+  window.addEventListener('rta:context',ev=>{
+    const c=ev.detail||{}, p=c.patient; if(!p) return;
+    try{
+      if(typeof PATIENTS==='undefined'||typeof selectPatient!=='function') return;
+      const id='HUB-'+String(p.mrn||p.id||Date.now());
+      let item=PATIENTS.find(x=>x.id===id);
+      const dose=(p.rx&&p.rx.dose)||'60';
+      const fx=(p.rx&&p.rx.fractions)||30;
+      const energy=(p.rx&&p.rx.energy)||'6 MV';
+      const technique=(p.rx&&p.rx.technique)||'VMAT';
+      const mapped={
+        id,name:p.name||'Center Patient',dob:p.dob||'1970-01-01',gender:p.sex||'Unknown',
+        region:mapRegion(p.site,p.diagnosis),
+        dx:{primary:p.diagnosis||p.site||'Radiation oncology case',location:p.site||'',stage:p.stage||'',site:p.site||''},
+        plan:{intent:p.intent||'Definitive',modality:'External Beam Radiation Therapy',technique,
+          totalDose:String(dose)+' Gy',fractionation:String(fx)+' fx',
+          rtRx:String(dose)+' Gy / '+String(fx)+' fx',radOnc:p.physician||'Teaching Faculty',constraints:''},
+        dose:{technique,energy,nFields:'—',beams:[]},fxTotal:Number(fx)||30
+      };
+      if(item) Object.assign(item,mapped); else PATIENTS.unshift(mapped);
+      if(typeof buildChips==='function') buildChips();
+      if(typeof renderList==='function') renderList();
+      selectPatient(id);
+    }catch(e){console.warn('Hub patient adapter:',e);}
+  });
+
+})();
+</script>
+
+</body>
+</html>
