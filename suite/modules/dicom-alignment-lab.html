@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RadTherapyApps Enterprise — DICOM MPR Alignment Lab</title>
+<script src="https://unpkg.com/dicom-parser@1.8.21/dist/dicomParser.min.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+:root{--bg:#06090e;--panel:#101826;--panel2:#141f31;--line:#25364c;--ink:#e7eef7;--muted:#8ea3bb;--cyan:#34d6c6;--amber:#f5b53d;--red:#ff5747;--green:#2fd27a;--blue:#3d8bf0;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}button,input,select{font:inherit}.app{display:grid;grid-template-columns:330px 1fr 345px;height:100vh;gap:10px;padding:10px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;min-height:0;overflow:auto}.panel::-webkit-scrollbar{width:8px}.panel::-webkit-scrollbar-thumb{background:#2b405a;border-radius:8px}.head{padding:14px 15px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#132034,#0f1826)}.brand{font-family:var(--mono);letter-spacing:.08em;font-weight:800;color:var(--cyan);font-size:12px;text-transform:uppercase}.title{font-weight:800;font-size:18px;margin-top:4px}.sub{color:var(--muted);font-size:12px;line-height:1.45;margin-top:5px}.section{padding:13px 15px;border-bottom:1px solid rgba(37,54,76,.65)}.lab{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;display:flex;justify-content:space-between;gap:8px}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:9px 10px;border-radius:9px;cursor:pointer;font-weight:700;font-size:12px}.btn:hover{border-color:var(--cyan)}.btn.primary{background:var(--cyan);color:#06231f;border-color:transparent}.btn.warn{background:rgba(245,181,61,.14);color:var(--amber);border-color:rgba(245,181,61,.4)}.btn.danger{background:rgba(255,87,71,.14);color:#ffaea6;border-color:rgba(255,87,71,.4)}.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btnrow.three{grid-template-columns:1fr 1fr 1fr}.filebox{border:1px dashed #3e5878;background:#0b1320;border-radius:12px;padding:13px;text-align:center;color:var(--muted);font-size:12px;line-height:1.45}.filebox.drag{border-color:var(--cyan);background:rgba(52,214,198,.1)}input[type=file]{display:none}.fakefile{display:inline-block;margin-top:8px}.kv{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(142,163,187,.24);padding:5px 0;font-size:12px;gap:12px}.kv span{color:var(--muted);font-family:var(--mono);font-size:11px}.kv b{text-align:right}.main{display:grid;grid-template-rows:1fr 310px;gap:10px;min-width:0;min-height:0}.viewgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;min-height:0}.viewport{position:relative;background:#000;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:0}.viewport canvas{width:100%;height:100%;display:block;background:#000;cursor:crosshair}.vtag{position:absolute;top:8px;left:9px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#b9cadc;background:rgba(0,0,0,.5);padding:4px 8px;border-radius:999px}.vmeta{position:absolute;bottom:8px;left:9px;right:9px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:#b9cadc;pointer-events:none}.cross{position:absolute;inset:0;pointer-events:none}.controls{display:grid;grid-template-columns:1.1fr 1fr;gap:10px;min-height:0}.strip{position:relative;background:#05080d;border:1px solid var(--line);border-radius:12px;overflow:hidden}.strip canvas{width:100%;height:100%;display:block}.sliders{display:grid;grid-template-columns:1fr 1fr;gap:9px}.slider{background:#0b1320;border:1px solid rgba(37,54,76,.8);border-radius:10px;padding:9px}.slider label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px}.slider b{color:var(--ink)}input[type=range]{width:100%;accent-color:var(--cyan)}.selectline{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}select,input[type=number]{background:#0b1320;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;width:100%;font-family:var(--mono);font-size:12px}.scorebox{background:#0b1320;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}.scorebig{font-family:var(--mono);font-size:30px;font-weight:800}.scorebig.ok{color:var(--green)}.scorebig.bad{color:var(--amber)}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 9px;font-family:var(--mono);font-size:10px;color:var(--muted);margin:2px 4px 2px 0}.pill i{display:block;width:8px;height:8px;border-radius:50%;background:var(--muted)}.pill.ok{color:var(--green);border-color:rgba(47,210,122,.4)}.pill.ok i{background:var(--green);box-shadow:0 0 8px var(--green)}.pill.bad{color:var(--amber);border-color:rgba(245,181,61,.4)}.pill.bad i{background:var(--amber)}.log{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--muted);max-height:200px;overflow:auto;background:#07101b;border:1px solid var(--line);border-radius:10px;padding:9px}.log div{border-bottom:1px dashed rgba(142,163,187,.16);padding:3px 0}.small{font-size:11px;color:var(--muted);line-height:1.45}.warntext{color:#ffd088}.notice{background:rgba(52,214,198,.06);border-left:3px solid var(--cyan);padding:9px 10px;border-radius:0 9px 9px 0;font-size:12px;color:var(--muted);line-height:1.45}.footer{font-size:11px;color:var(--muted);line-height:1.45}.hidden{display:none!important}.couchControls{display:grid;gap:10px}.axisCtl{background:#0b1320;border:1px solid rgba(37,54,76,.8);border-radius:12px;padding:10px}.axisCtl .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}.axisCtl .top b{color:var(--ink);font-size:13px}.nudgeGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.nudgeGrid .btn{padding:8px 4px;font-size:11px}.mouseToggle{display:flex;align-items:center;gap:8px;background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-top:10px;font-size:12px;color:var(--muted)}.mouseToggle input{width:16px;height:16px;accent-color:var(--cyan)}.viewport.dragging canvas{cursor:grabbing}.viewport canvas{cursor:grab}.dragHelp{font-size:11px;color:var(--muted);line-height:1.45;margin-top:8px}.kbd{font-family:var(--mono);border:1px solid var(--line);background:#07101b;border-radius:6px;padding:1px 5px;color:var(--cyan)}@media(max-width:1150px){.app{grid-template-columns:1fr;height:auto;overflow:auto}.main{min-height:850px}.viewgrid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}html,body{overflow:auto}.panel{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="panel">
+    <div class="head"><div class="brand">RadTherapyApps Enterprise</div><div class="title">DICOM MPR Alignment Lab</div><div class="sub">Browser-based teaching prototype for CT/CBCT review, multi-planar reconstruction, couch-shift practice, mouse-based registration, and lightweight 3D maximum-intensity projection.</div></div>
+    <div class="section">
+      <div class="lab">1 · Load CT image set</div>
+      <div id="dropRef" class="filebox">Drop a folder/ZIP of de-identified CT DICOM slices here, or choose files.<br><b>The same uploaded series becomes the reference CT and simulated moving CBCT with randomized offsets.</b><br><label class="btn primary fakefile" for="refFiles">Choose CT files/folder</label><input id="refFiles" type="file" multiple webkitdirectory directory accept=".dcm,.dicom,application/dicom,*/*"></div>
+      <div class="btnrow" style="margin-top:8px"><button class="btn" id="demoBtn">Load synthetic demo</button><button class="btn warn" id="zipBtn">Choose ZIP</button></div><input id="zipInput" type="file" accept=".zip,application/zip">
+    </div>
+    <div class="section">
+      <div class="lab">2 · Moving-image simulation</div>
+      <div class="notice">After upload, the platform automatically duplicates the reference CT into a moving daily-image volume and applies a hidden random LAT/VRT/LNG plus rotation error. This lets students practice recognizing and correcting setup offsets even with one image set.</div>
+      <div class="btnrow" style="margin-top:9px"><button class="btn" id="copyRefBtn">Use reference as moving CBCT</button><button class="btn warn" id="reseedBtn">Randomize offset</button></div>
+      <div id="dropMov" class="filebox" style="margin-top:9px">Advanced optional: load a second DICOM series as the moving/daily image set.<br><label class="btn fakefile" for="movFiles">Choose moving files</label><input id="movFiles" type="file" multiple webkitdirectory directory accept=".dcm,.dicom,application/dicom,*/*"></div>
+    </div>
+    <div class="section">
+      <div class="lab">Loaded dataset</div>
+      <div id="datasetInfo"><div class="kv"><span>Status</span><b>No volume loaded</b></div></div>
+    </div>
+    <div class="section">
+      <div class="lab">Display tools</div>
+      <div class="sliders">
+        <div class="slider"><label>Window <b id="winV">400</b></label><input id="win" type="range" min="1" max="2000" value="400"></div>
+        <div class="slider"><label>Level <b id="levV">40</b></label><input id="lev" type="range" min="-1000" max="1000" value="40"></div>
+        <div class="slider"><label>Overlay <b id="alphaV">55%</b></label><input id="alpha" type="range" min="0" max="100" value="55"></div>
+        <div class="slider"><label>3D quality <b id="qV">3</b></label><input id="quality" type="range" min="1" max="6" value="3"></div>
+      </div>
+      <div class="selectline"><select id="colorMode"><option value="blend">Blend overlay</option><option value="split">Split screen</option><option value="checker">Checkerboard</option></select><select id="preset"><option value="soft">Soft tissue W/L</option><option value="bone">Bone W/L</option><option value="lung">Lung W/L</option><option value="brain">Brain W/L</option></select></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="viewgrid">
+      <div class="viewport"><canvas id="axial"></canvas><div class="vtag">Axial</div><div class="vmeta"><span id="axMeta">—</span><span>mouse/slider scroll</span></div></div>
+      <div class="viewport"><canvas id="coronal"></canvas><div class="vtag">Coronal</div><div class="vmeta"><span id="coMeta">—</span><span>A/P</span></div></div>
+      <div class="viewport"><canvas id="sagittal"></canvas><div class="vtag">Sagittal</div><div class="vmeta"><span id="saMeta">—</span><span>L/R</span></div></div>
+    </section>
+    <section class="controls">
+      <div class="strip"><canvas id="mip"></canvas><div class="vtag">3D reconstruction · MIP/skin projection</div><div class="vmeta"><span id="mipMeta">—</span><span>not for diagnosis</span></div></div>
+      <div class="panel" style="border-radius:12px"><div class="section" style="border-bottom:0">
+        <div class="lab">Crosshair / slice controls</div>
+        <div class="sliders">
+          <div class="slider"><label>Axial Z <b id="zV">0</b></label><input id="z" type="range" min="0" max="0" value="0"></div>
+          <div class="slider"><label>Coronal Y <b id="yV">0</b></label><input id="y" type="range" min="0" max="0" value="0"></div>
+          <div class="slider"><label>Sagittal X <b id="xV">0</b></label><input id="x" type="range" min="0" max="0" value="0"></div>
+          <div class="slider"><label>MIP angle <b id="angV">30°</b></label><input id="ang" type="range" min="0" max="359" value="30"></div>
+        </div>
+      </div></div>
+    </section>
+  </main>
+
+  <aside class="panel">
+    <div class="head"><div class="brand">Alignment Console</div><div class="title">Daily Image Registration</div><div class="sub">Adjust the moving image until anatomy overlays the reference CT. Values are modeled as couch shifts in mm and rotations in degrees.</div></div>
+    <div class="section">
+      <div class="lab">Registration score</div>
+      <div class="scorebox"><div id="scoreBig" class="scorebig bad">—</div><div class="small" id="scoreTxt">Load a volume to begin.</div></div>
+      <span class="pill" id="pLat"><i></i> LAT</span><span class="pill" id="pVrt"><i></i> VRT/AP</span><span class="pill" id="pLng"><i></i> LNG/SI</span><span class="pill" id="pRot"><i></i> ROT</span>
+    </div>
+    <div class="section">
+      <div class="lab">Student couch correction</div>
+      <div class="couchControls">
+        <div class="axisCtl"><div class="top"><span>LAT X / couch lateral</span><b id="dxV">0.0 mm</b></div><div class="nudgeGrid"><button class="btn" data-nudge="dx:-1">−1</button><button class="btn" data-nudge="dx:-0.5">−0.5</button><button class="btn" data-nudge="dx:0.5">+0.5</button><button class="btn" data-nudge="dx:1">+1</button><button class="btn" data-nudge="dx:-5">−5</button><button class="btn" data-nudge="dx:5">+5</button></div></div>
+        <div class="axisCtl"><div class="top"><span>VRT/AP Y / couch vertical</span><b id="dyV">0.0 mm</b></div><div class="nudgeGrid"><button class="btn" data-nudge="dy:-1">−1</button><button class="btn" data-nudge="dy:-0.5">−0.5</button><button class="btn" data-nudge="dy:0.5">+0.5</button><button class="btn" data-nudge="dy:1">+1</button><button class="btn" data-nudge="dy:-5">−5</button><button class="btn" data-nudge="dy:5">+5</button></div></div>
+        <div class="axisCtl"><div class="top"><span>LNG/SI Z / couch longitudinal</span><b id="dzV">0.0 mm</b></div><div class="nudgeGrid"><button class="btn" data-nudge="dz:-1">−1</button><button class="btn" data-nudge="dz:-0.5">−0.5</button><button class="btn" data-nudge="dz:0.5">+0.5</button><button class="btn" data-nudge="dz:1">+1</button><button class="btn" data-nudge="dz:-5">−5</button><button class="btn" data-nudge="dz:5">+5</button></div></div>
+        <div class="axisCtl"><div class="top"><span>Rotations</span><b><span id="rollV">0.0°</span> / <span id="pitchV">0.0°</span> / <span id="yawV">0.0°</span></b></div><div class="nudgeGrid"><button class="btn" data-nudge="roll:-0.2">Roll −</button><button class="btn" data-nudge="roll:0.2">Roll +</button><button class="btn" data-nudge="pitch:-0.2">Pitch −</button><button class="btn" data-nudge="pitch:0.2">Pitch +</button><button class="btn" data-nudge="yaw:-0.2">Yaw −</button><button class="btn" data-nudge="yaw:0.2">Yaw +</button></div></div>
+      </div>
+      <label class="mouseToggle"><input type="checkbox" id="mouseShift" checked> Shift moving image with mouse drag inside any MPR viewport</label>
+      <div class="dragHelp">Drag on <span class="kbd">Axial</span> for LAT/VRT, <span class="kbd">Coronal</span> for LAT/LNG, and <span class="kbd">Sagittal</span> for VRT/LNG corrections. Mouse wheel scrolls slices.</div>
+      <div class="btnrow three" style="margin-top:10px"><button class="btn" id="randomErr">New error</button><button class="btn primary" id="autoMatch">Auto-match</button><button class="btn warn" id="resetShift">Reset</button></div>
+    </div>
+    <div class="section">
+      <div class="lab">Teaching outputs</div>
+      <div class="kv"><span>True setup error</span><b id="truthTxt">hidden for student mode</b></div>
+      <div class="kv"><span>Residual max</span><b id="residTxt">—</b></div>
+      <div class="kv"><span>Tolerance</span><b>±2 mm / ±1°</b></div>
+      <div class="kv"><span>Workflow status</span><b id="wfTxt">waiting</b></div>
+      <div class="btnrow" style="margin-top:10px"><button class="btn primary" id="approveBtn">Approve alignment</button><button class="btn danger" id="rejectBtn">Re-image / call MD</button></div>
+    </div>
+    <div class="section">
+      <div class="lab">Integration notes</div>
+      <div class="small">Mount this page/module from the OIS Imaging button or LINAC image-guidance panel. Emit the approved shifts to your treatment console as <span class="warntext">{lat, vrt, lng, roll, pitch, yaw}</span>. Compressed transfer syntaxes may need Cornerstone image loader/GDCM later; this prototype directly supports common uncompressed CT files.</div>
+    </div>
+    <div class="section"><div class="lab">Event log</div><div class="log" id="log"></div></div>
+    <div class="section footer"><b>Teaching emulator only.</b> Not a medical device, not for diagnosis, treatment, or patient-specific decisions.</div>
+  </aside>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const canv=['axial','coronal','sagittal','mip'].reduce((o,id)=>(o[id]=$(id),o),{});
+const ctx=Object.fromEntries(Object.entries(canv).map(([k,c])=>[k,c.getContext('2d',{willReadFrequently:true})]));
+const S={ref:null,mov:null,usingSynthetic:false,x:0,y:0,z:0,win:400,lev:40,alpha:.55,quality:3,mipAngle:30,mode:'blend',truth:{dx:7,dy:-5,dz:9,roll:0.6,pitch:-0.3,yaw:0.8},corr:{dx:0,dy:0,dz:0,roll:0,pitch:0,yaw:0},approved:false,viewGeom:{},drag:null,mouseShift:true};
+function log(m){const t=new Date().toLocaleTimeString([], {hour12:false}); const d=document.createElement('div'); d.innerHTML='<span style="color:#c6d6e6">'+t+'</span> '+m; $('log').prepend(d)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))} function fmt(v,d=1){return Number(v).toFixed(d)}
+function resizeCanvas(c){const r=c.getBoundingClientRect(); const d=Math.min(devicePixelRatio||1,2); c.width=Math.max(1,Math.floor(r.width*d)); c.height=Math.max(1,Math.floor(r.height*d)); return {w:c.width,h:c.height,d}}
+function str(ds,tag,def=''){try{return ds.string(tag)||def}catch{return def}} function uint16(ds,tag,def=0){try{return ds.uint16(tag)??def}catch{return def}} function floatTag(ds,tag,def=0){const s=str(ds,tag,''); const v=parseFloat(String(s).split('\\')[0]); return Number.isFinite(v)?v:def}
+function parseMulti(s){return String(s||'').split('\\').map(Number).filter(Number.isFinite)}
+async function filesFromZip(file){const z=await JSZip.loadAsync(file); const out=[]; for(const p of Object.values(z.files)){ if(p.dir) continue; const b=await p.async('arraybuffer'); out.push(new File([b], p.name.split('/').pop()||'dicom.dcm')); } return out}
+async function loadSeries(files, target='ref'){
+  const slices=[]; let skipped=0;
+  for(const f of Array.from(files)){ try{ const buf=await f.arrayBuffer(); const bytes=new Uint8Array(buf); const ds=dicomParser.parseDicom(bytes); const rows=uint16(ds,'x00280010'), cols=uint16(ds,'x00280011'); const pixel=ds.elements.x7fe00010; if(!rows||!cols||!pixel) {skipped++; continue;} const bits=uint16(ds,'x00280100',16), repr=uint16(ds,'x00280103',0); if(bits!==16 && bits!==8){skipped++; continue;} const slope=floatTag(ds,'x00281053',1), intercept=floatTag(ds,'x00281052',0); const instance=parseFloat(str(ds,'x00200013','0'))||0; const ipp=parseMulti(str(ds,'x00200032','')); const ps=parseMulti(str(ds,'x00280030','')); const orient=parseMulti(str(ds,'x00200037','')); const ts=str(ds,'x00020010',''); if(ts.includes('1.2.840.10008.1.2.4')){skipped++; continue;} const n=rows*cols; let raw; if(bits===16){ const off=pixel.dataOffset; raw=repr?new Int16Array(ds.byteArray.buffer, off, n):new Uint16Array(ds.byteArray.buffer, off, n); } else { raw=new Uint8Array(ds.byteArray.buffer, pixel.dataOffset, n); } const hu=new Int16Array(n); for(let i=0;i<n;i++) hu[i]=Math.round(raw[i]*slope+intercept); slices.push({f,ds,rows,cols,hu,instance,z:Number.isFinite(ipp[2])?ipp[2]:instance,ipp,ps,orient,thick:floatTag(ds,'x00180050',1)}); }catch(e){skipped++;} }
+  if(!slices.length) throw new Error('No uncompressed CT DICOM slices were parsed. Try synthetic demo or an uncompressed CT series.');
+  slices.sort((a,b)=>a.z-b.z || a.instance-b.instance); const rows=slices[0].rows, cols=slices[0].cols; const good=slices.filter(s=>s.rows===rows&&s.cols===cols); const depth=good.length; const data=new Int16Array(rows*cols*depth); good.forEach((s,k)=>data.set(s.hu,k*rows*cols)); const ps=good[0].ps.length>=2?good[0].ps:[1,1]; let dz=Math.abs((good[1]?.z??(good[0].z+good[0].thick))-good[0].z)||good[0].thick||1; const vol={cols,rows,depth,data,spacing:{x:ps[1]||1,y:ps[0]||1,z:dz},meta:{study:str(good[0].ds,'x0020000d',''),series:str(good[0].ds,'x0020000e',''),patient:str(good[0].ds,'x00100010','De-identified'),modality:str(good[0].ds,'x00080060','CT'),desc:str(good[0].ds,'x0008103e',''),count:depth,skipped}}; S[target]=vol; if(target==='ref'){initFromVolume(vol); S.mov=vol; randomError(false); log('Reference CT duplicated as simulated moving CBCT.')} else {randomError(false); log('External moving image set loaded; random daily offset generated.')} updateDatasetInfo(); log((target==='ref'?'Reference':'Moving')+' volume loaded: '+cols+'×'+rows+'×'+depth+'; skipped '+skipped); renderAll(); }
+function initFromVolume(v){S.x=Math.floor(v.cols/2);S.y=Math.floor(v.rows/2);S.z=Math.floor(v.depth/2); $('x').max=v.cols-1;$('y').max=v.rows-1;$('z').max=v.depth-1; $('x').value=S.x;$('y').value=S.y;$('z').value=S.z; updateDatasetInfo();}
+function makeDemo(){const cols=160,rows=160,depth=96,data=new Int16Array(cols*rows*depth); const cx=cols/2, cy=rows/2, cz=depth/2; for(let z=0;z<depth;z++){for(let y=0;y<rows;y++){for(let x=0;x<cols;x++){const dx=(x-cx)/58, dy=(y-cy)/50, dz=(z-cz)/34; let v=-900; const body=dx*dx+dy*dy+dz*dz<1; if(body) v=35+18*Math.sin(x*.08)+12*Math.cos(y*.06); const bone1=((x-cx+22)/10)**2+((y-cy)/15)**2+((z-cz)/28)**2<1; const bone2=((x-cx-22)/10)**2+((y-cy)/15)**2+((z-cz)/28)**2<1; const cord=((x-cx)/7)**2+((y-cy+28)/7)**2+((z-cz)/44)**2<1; const tumor=((x-cx-18)/13)**2+((y-cy+18)/10)**2+((z-cz-5)/9)**2<1; if(bone1||bone2) v=850; if(cord) v=60; if(tumor) v=115; data[z*rows*cols+y*cols+x]=v;}}} S.ref={cols,rows,depth,data,spacing:{x:1,y:1,z:2.5},meta:{patient:'Synthetic QA Phantom',modality:'CT',desc:'Teaching anatomy phantom',count:depth,skipped:0}}; S.mov=S.ref; S.usingSynthetic=true; initFromVolume(S.ref); randomError(false); log('Synthetic CT phantom loaded.'); renderAll();}
+function updateDatasetInfo(){const v=S.ref; if(!v){$('datasetInfo').innerHTML='<div class="kv"><span>Status</span><b>No volume loaded</b></div>'; return;} const m=v.meta; $('datasetInfo').innerHTML=`<div class="kv"><span>Patient</span><b>${m.patient||'—'}</b></div><div class="kv"><span>Modality</span><b>${m.modality}</b></div><div class="kv"><span>Series</span><b>${m.desc||'—'}</b></div><div class="kv"><span>Matrix</span><b>${v.cols} × ${v.rows} × ${v.depth}</b></div><div class="kv"><span>Spacing</span><b>${fmt(v.spacing.x)} / ${fmt(v.spacing.y)} / ${fmt(v.spacing.z)} mm</b></div><div class="kv"><span>Moving source</span><b>${S.mov===v?'Reference clone':'External/none'}</b></div><div class="kv"><span>Skipped</span><b>${m.skipped||0}</b></div>`}
+function hu(v,x,y,z){x=Math.round(x);y=Math.round(y);z=Math.round(z); if(!v||x<0||y<0||z<0||x>=v.cols||y>=v.rows||z>=v.depth) return -1024; return v.data[z*v.rows*v.cols+y*v.cols+x]}
+function ww(v){return clamp(Math.round((v-(S.lev-S.win/2))*255/S.win),0,255)}
+function drawSlice(kind){const c=canv[kind], g=ctx[kind]; const {w,h}=resizeCanvas(c); const img=g.createImageData(w,h); const v=S.ref; if(!v){g.fillStyle='#000';g.fillRect(0,0,w,h);return} let sw,sh,map; if(kind==='axial'){sw=v.cols;sh=v.rows;map=(i,j,vol,move=false)=>[i,j,S.z]} if(kind==='coronal'){sw=v.cols;sh=v.depth;map=(i,j)=>[i,S.y,v.depth-1-j]} if(kind==='sagittal'){sw=v.rows;sh=v.depth;map=(i,j)=>[S.x,i,v.depth-1-j]} const scale=Math.min(w/sw,h/sh), ox=(w-sw*scale)/2, oy=(h-sh*scale)/2; S.viewGeom[kind]={scale,ox,oy,sw,sh,w,h}; const a=S.alpha; for(let py=0;py<h;py++){for(let px=0;px<w;px++){const ix=(px-ox)/scale, iy=(py-oy)/scale; let r=0,b=0,gg=0; if(ix>=0&&iy>=0&&ix<sw&&iy<sh){const p=map(ix,iy); const base=ww(hu(v,p[0],p[1],p[2])); r=gg=b=base; const mv=S.mov||S.ref; let mp=p.slice(); // apply simulated moving offset then student correction; residual causes misregistration
+      const rx=(S.truth.dx-S.corr.dx)/(v.spacing.x||1), ry=(S.truth.dy-S.corr.dy)/(v.spacing.y||1), rz=(S.truth.dz-S.corr.dz)/(v.spacing.z||1); mp=[p[0]+rx,p[1]+ry,p[2]+rz];
+      const mval=ww(hu(mv,mp[0],mp[1],mp[2])); const check=((Math.floor(ix/24)+Math.floor(iy/24))%2)===0; const split=ix<sw/2; let use=S.mode==='blend'||(S.mode==='checker'&&check)||(S.mode==='split'&&split); if(use){r=Math.round(base*(1-a)+mval*a); gg=Math.round(base*(1-a)+mval*a*.75+20*a); b=Math.round(base*(1-a)+mval*a*.15);} }
+      const k=(py*w+px)*4; img.data[k]=r;img.data[k+1]=gg;img.data[k+2]=b;img.data[k+3]=255; }} g.putImageData(img,0,0); drawCross(g,w,h,kind,scale,ox,oy,sw,sh);}
+function drawCross(g,w,h,kind,scale,ox,oy,sw,sh){const v=S.ref; if(!v)return; let cx,cy; if(kind==='axial'){cx=ox+S.x*scale;cy=oy+S.y*scale;$('axMeta').textContent='Z '+S.z+' / '+(v.depth-1)} if(kind==='coronal'){cx=ox+S.x*scale;cy=oy+(v.depth-1-S.z)*scale;$('coMeta').textContent='Y '+S.y+' / '+(v.rows-1)} if(kind==='sagittal'){cx=ox+S.y*scale;cy=oy+(v.depth-1-S.z)*scale;$('saMeta').textContent='X '+S.x+' / '+(v.cols-1)} g.save();g.strokeStyle='rgba(52,214,198,.75)';g.lineWidth=1;g.beginPath();g.moveTo(cx,0);g.lineTo(cx,h);g.moveTo(0,cy);g.lineTo(w,cy);g.stroke();g.restore();}
+function drawMIP(){const c=canv.mip,g=ctx.mip,{w,h}=resizeCanvas(c),v=S.ref; g.fillStyle='#000';g.fillRect(0,0,w,h); if(!v)return; const img=g.createImageData(w,h), q=+S.quality, step=Math.max(1,7-q), ang=S.mipAngle*Math.PI/180, ca=Math.cos(ang), sa=Math.sin(ang); for(let py=0;py<h;py++){for(let px=0;px<w;px++){const nx=(px/w-.5)*v.cols*1.25, ny=(py/h-.5)*v.rows*1.25; let max=-1024; for(let z=0;z<v.depth;z+=step){const x=v.cols/2+nx*ca+(z-v.depth/2)*sa*.45, y=v.rows/2+ny, zz=v.depth/2-nx*sa*.05+(z-v.depth/2)*ca; const val=hu(v,x,y,zz); if(val>max) max=val;} const gv=ww(max); const k=(py*w+px)*4; img.data[k]=gv;img.data[k+1]=Math.min(255,gv+12);img.data[k+2]=Math.min(255,gv+24);img.data[k+3]=255;}} g.putImageData(img,0,0); $('mipMeta').textContent=`angle ${S.mipAngle}° · step ${step}`}
+function renderAll(){['axial','coronal','sagittal'].forEach(drawSlice); drawMIP(); updateLabels(); score();}
+function updateLabels(){
+  ['x','y','z','win','lev'].forEach(id=>{const el=$(id), lab=$(id+'V'); if(lab) lab.textContent=id.length===1?el.value:fmt(el.value, id==='win'||id==='lev'?0:1)});
+  ['dx','dy','dz'].forEach(id=>{const lab=$(id+'V'); if(lab) lab.textContent=fmt(S.corr[id],1)+' mm'});
+  ['roll','pitch','yaw'].forEach(id=>{const lab=$(id+'V'); if(lab) lab.textContent=fmt(S.corr[id],1)+'°'});
+  $('alphaV').textContent=Math.round(S.alpha*100)+'%'; $('qV').textContent=S.quality; $('angV').textContent=S.mipAngle+'°';
+}
+function score(){const e={dx:S.truth.dx-S.corr.dx,dy:S.truth.dy-S.corr.dy,dz:S.truth.dz-S.corr.dz,roll:S.truth.roll-S.corr.roll,pitch:S.truth.pitch-S.corr.pitch,yaw:S.truth.yaw-S.corr.yaw}; const maxT=Math.max(Math.abs(e.dx),Math.abs(e.dy),Math.abs(e.dz)); const maxR=Math.max(Math.abs(e.roll),Math.abs(e.pitch),Math.abs(e.yaw)); const ok=maxT<=2&&maxR<=1; const pct=clamp(100-(maxT/18*70+maxR/5*30),0,100); $('scoreBig').textContent=S.ref?Math.round(pct)+'%':'—'; $('scoreBig').className='scorebig '+(ok?'ok':'bad'); $('scoreTxt').textContent=S.ref?(ok?'Within teaching tolerance. Ready for approval.':'Keep aligning anatomy; residual remains outside tolerance.'):'Load a volume to begin.'; $('residTxt').textContent=S.ref?`${fmt(maxT)} mm / ${fmt(maxR)}°`:'—'; $('wfTxt').textContent=S.approved?'approved':(ok?'ready to approve':'alignment pending'); $('truthTxt').textContent=S.ref?(S.approved?`LAT ${fmt(S.truth.dx)} · VRT ${fmt(S.truth.dy)} · LNG ${fmt(S.truth.dz)} mm`:'hidden for student mode'):'hidden'; [['pLat',Math.abs(e.dx)<=2],['pVrt',Math.abs(e.dy)<=2],['pLng',Math.abs(e.dz)<=2],['pRot',maxR<=1]].forEach(([id,good])=>{$(id).className='pill '+(good?'ok':'bad')});}
+function randomError(doLog=true){S.truth={dx:rand(-12,12),dy:rand(-10,10),dz:rand(-14,14),roll:rand(-1.5,1.5),pitch:rand(-1.2,1.2),yaw:rand(-1.5,1.5)}; S.corr={dx:0,dy:0,dz:0,roll:0,pitch:0,yaw:0}; S.approved=false; if(doLog)log('New hidden setup error generated for moving CBCT clone.'); renderAll();}
+function rand(a,b){return Math.round((a+Math.random()*(b-a))*10)/10}
+function setPreset(p){const map={soft:[400,40],bone:[1800,400],lung:[1500,-600],brain:[80,40]}; [S.win,S.lev]=map[p]||map.soft; $('win').value=S.win;$('lev').value=S.lev; renderAll();}
+['x','y','z'].forEach(id=>$(id).addEventListener('input',e=>{S[id]=+e.target.value;renderAll()}));
+['win','lev'].forEach(id=>$(id).addEventListener('input',e=>{S[id]=+e.target.value;renderAll()}));
+$('alpha').addEventListener('input',e=>{S.alpha=+e.target.value/100;renderAll()}); $('quality').addEventListener('input',e=>{S.quality=+e.target.value;renderAll()}); $('ang').addEventListener('input',e=>{S.mipAngle=+e.target.value;renderAll()}); $('colorMode').addEventListener('change',e=>{S.mode=e.target.value;renderAll()}); $('preset').addEventListener('change',e=>setPreset(e.target.value));
+function setCorr(axis,value){const lim=axis==='dx'||axis==='dy'||axis==='dz'?30:5; S.corr[axis]=clamp(Math.round(value*10)/10,-lim,lim); S.approved=false;}
+function nudge(axis,delta){setCorr(axis,(S.corr[axis]||0)+delta); renderAll();}
+document.querySelectorAll('[data-nudge]').forEach(btn=>btn.addEventListener('click',()=>{const [axis,delta]=btn.dataset.nudge.split(':'); nudge(axis,+delta);}));
+$('resetShift').onclick=()=>{S.corr={dx:0,dy:0,dz:0,roll:0,pitch:0,yaw:0}; log('Student correction reset.'); renderAll()};
+$('autoMatch').onclick=()=>{S.corr={...S.truth}; log('Auto-match applied proposed correction.'); renderAll()}; $('randomErr').onclick=()=>randomError(true); $('demoBtn').onclick=makeDemo; $('zipBtn').onclick=()=>$('zipInput').click();
+$('copyRefBtn').onclick=()=>{if(!S.ref){alert('Load a reference CT first.');return;} S.mov=S.ref; randomError(true); log('Reference CT copied to moving CBCT role.'); updateDatasetInfo(); renderAll();};
+$('reseedBtn').onclick=()=>randomError(true);
+$('mouseShift').onchange=e=>{S.mouseShift=e.target.checked; log('Mouse image shifting '+(S.mouseShift?'enabled':'disabled')+'.')};
+function canvasDragAxes(kind){
+  if(kind==='axial') return ['dx','dy',1,1];
+  if(kind==='coronal') return ['dx','dz',1,-1];
+  if(kind==='sagittal') return ['dy','dz',1,-1];
+  return null;
+}
+function startDrag(kind,e){if(!S.ref||!S.mouseShift)return; const geom=S.viewGeom[kind]; if(!geom)return; S.drag={kind,x:e.clientX,y:e.clientY,corr:{...S.corr}}; canv[kind].parentElement.classList.add('dragging'); e.preventDefault();}
+function moveDrag(e){if(!S.drag||!S.ref)return; const geom=S.viewGeom[S.drag.kind]; const ax=canvasDragAxes(S.drag.kind); if(!geom||!ax)return; const dxPix=(e.clientX-S.drag.x)*(devicePixelRatio||1), dyPix=(e.clientY-S.drag.y)*(devicePixelRatio||1); const mmX=dxPix/geom.scale, mmY=dyPix/geom.scale; const [a1,a2,s1,s2]=ax; const sp=S.ref.spacing; const mmPerIndex={dx:sp.x||1,dy:sp.y||1,dz:sp.z||1}; setCorr(a1,S.drag.corr[a1]+s1*mmX*mmPerIndex[a1]); setCorr(a2,S.drag.corr[a2]+s2*mmY*mmPerIndex[a2]); renderAll(); e.preventDefault();}
+function endDrag(){if(!S.drag)return; const k=S.drag.kind; S.drag=null; canv[k]?.parentElement.classList.remove('dragging'); log('Mouse drag updated image shift: LAT '+fmt(S.corr.dx)+' / VRT '+fmt(S.corr.dy)+' / LNG '+fmt(S.corr.dz)+' mm.');}
+['axial','coronal','sagittal'].forEach(kind=>{canv[kind].addEventListener('pointerdown',e=>startDrag(kind,e)); canv[kind].addEventListener('wheel',e=>{if(!S.ref)return; e.preventDefault(); const step=e.deltaY>0?1:-1; if(kind==='axial') S.z=clamp(S.z+step,0,S.ref.depth-1); if(kind==='coronal') S.y=clamp(S.y+step,0,S.ref.rows-1); if(kind==='sagittal') S.x=clamp(S.x+step,0,S.ref.cols-1); $('x').value=S.x;$('y').value=S.y;$('z').value=S.z; renderAll();},{passive:false});});
+window.addEventListener('pointermove',moveDrag); window.addEventListener('pointerup',endDrag);
+$('approveBtn').onclick=()=>{const txt=$('residTxt').textContent; S.approved=true; log('<b style="color:#2fd27a">Alignment approved</b> · residual '+txt+' · shifts exported to LINAC/OIS.'); score()}; $('rejectBtn').onclick=()=>{S.approved=false; log('<b style="color:#ff5747">Re-image / physician review selected</b>.'); score()};
+$('refFiles').onchange=e=>loadSeries(e.target.files,'ref').catch(err=>alert(err.message)); $('movFiles').onchange=e=>loadSeries(e.target.files,'mov').catch(err=>alert(err.message)); $('zipInput').onchange=async e=>{if(!e.target.files[0])return; try{const files=await filesFromZip(e.target.files[0]); await loadSeries(files,'ref')}catch(err){alert(err.message)}};
+function wireDrop(id,target){const el=$(id); ['dragenter','dragover'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();el.classList.add('drag')})); ['dragleave','drop'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();el.classList.remove('drag')})); el.addEventListener('drop',async e=>{const files=[...e.dataTransfer.files]; if(files[0]&&files[0].name.toLowerCase().endsWith('.zip')){loadSeries(await filesFromZip(files[0]),target).catch(err=>alert(err.message))} else loadSeries(files,target).catch(err=>alert(err.message));});}
+wireDrop('dropRef','ref'); wireDrop('dropMov','mov'); window.addEventListener('resize',renderAll); makeDemo();
+</script>
+
+<style id="rtaModuleBridgeStyle">
+#rtaHubRibbon{position:fixed;right:8px;top:8px;z-index:2147483647;display:none;max-width:330px;
+background:rgba(7,13,21,.94);color:#dce7f4;border:1px solid rgba(52,214,198,.45);border-radius:9px;
+padding:6px 9px;box-shadow:0 8px 24px rgba(0,0,0,.35);font:10px ui-monospace,Consolas,monospace;
+pointer-events:none;line-height:1.35}
+#rtaHubRibbon b{color:#34d6c6}#rtaHubRibbon span{color:#8fa3bb}
+</style>
+<div id="rtaHubRibbon"></div>
+<script id="rtaModuleBridge">
+(function(){
+  const MODULE_KEY="dicom-alignment-lab";
+  window.RadTherapyBridge={
+    context:null,
+    emit(event,detail){ parent.postMessage({type:'RTA_MODULE_EVENT',module:MODULE_KEY,event,detail:detail||{}},'*'); }
+  };
+  function showContext(ctx){
+    window.RadTherapyBridge.context=ctx;
+    const p=ctx&&ctx.patient, el=document.getElementById('rtaHubRibbon');
+    if(!el) return;
+    if(!p){el.style.display='none';return;}
+    el.style.display='block';
+    el.innerHTML='<b>SIMULATED CENTER</b><br>'+String(p.name||'Patient')+
+      ' <span>· MRN '+String(p.mrn||p.id||'—')+' · '+String(p.site||'')+'</span>';
+    window.dispatchEvent(new CustomEvent('rta:context',{detail:ctx}));
+  }
+  window.addEventListener('message',ev=>{
+    const d=ev.data||{};
+    if(d.type==='RTA_CONTEXT') showContext(d.context||{});
+  });
+  parent.postMessage({type:'RTA_MODULE_READY',module:MODULE_KEY},'*');
+  parent.postMessage({type:'RTA_REQUEST_CONTEXT',module:MODULE_KEY},'*');
+  
+  window.addEventListener('rta:context',ev=>{
+    const p=(ev.detail||{}).patient; if(!p) return;
+    const t=document.querySelector('.head .title');
+    if(t) t.textContent='DICOM MPR Alignment Lab — '+String(p.name||'Patient');
+    if(typeof log==='function') log('Center context loaded: <b>'+String(p.name||'patient')+'</b> · '+String(p.site||''));
+  });
+  const ap=document.getElementById('approveBtn');
+  if(ap) ap.addEventListener('click',()=>setTimeout(()=>window.RadTherapyBridge.emit('igrt-approved',{}),0));
+
+})();
+</script>
+
+</body>
+</html>
